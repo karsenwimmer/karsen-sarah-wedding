@@ -78,7 +78,7 @@ export function UpdatesSection() {
     <section className="section section--quiet" id="updates" aria-labelledby="updates-title">
       <div className="section__inner section__inner--narrow">
         <p className="eyebrow">Updates</p>
-        <h2 id="updates-title">As the Celebration Approaches</h2>
+        <h2 className="sr-only" id="updates-title">Updates</h2>
         <p>More details will be shared here as our celebration approaches.</p>
       </div>
     </section>
