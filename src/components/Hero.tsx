@@ -27,11 +27,8 @@ export function Hero() {
           <p>{weddingConfig.venue.receptionLocation}</p>
         </div>
         <p className="hero__note">Formal invitation to follow. RSVP details will come later.</p>
-        <a className="button button--primary" href="#save-the-date">
-          Save the Date
-        </a>
         <div className="calendar-actions" aria-label="Add this save the date to your calendar">
-          <span className="calendar-actions__label">Add to calendar</span>
+          <span className="calendar-actions__label">Save the date</span>
           <div className="calendar-actions__links">
             <a href={createGoogleCalendarUrl()} target="_blank" rel="noreferrer">
               Google
@@ -44,6 +41,9 @@ export function Hero() {
             </a>
           </div>
         </div>
+        <a className="button button--primary" href="#save-the-date">
+          Enter contact details
+        </a>
       </div>
     </section>
   );
