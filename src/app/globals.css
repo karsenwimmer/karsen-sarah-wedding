@@ -257,6 +257,57 @@ a {
   font-style: italic;
 }
 
+.calendar-actions {
+  display: grid;
+  justify-items: center;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.calendar-actions__label {
+  color: rgb(32 32 30 / 0.56);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.calendar-actions__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.42rem;
+}
+
+.calendar-actions__links a {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(178 154 104 / 0.48);
+  border-radius: 999px;
+  padding: 0.62rem 0.9rem;
+  color: var(--botanical);
+  background: rgb(255 253 247 / 0.42);
+  backdrop-filter: blur(3px);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.calendar-actions__links a:hover {
+  transform: translateY(-1px);
+  border-color: rgb(178 154 104 / 0.78);
+  color: var(--ink);
+  background: rgb(255 253 247 / 0.68);
+}
+
 .button {
   min-height: 48px;
   display: inline-flex;

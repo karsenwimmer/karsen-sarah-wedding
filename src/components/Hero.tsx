@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Countdown } from "@/components/Countdown";
 import { SealMark } from "@/components/SealMark";
 import { weddingConfig } from "@/config/wedding";
+import { createGoogleCalendarUrl, createOutlookCalendarUrl } from "@/lib/calendar";
 
 export function Hero() {
   return (
@@ -26,6 +27,20 @@ export function Hero() {
           <p>{weddingConfig.venue.receptionLocation}</p>
         </div>
         <p className="hero__note">Formal invitation to follow. RSVP details will come later.</p>
+        <div className="calendar-actions" aria-label="Add this save the date to your calendar">
+          <span className="calendar-actions__label">Add to calendar</span>
+          <div className="calendar-actions__links">
+            <a href={createGoogleCalendarUrl()} target="_blank" rel="noreferrer">
+              Google
+            </a>
+            <a href={createOutlookCalendarUrl()} target="_blank" rel="noreferrer">
+              Outlook
+            </a>
+            <a href="/save-the-date.ics" download>
+              Apple / ICS
+            </a>
+          </div>
+        </div>
         <a className="button button--primary" href="#save-the-date">
           Save the Date
         </a>
