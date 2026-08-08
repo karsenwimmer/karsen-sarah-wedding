@@ -27,6 +27,9 @@ export function Hero() {
           <p>{weddingConfig.venue.receptionLocation}</p>
         </div>
         <p className="hero__note">Formal invitation to follow. RSVP details will come later.</p>
+        <a className="button button--primary" href="#save-the-date">
+          Save the Date
+        </a>
         <div className="calendar-actions" aria-label="Add this save the date to your calendar">
           <span className="calendar-actions__label">Add to calendar</span>
           <div className="calendar-actions__links">
@@ -36,14 +39,11 @@ export function Hero() {
             <a href={createOutlookCalendarUrl()} target="_blank" rel="noreferrer">
               Outlook
             </a>
-            <a href="/save-the-date.ics" download>
-              Apple / ICS
+            <a href="/save-the-date.ics" download title="Downloads a calendar file for Apple Calendar">
+              Apple
             </a>
           </div>
         </div>
-        <a className="button button--primary" href="#save-the-date">
-          Save the Date
-        </a>
       </div>
     </section>
   );

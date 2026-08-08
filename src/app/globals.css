@@ -260,8 +260,8 @@ a {
 .calendar-actions {
   display: grid;
   justify-items: center;
-  gap: 0.65rem;
-  margin-top: 1rem;
+  gap: 0.58rem;
+  margin-top: 1.05rem;
 }
 
 .calendar-actions__label {
@@ -289,11 +289,12 @@ a {
   color: var(--botanical);
   background: rgb(255 253 247 / 0.42);
   backdrop-filter: blur(3px);
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: 0;
   line-height: 1;
-  text-transform: uppercase;
+  text-transform: none;
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -317,11 +318,11 @@ a {
   border: 1px solid var(--gold);
   border-radius: 999px;
   padding: 0.9rem 1.35rem;
-  font: inherit;
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.02rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
   transition:
     transform 180ms ease,
     background-color 180ms ease,
