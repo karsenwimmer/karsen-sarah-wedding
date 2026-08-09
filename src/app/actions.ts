@@ -68,8 +68,8 @@ export async function submitMailingInformation(
       status: "success",
       message:
         result.status === "updated"
-          ? "Your household information has been updated. We look forward to celebrating with you on July 17, 2027."
-          : "Thank you. Your household information has been received. We look forward to celebrating with you on July 17, 2027.",
+          ? "Thank you. Your mailing details have been updated. Official invitations will be sent at a later date."
+          : "Thank you. Your mailing details have been received. Official invitations will be sent at a later date.",
       fieldErrors: {}
     };
   } catch (error) {

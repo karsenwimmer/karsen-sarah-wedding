@@ -4,7 +4,6 @@ import { parseHouseholdFormData } from "@/lib/household-schema";
 function baseFormData(overrides: Record<string, string | undefined> = {}) {
   const formData = new FormData();
   const values: Record<string, string> = {
-    householdName: "The Wimmer Household",
     primaryFirstName: "Karsen",
     primaryLastName: "Wimmer",
     primaryEmail: "  KARSEN@example.COM ",
@@ -42,6 +41,7 @@ describe("household form parsing", () => {
     if (parsed.success) {
       expect(parsed.data.primaryEmail).toBe("karsen@example.com");
       expect(parsed.data.normalizedEmail).toBe("karsen@example.com");
+      expect(parsed.data.householdName).toBe("Karsen Wimmer");
       expect(parsed.data.postalZip).toBe("L6J 1A1");
       expect(parsed.data.members).toEqual([
         { firstName: "Karsen", lastName: "Wimmer" },

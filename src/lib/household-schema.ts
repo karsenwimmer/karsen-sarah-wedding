@@ -23,7 +23,7 @@ const memberSchema = z.object({
 });
 
 export const householdSubmissionSchema = z.object({
-  householdName: requiredText("Household or family name", 140),
+  householdName: requiredText("Household name", 140),
   primaryFirstName: requiredText("Primary contact first name", 80),
   primaryLastName: requiredText("Primary contact last name", 80),
   primaryEmail: z
@@ -104,10 +104,12 @@ function readMembers(formData: FormData): HouseholdMemberInput[] {
 
 export function parseHouseholdFormData(formData: FormData) {
   const country = readString(formData, "country") || "Canada";
+  const primaryFirstName = readString(formData, "primaryFirstName");
+  const primaryLastName = readString(formData, "primaryLastName");
   const raw = {
-    householdName: readString(formData, "householdName"),
-    primaryFirstName: readString(formData, "primaryFirstName"),
-    primaryLastName: readString(formData, "primaryLastName"),
+    householdName: `${primaryFirstName} ${primaryLastName}`.trim(),
+    primaryFirstName,
+    primaryLastName,
     primaryEmail: readString(formData, "primaryEmail"),
     primaryPhone: readString(formData, "primaryPhone"),
     streetAddress: readString(formData, "streetAddress"),

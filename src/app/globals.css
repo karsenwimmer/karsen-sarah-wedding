@@ -527,6 +527,21 @@ a {
   align-items: start;
 }
 
+.section__inner--split:has(.mailing-form--complete) {
+  align-items: center;
+}
+
+.section__inner--split:has(.mailing-form--complete) .mailing-copy {
+  position: static;
+  min-height: 0;
+  align-content: center;
+  padding-block: 0;
+}
+
+.section__inner--split:has(.mailing-form--complete) .mailing-preview {
+  align-self: center;
+}
+
 .section__inner--narrow {
   width: min(760px, 100%);
   text-align: center;
@@ -788,7 +803,7 @@ a {
   min-height: 44px;
   margin-top: 0;
   padding: 0.72rem 1rem;
-  font-size: 0.68rem;
+  font-size: 0.9rem;
 }
 
 .consent-field {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { submitMailingInformation } from "@/app/actions";
 import { MAX_HOUSEHOLD_MEMBERS } from "@/lib/household-schema";
 import { initialMailingFormState } from "@/lib/mailing-form-state";
@@ -113,12 +113,6 @@ export function MailingForm() {
   }, [state.status, state.message]);
 
   const canAddMember = memberRows.length < MAX_HOUSEHOLD_MEMBERS - 1;
-  const memberHelp = useMemo(
-    () =>
-      `${memberRows.length + 1} of ${MAX_HOUSEHOLD_MEMBERS} household members listed, including the primary contact.`,
-    [memberRows.length]
-  );
-
   function addMember() {
     setMemberRows((rows) => {
       if (rows.length >= MAX_HOUSEHOLD_MEMBERS - 1) {
@@ -187,16 +181,8 @@ export function MailingForm() {
       </div>
 
       <fieldset>
-        <legend>Household Information</legend>
+        <legend>Primary Contact</legend>
         <div className="form-grid">
-          <TextField
-            error={state.fieldErrors.householdName}
-            label="Household or family name"
-            maxLength={140}
-            name="householdName"
-            placeholder="The Wimmer Household"
-            required
-          />
           <TextField
             autoComplete="given-name"
             error={state.fieldErrors.primaryFirstName}
@@ -237,9 +223,6 @@ export function MailingForm() {
         <legend>Household Members</legend>
         <p className="form-help">
           The primary contact is included automatically. This helps us address the invitation; it is not an RSVP or attendance confirmation.
-        </p>
-        <p className="form-help" aria-live="polite">
-          {memberHelp}
         </p>
         <input name="memberCount" type="hidden" value={memberRows.length} readOnly />
         <FieldError message={state.fieldErrors.members} />
