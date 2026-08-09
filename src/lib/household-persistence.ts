@@ -21,6 +21,11 @@ export type HouseholdRepository = {
     status: ConfirmationEmailStatus,
     errorMessage?: string | null
   ): Promise<void>;
+  updateCoupleNotificationStatus(
+    householdId: string,
+    status: ConfirmationEmailStatus,
+    errorMessage?: string | null
+  ): Promise<void>;
   logSubmissionEvent(
     householdId: string,
     eventType: "household_created" | "household_updated",

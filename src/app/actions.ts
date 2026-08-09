@@ -6,6 +6,7 @@ import type { MailingFormState } from "@/lib/mailing-form-state";
 import { checkSubmissionRateLimit } from "@/lib/submission-rate-limit";
 import { createSupabaseHouseholdRepository } from "@/lib/supabase-households";
 import { sendHouseholdConfirmationEmail } from "@/lib/confirmation-email";
+import { sendCoupleNotificationEmail } from "@/lib/couple-notification-email";
 
 export async function submitMailingInformation(
   _previousState: MailingFormState,
@@ -43,6 +44,7 @@ export async function submitMailingInformation(
     const repository = createSupabaseHouseholdRepository();
     const result = await persistHouseholdSubmission(parsed.data, repository);
     const confirmationEmail = await sendHouseholdConfirmationEmail(parsed.data);
+    const coupleNotificationEmail = await sendCoupleNotificationEmail(parsed.data, result.status);
 
     if (confirmationEmail.status !== "sent") {
       console.warn("Confirmation email was not sent.", {
@@ -51,11 +53,23 @@ export async function submitMailingInformation(
       });
     }
 
+    if (coupleNotificationEmail.status !== "sent") {
+      console.warn("Couple notification email was not sent.", {
+        status: coupleNotificationEmail.status,
+        errorMessage: coupleNotificationEmail.errorMessage
+      });
+    }
+
     try {
       await repository.updateConfirmationEmailStatus(
         result.householdId,
         confirmationEmail.status,
         confirmationEmail.errorMessage
+      );
+      await repository.updateCoupleNotificationStatus(
+        result.householdId,
+        coupleNotificationEmail.status,
+        coupleNotificationEmail.errorMessage
       );
     } catch (error) {
       console.warn("Could not update confirmation email status.", {

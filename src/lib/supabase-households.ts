@@ -118,6 +118,18 @@ export function createSupabaseHouseholdRepository(): HouseholdRepository {
       throwIfSupabaseError(error);
     },
 
+    async updateCoupleNotificationStatus(householdId, status, errorMessage) {
+      const { error } = await supabase
+        .from("households")
+        .update({
+          couple_notification_status: status,
+          last_email_error: toEmailErrorValue(status, errorMessage)
+        })
+        .eq("id", householdId);
+
+      throwIfSupabaseError(error);
+    },
+
     async logSubmissionEvent(householdId, eventType, metadata) {
       const { error } = await supabase.from("submission_events").insert({
         household_id: householdId,

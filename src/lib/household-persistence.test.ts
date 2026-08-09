@@ -53,6 +53,9 @@ function createRepository(existingId?: string) {
     async updateConfirmationEmailStatus(householdId, status) {
       calls.push(`email:${householdId}:${status}`);
     },
+    async updateCoupleNotificationStatus(householdId, status) {
+      calls.push(`couple:${householdId}:${status}`);
+    },
     async logSubmissionEvent(householdId, eventType, metadata) {
       calls.push(`${eventType}:${householdId}:${metadata?.member_count}`);
     }

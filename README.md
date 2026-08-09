@@ -8,7 +8,7 @@ Sending domain: wedding@thewimmers.ca
 
 ## Current Scope
 
-This repository currently contains Milestones 1, 2, and the first part of Milestone 3:
+This repository currently contains the save-the-date, mailing form, email notifications, and first private admin dashboard:
 
 - Next.js App Router with TypeScript
 - Tailwind CSS design tokens
@@ -20,11 +20,13 @@ This repository currently contains Milestones 1, 2, and the first part of Milest
 - Household mailing-information form
 - Supabase SQL migration for household storage, household members, submission events, and future RSVP fields
 - Server-side form validation, rate limiting, create/update persistence, and no anonymous Supabase table access
+- Resend guest confirmation emails and couple notification emails
+- Password-protected private admin dashboard at `/admin`
 - Static Updates and FAQ sections
 - Noindex metadata and `robots.txt`
 - Vercel redirect config for `www.thewimmers.ca` to `thewimmers.ca`
 
-Resend, RSVP flows, RSVP emails, and the private admin dashboard are intentionally not implemented yet.
+RSVP flows, RSVP emails, invitation tokens, and dashboard editing controls are intentionally not implemented yet.
 
 ## Local Setup
 
@@ -49,8 +51,12 @@ http://localhost:3000
 Copy `.env.example` to `.env.local` and fill in the Supabase values before testing real submissions:
 
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=...
+SUPABASE_URL=...
 SUPABASE_SERVICE_ROLE_KEY=...
+RESEND_API_KEY=...
+RESEND_FROM_EMAIL=wedding@thewimmers.ca
+COUPLE_NOTIFICATION_EMAIL=...
+ADMIN_DASHBOARD_PASSWORD=...
 ```
 
 Apply the Supabase migration in:
@@ -84,8 +90,6 @@ karsenwimmer/karsen-sarah-wedding
 
 The custom domain `thewimmers.ca` should be attached to that Vercel project. `www.thewimmers.ca` is configured to permanently redirect to `https://thewimmers.ca`.
 
-Milestone 4 will add Resend guest confirmations and couple notifications from `wedding@thewimmers.ca`.
-
-Milestone 5 will add Supabase Auth and the private admin dashboard.
+Guest confirmations and couple notifications send from `wedding@thewimmers.ca` through Resend. The admin dashboard uses `ADMIN_DASHBOARD_PASSWORD` and a secure HTTP-only cookie.
 
 Formal RSVP links, RSVP token handling, RSVP short codes, invitation QR codes, meal selections, and admin RSVP controls remain future work.

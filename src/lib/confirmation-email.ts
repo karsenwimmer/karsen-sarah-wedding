@@ -1,38 +1,13 @@
-import { weddingConfig } from "@/config/wedding";
 import type { HouseholdSubmission } from "@/lib/household-schema";
-import type { ConfirmationEmailStatus } from "@/lib/household-persistence";
+import {
+  escapeHtml,
+  sendEmail,
+  siteUrl,
+  type EmailContent,
+  type SendEmailResult
+} from "@/lib/email-delivery";
 
-const RESEND_EMAIL_ENDPOINT = "https://api.resend.com/emails";
-
-type ConfirmationEmailContent = {
-  html: string;
-  subject: string;
-  text: string;
-};
-
-export type SendConfirmationEmailResult = {
-  status: ConfirmationEmailStatus;
-  errorMessage?: string;
-};
-
-function escapeHtml(value: string) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function formatFromAddress(value: string) {
-  return value.includes("<") ? value : `${weddingConfig.couple.displayName} <${value}>`;
-}
-
-function siteUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? weddingConfig.links.websiteUrl;
-}
-
-export function buildConfirmationEmail(input: HouseholdSubmission): ConfirmationEmailContent {
+export function buildConfirmationEmail(input: HouseholdSubmission): EmailContent {
   const escapedFirstName = escapeHtml(input.primaryFirstName);
   const escapedSiteUrl = escapeHtml(siteUrl());
   const subject = "We received your wedding mailing details";
@@ -93,56 +68,12 @@ ${siteUrl()}`;
   return { html, subject, text };
 }
 
-async function readResendError(response: Response) {
-  try {
-    const body = (await response.json()) as { message?: string; error?: string };
-    return body.message ?? body.error ?? response.statusText;
-  } catch {
-    return response.statusText;
-  }
-}
-
 export async function sendHouseholdConfirmationEmail(
   input: HouseholdSubmission
-): Promise<SendConfirmationEmailResult> {
-  const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.RESEND_FROM_EMAIL;
-
-  if (!apiKey || !fromEmail) {
-    return { status: "not_configured" };
-  }
-
+): Promise<SendEmailResult> {
   const email = buildConfirmationEmail(input);
-
-  try {
-    const response = await fetch(RESEND_EMAIL_ENDPOINT, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        from: formatFromAddress(fromEmail),
-        to: input.primaryEmail,
-        reply_to: process.env.RESEND_REPLY_TO ?? fromEmail,
-        subject: email.subject,
-        html: email.html,
-        text: email.text
-      })
-    });
-
-    if (!response.ok) {
-      return {
-        status: "failed",
-        errorMessage: await readResendError(response)
-      };
-    }
-
-    return { status: "sent" };
-  } catch (error) {
-    return {
-      status: "failed",
-      errorMessage: error instanceof Error ? error.message : "Unknown email delivery error"
-    };
-  }
+  return sendEmail({
+    ...email,
+    to: input.primaryEmail
+  });
 }
