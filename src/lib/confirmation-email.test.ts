@@ -26,6 +26,10 @@ function submission(overrides: Partial<HouseholdSubmission> = {}): HouseholdSubm
       {
         firstName: "Karsen",
         lastName: "Wimmer"
+      },
+      {
+        firstName: "Sarah",
+        lastName: "Wimmer"
       }
     ],
     honeypot: "",
@@ -48,8 +52,13 @@ describe("confirmation email", () => {
     expect(email.subject).toBe("We received your wedding mailing details");
     expect(email.text).toContain("Hi Karsen");
     expect(email.text).toContain("This is not an RSVP.");
+    expect(email.text).toContain("Primary contact: Karsen Wimmer");
+    expect(email.text).toContain("Sarah Wimmer");
+    expect(email.text).toContain("123 Lakeshore Road");
+    expect(email.text).toContain("The newest submission will be kept.");
     expect(email.text).toContain("https://thewimmers.ca");
     expect(email.html).toContain("Thank you, Karsen");
+    expect(email.html).toContain("Details submitted");
     expect(email.html).toContain("Visit the wedding website");
   });
 
