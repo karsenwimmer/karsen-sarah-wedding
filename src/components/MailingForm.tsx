@@ -142,6 +142,22 @@ export function MailingForm() {
     }
   }
 
+  if (state.status === "success") {
+    return (
+      <div className="mailing-form mailing-form--complete">
+        <div
+          className="form-status form-status--success form-status--complete"
+          ref={statusRef}
+          tabIndex={-1}
+          role="status"
+          aria-live="polite"
+        >
+          {state.message}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <form
       className="mailing-form"

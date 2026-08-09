@@ -20,6 +20,20 @@ export function SiteHeader() {
           </a>
         ))}
       </nav>
+      <details className="site-header__menu">
+        <summary aria-label="Open navigation menu">
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
+        </summary>
+        <nav aria-label="Mobile navigation">
+          {navItems.map(([label, href]) => (
+            <a href={href} key={href}>
+              {label}
+            </a>
+          ))}
+        </nav>
+      </details>
     </header>
   );
 }

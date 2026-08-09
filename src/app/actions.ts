@@ -44,13 +44,23 @@ export async function submitMailingInformation(
     const result = await persistHouseholdSubmission(parsed.data, repository);
     const confirmationEmail = await sendHouseholdConfirmationEmail(parsed.data);
 
+    if (confirmationEmail.status !== "sent") {
+      console.warn("Confirmation email was not sent.", {
+        status: confirmationEmail.status,
+        errorMessage: confirmationEmail.errorMessage
+      });
+    }
+
     try {
       await repository.updateConfirmationEmailStatus(
         result.householdId,
         confirmationEmail.status,
         confirmationEmail.errorMessage
       );
-    } catch {
+    } catch (error) {
+      console.warn("Could not update confirmation email status.", {
+        errorMessage: error instanceof Error ? error.message : "Unknown status update error"
+      });
       // The household details are already saved, so a status audit hiccup should not block guests.
     }
 
@@ -58,8 +68,8 @@ export async function submitMailingInformation(
       status: "success",
       message:
         result.status === "updated"
-          ? "Your household information has been updated."
-          : "Thank you. Your household information has been received. We look forward to celebrating with you on 07 - 17 - 27.",
+          ? "Your household information has been updated. We look forward to celebrating with you on July 17, 2027."
+          : "Thank you. Your household information has been received. We look forward to celebrating with you on July 17, 2027.",
       fieldErrors: {}
     };
   } catch (error) {
