@@ -50,6 +50,9 @@ function createRepository(existingId?: string) {
     async replaceMembers(householdId) {
       calls.push(`replace:${householdId}`);
     },
+    async updateConfirmationEmailStatus(householdId, status) {
+      calls.push(`email:${householdId}:${status}`);
+    },
     async logSubmissionEvent(householdId, eventType, metadata) {
       calls.push(`${eventType}:${householdId}:${metadata?.member_count}`);
     }

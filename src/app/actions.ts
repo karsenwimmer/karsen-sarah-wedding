@@ -5,6 +5,7 @@ import { persistHouseholdSubmission } from "@/lib/household-persistence";
 import type { MailingFormState } from "@/lib/mailing-form-state";
 import { checkSubmissionRateLimit } from "@/lib/submission-rate-limit";
 import { createSupabaseHouseholdRepository } from "@/lib/supabase-households";
+import { sendHouseholdConfirmationEmail } from "@/lib/confirmation-email";
 
 export async function submitMailingInformation(
   _previousState: MailingFormState,
@@ -39,10 +40,19 @@ export async function submitMailingInformation(
   }
 
   try {
-    const result = await persistHouseholdSubmission(
-      parsed.data,
-      createSupabaseHouseholdRepository()
-    );
+    const repository = createSupabaseHouseholdRepository();
+    const result = await persistHouseholdSubmission(parsed.data, repository);
+    const confirmationEmail = await sendHouseholdConfirmationEmail(parsed.data);
+
+    try {
+      await repository.updateConfirmationEmailStatus(
+        result.householdId,
+        confirmationEmail.status,
+        confirmationEmail.errorMessage
+      );
+    } catch {
+      // The household details are already saved, so a status audit hiccup should not block guests.
+    }
 
     return {
       status: "success",

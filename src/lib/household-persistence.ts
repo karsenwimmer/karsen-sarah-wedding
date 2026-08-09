@@ -9,11 +9,18 @@ export type HouseholdSaveResult = {
   status: "created" | "updated";
 };
 
+export type ConfirmationEmailStatus = "sent" | "failed" | "not_configured";
+
 export type HouseholdRepository = {
   findByNormalizedEmail(normalizedEmail: string): Promise<HouseholdRecord | null>;
   createHousehold(input: HouseholdSubmission): Promise<HouseholdRecord>;
   updateHousehold(id: string, input: HouseholdSubmission): Promise<HouseholdRecord>;
   replaceMembers(householdId: string, members: HouseholdMemberInput[]): Promise<void>;
+  updateConfirmationEmailStatus(
+    householdId: string,
+    status: ConfirmationEmailStatus,
+    errorMessage?: string | null
+  ): Promise<void>;
   logSubmissionEvent(
     householdId: string,
     eventType: "household_created" | "household_updated",

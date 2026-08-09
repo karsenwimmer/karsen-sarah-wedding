@@ -4,6 +4,7 @@ import type {
   HouseholdSubmission
 } from "@/lib/household-schema";
 import type {
+  ConfirmationEmailStatus,
   HouseholdRecord,
   HouseholdRepository
 } from "@/lib/household-persistence";
@@ -42,6 +43,14 @@ function throwIfSupabaseError(error: { message: string } | null) {
   if (error) {
     throw new Error(error.message);
   }
+}
+
+function toEmailErrorValue(status: ConfirmationEmailStatus, errorMessage?: string | null) {
+  if (status !== "failed" || !errorMessage) {
+    return null;
+  }
+
+  return errorMessage.slice(0, 500);
 }
 
 export function createSupabaseHouseholdRepository(): HouseholdRepository {
@@ -95,6 +104,18 @@ export function createSupabaseHouseholdRepository(): HouseholdRepository {
         .insert(toMemberRows(householdId, members));
 
       throwIfSupabaseError(insertResult.error);
+    },
+
+    async updateConfirmationEmailStatus(householdId, status, errorMessage) {
+      const { error } = await supabase
+        .from("households")
+        .update({
+          confirmation_email_status: status,
+          last_email_error: toEmailErrorValue(status, errorMessage)
+        })
+        .eq("id", householdId);
+
+      throwIfSupabaseError(error);
     },
 
     async logSubmissionEvent(householdId, eventType, metadata) {
