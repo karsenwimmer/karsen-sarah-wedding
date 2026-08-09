@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { weddingConfig } from "@/config/wedding";
 import { MailingForm } from "@/components/MailingForm";
 
@@ -28,22 +29,16 @@ const faqs = [
   }
 ];
 
-function WreathSide({ side }: { side: "left" | "right" }) {
-  return (
-    <span className={`wreath-divider__branch wreath-divider__branch--${side}`}>
-      {Array.from({ length: 12 }).map((_, index) => (
-        <span className="wreath-divider__sprig" key={index} />
-      ))}
-    </span>
-  );
-}
-
 export function WreathDivider() {
   return (
     <div className="wreath-divider" aria-hidden="true">
-      <WreathSide side="left" />
-      <span className="wreath-divider__center" />
-      <WreathSide side="right" />
+      <Image
+        src="/images/decor/gold-wreath-divider.png"
+        alt=""
+        width={1608}
+        height={225}
+        sizes="(max-width: 700px) 38vw, 33vw"
+      />
     </div>
   );
 }
