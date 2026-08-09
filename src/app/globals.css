@@ -443,6 +443,19 @@ a {
   background: rgb(255 253 247 / 0.48);
 }
 
+.section--quiet h2 {
+  margin: 0;
+  font-size: clamp(2.1rem, 4vw, 3.2rem);
+  line-height: 1;
+}
+
+.section--quiet p {
+  margin: 1.3rem auto 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.32rem, 2.2vw, 1.7rem);
+  line-height: 1.55;
+}
+
 .section__inner {
   width: min(1120px, 100%);
   margin: 0 auto;
@@ -508,6 +521,7 @@ a {
 
 .mailing-copy p:not(.eyebrow) {
   max-width: 26rem;
+  margin: clamp(1.45rem, 3vw, 2.2rem) 0 0;
 }
 
 .mailing-preview {

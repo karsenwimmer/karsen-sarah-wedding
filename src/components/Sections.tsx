@@ -48,7 +48,6 @@ export function MailingPreviewSection() {
     <section className="section section--mailing" id="save-the-date" aria-labelledby="mailing-title">
       <div className="section__inner section__inner--split">
         <div className="mailing-copy">
-          <p className="eyebrow">Formal Invitation to Follow</p>
           <h2 id="mailing-title">Share Your Household Details</h2>
           <p>
             We will be sending physical invitations with complete wedding details at a later
@@ -72,8 +71,7 @@ export function UpdatesSection() {
   return (
     <section className="section section--quiet" id="updates" aria-labelledby="updates-title">
       <div className="section__inner section__inner--narrow">
-        <p className="eyebrow">Updates</p>
-        <h2 className="sr-only" id="updates-title">Updates</h2>
+        <h2 id="updates-title">Updates</h2>
         <p>More details will be shared here as our celebration approaches.</p>
       </div>
     </section>
