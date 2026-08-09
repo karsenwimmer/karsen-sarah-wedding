@@ -56,6 +56,10 @@ export async function submitMailingInformation(
     const isMissingConfig =
       error instanceof Error && error.message === "Supabase is not configured.";
 
+    console.error("Household submission failed", {
+      message: error instanceof Error ? error.message : "Unknown error"
+    });
+
     return {
       status: "error",
       message: isMissingConfig
