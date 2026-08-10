@@ -57,8 +57,8 @@ export function EnvelopeIntro() {
     }
 
     setState("opening");
-    timers.current.push(window.setTimeout(() => setState("zooming"), 2050));
-    timers.current.push(window.setTimeout(finishIntro, 2720));
+    timers.current.push(window.setTimeout(() => setState("zooming"), 3050));
+    timers.current.push(window.setTimeout(finishIntro, 4250));
   }
 
   return (
@@ -87,55 +87,58 @@ export function EnvelopeIntro() {
                   initial={false}
                   animate={
                     state === "zooming"
-                      ? { y: -112, opacity: 0, scale: 5.2 }
+                      ? { y: -118, opacity: 0, scale: 5.8 }
                       : state === "opening"
-                        ? { y: [-4, -94, -94], opacity: 1, scale: 1 }
-                        : { y: 78, opacity: 0, scale: 0.96 }
+                        ? { y: [-8, -92, -92], opacity: 1, scale: 1 }
+                        : { y: 118, opacity: 0, scale: 0.94 }
                   }
                   transition={
                     state === "zooming"
-                      ? { duration: 0.58, ease: [0.68, 0, 0.2, 1] }
-                      : { duration: 2.02, delay: 0.64, ease: [0.2, 0.8, 0.2, 1] }
+                      ? { duration: 0.92, ease: [0.68, 0, 0.2, 1] }
+                      : { duration: 2.55, delay: 0.82, ease: [0.16, 0.72, 0.18, 1] }
                   }
                 >
-                  <SealMark size={74} />
-                  <span>{weddingConfig.couple.displayName}</span>
+                  <SealMark className="intro__card-seal" size={88} />
+                  <span className="intro__card-kicker">Save the Date</span>
+                  <span className="intro__card-names">{weddingConfig.couple.displayName}</span>
                   <strong>{weddingConfig.date.shortLabel}</strong>
+                  <span className="intro__card-venue">
+                    The Boathouse Restaurant &amp; Event Venue
+                  </span>
                 </motion.div>
 
                 <motion.div
                   className="intro__envelope"
                   initial={false}
-                  animate={state === "zooming" ? { opacity: 0, scale: 0.9, y: 42 } : { opacity: 1, scale: 1, y: 0 }}
-                  transition={{ duration: 0.28, ease: "easeOut" }}
+                  animate={
+                    state === "zooming"
+                      ? { opacity: 0, scale: 0.88, y: 64 }
+                      : { opacity: 1, scale: 1, y: 0 }
+                  }
+                  transition={{ duration: 0.58, ease: "easeOut" }}
                 >
                   <motion.div
                     className="intro__flap"
                     initial={false}
-                    animate={{ rotateX: state === "opening" || state === "zooming" ? -178 : 0 }}
-                    transition={{ duration: 0.85, delay: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                  />
+                    animate={{
+                      rotateX: state === "opening" || state === "zooming" ? -174 : 0
+                    }}
+                    transition={{ duration: 1.35, delay: 0.42, ease: [0.36, 0, 0.18, 1] }}
+                  >
+                    <span className="intro__flap-face" />
+                    <span className="intro__seal">
+                      <Image
+                        src="/images/seals/ks-wax-seal-centered.png"
+                        alt=""
+                        width={170}
+                        height={170}
+                        priority
+                        sizes="112px"
+                      />
+                    </span>
+                  </motion.div>
                   <div className="intro__pocket intro__pocket--left" />
                   <div className="intro__pocket intro__pocket--right" />
-                  <motion.span
-                    className="intro__seal"
-                    initial={false}
-                    animate={
-                      state === "opening" || state === "zooming"
-                        ? { opacity: 0, scale: 0.82, y: 12 }
-                        : { opacity: 1, scale: 1, y: 0 }
-                    }
-                    transition={{ duration: 0.32, ease: "easeOut" }}
-                  >
-                    <Image
-                      src="/images/seals/ks-wax-seal-centered.png"
-                      alt=""
-                      width={150}
-                      height={150}
-                      priority
-                      sizes="92px"
-                    />
-                  </motion.span>
                 </motion.div>
               </span>
               <span className="intro__open-label">click to open</span>
