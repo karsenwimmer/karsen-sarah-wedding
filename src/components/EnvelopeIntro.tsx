@@ -3,8 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { SealMark } from "@/components/SealMark";
-import { weddingConfig } from "@/config/wedding";
+import { SaveDateMark } from "@/components/SaveDateMark";
 
 const SESSION_KEY = "ks-envelope-intro-played";
 
@@ -37,8 +36,22 @@ export function EnvelopeIntro() {
     };
   }, []);
 
+  useEffect(() => {
+    if (state === "hidden" || state === "checking") {
+      delete document.documentElement.dataset.envelopeIntro;
+      return;
+    }
+
+    document.documentElement.dataset.envelopeIntro = state;
+
+    return () => {
+      delete document.documentElement.dataset.envelopeIntro;
+    };
+  }, [state]);
+
   function finishIntro() {
     window.sessionStorage.setItem(SESSION_KEY, "true");
+    delete document.documentElement.dataset.envelopeIntro;
     setState("hidden");
 
     window.requestAnimationFrame(() => {
@@ -57,8 +70,8 @@ export function EnvelopeIntro() {
     }
 
     setState("opening");
-    timers.current.push(window.setTimeout(() => setState("zooming"), 3600));
-    timers.current.push(window.setTimeout(finishIntro, 5200));
+    timers.current.push(window.setTimeout(() => setState("zooming"), 4300));
+    timers.current.push(window.setTimeout(finishIntro, 6350));
   }
 
   return (
@@ -87,24 +100,18 @@ export function EnvelopeIntro() {
                   initial={false}
                   animate={
                     state === "zooming"
-                      ? { y: -168, opacity: [1, 1, 0.96], scale: 7.2 }
+                      ? { y: 42, opacity: [1, 0.74, 0.03], scale: 1.72 }
                       : state === "opening"
-                        ? { y: [-8, -112, -112], opacity: 1, scale: 1 }
+                        ? { y: [-8, -92, -92], opacity: 1, scale: 1 }
                         : { y: 118, opacity: 0, scale: 0.94 }
                   }
                   transition={
                     state === "zooming"
-                      ? { duration: 1.45, ease: [0.64, 0, 0.18, 1] }
-                      : { duration: 3.05, delay: 0.98, ease: [0.16, 0.72, 0.18, 1] }
+                      ? { duration: 2.02, ease: [0.44, 0, 0.16, 1] }
+                      : { duration: 3.75, delay: 0.92, ease: [0.16, 0.72, 0.18, 1] }
                   }
                 >
-                  <SealMark className="intro__card-seal" size={88} />
-                  <span className="intro__card-kicker">Save the Date</span>
-                  <span className="intro__card-names">{weddingConfig.couple.displayName}</span>
-                  <strong>{weddingConfig.date.shortLabel}</strong>
-                  <span className="intro__card-venue">
-                    The Boathouse Restaurant &amp; Event Venue
-                  </span>
+                  <SaveDateMark className="intro__card-mark" includeVenue sealSize={88} />
                 </motion.div>
 
                 <motion.div
@@ -112,10 +119,10 @@ export function EnvelopeIntro() {
                   initial={false}
                   animate={
                     state === "zooming"
-                      ? { opacity: [1, 0.72, 0], scale: 0.92, y: 70 }
+                      ? { opacity: [1, 0.55, 0], scale: 0.97, y: 72 }
                       : { opacity: 1, scale: 1, y: 0 }
                   }
-                  transition={{ duration: 0.95, ease: "easeOut" }}
+                  transition={{ duration: 1.35, ease: "easeOut" }}
                 >
                   <motion.div
                     className="intro__flap"
@@ -123,7 +130,7 @@ export function EnvelopeIntro() {
                     animate={{
                       rotateX: state === "opening" || state === "zooming" ? -174 : 0
                     }}
-                    transition={{ duration: 1.72, delay: 0.54, ease: [0.36, 0, 0.18, 1] }}
+                    transition={{ duration: 2.05, delay: 0.48, ease: [0.36, 0, 0.18, 1] }}
                   >
                     <span className="intro__flap-face" />
                     <span className="intro__seal">

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Libre_Franklin } from "next/font/google";
+import { Cormorant_Garamond, Imperial_Script, Libre_Franklin } from "next/font/google";
 import "./globals.css";
 import { weddingConfig } from "@/config/wedding";
 
@@ -13,6 +13,13 @@ const body = Libre_Franklin({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-body"
+});
+
+const script = Imperial_Script({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-script"
 });
 
 const siteUrl = weddingConfig.links.websiteUrl;
@@ -68,7 +75,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable} ${script.variable}`}>
       <body>{children}</body>
     </html>
   );

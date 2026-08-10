@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Countdown } from "@/components/Countdown";
-import { SealMark } from "@/components/SealMark";
+import { SaveDateMark } from "@/components/SaveDateMark";
 import { weddingConfig } from "@/config/wedding";
 import { createGoogleCalendarUrl, createOutlookCalendarUrl } from "@/lib/calendar";
 
@@ -17,10 +17,13 @@ export function Hero() {
       />
       <div className="hero__wash" aria-hidden="true" />
       <div className="hero__content">
-        <SealMark className="hero__seal" priority size={160} />
-        <p className="eyebrow">Save the Date</p>
-        <h1 id="hero-title">{weddingConfig.couple.displayName}</h1>
-        <p className="hero__date">{weddingConfig.date.shortLabel}</p>
+        <SaveDateMark
+          className="hero__mark"
+          headingId="hero-title"
+          sealPriority
+          sealSize={160}
+          titleElement="h1"
+        />
         {weddingConfig.features.countdown ? <Countdown /> : null}
         <div className="hero__details">
           <div className="hero__venue">
