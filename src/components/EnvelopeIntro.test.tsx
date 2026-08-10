@@ -22,8 +22,8 @@ describe("EnvelopeIntro", () => {
 
     await waitFor(
       () => expect(window.sessionStorage.getItem("ks-envelope-intro-played")).toBe("true"),
-      { timeout: 5000 }
+      { timeout: 7000 }
     );
     await waitFor(() => expect(document.getElementById("main-content")).toHaveFocus());
-  });
+  }, 7500);
 });

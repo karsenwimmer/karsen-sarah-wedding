@@ -57,21 +57,21 @@ export function EnvelopeIntro() {
     }
 
     setState("opening");
-    timers.current.push(window.setTimeout(() => setState("zooming"), 3050));
-    timers.current.push(window.setTimeout(finishIntro, 4250));
+    timers.current.push(window.setTimeout(() => setState("zooming"), 3600));
+    timers.current.push(window.setTimeout(finishIntro, 5200));
   }
 
   return (
     <AnimatePresence>
       {state !== "hidden" ? (
         <motion.div
-          className="intro"
+          className={`intro intro--${state}`}
           aria-label="Wedding save the date introduction"
           role="dialog"
           initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.25, ease: "easeOut" }}
+          transition={{ duration: 0.16, ease: "easeOut" }}
         >
           {state === "ready" || state === "opening" || state === "zooming" ? (
             <button
@@ -87,15 +87,15 @@ export function EnvelopeIntro() {
                   initial={false}
                   animate={
                     state === "zooming"
-                      ? { y: -118, opacity: 0, scale: 5.8 }
+                      ? { y: -168, opacity: [1, 1, 0.96], scale: 7.2 }
                       : state === "opening"
-                        ? { y: [-8, -92, -92], opacity: 1, scale: 1 }
+                        ? { y: [-8, -112, -112], opacity: 1, scale: 1 }
                         : { y: 118, opacity: 0, scale: 0.94 }
                   }
                   transition={
                     state === "zooming"
-                      ? { duration: 0.92, ease: [0.68, 0, 0.2, 1] }
-                      : { duration: 2.55, delay: 0.82, ease: [0.16, 0.72, 0.18, 1] }
+                      ? { duration: 1.45, ease: [0.64, 0, 0.18, 1] }
+                      : { duration: 3.05, delay: 0.98, ease: [0.16, 0.72, 0.18, 1] }
                   }
                 >
                   <SealMark className="intro__card-seal" size={88} />
@@ -112,10 +112,10 @@ export function EnvelopeIntro() {
                   initial={false}
                   animate={
                     state === "zooming"
-                      ? { opacity: 0, scale: 0.88, y: 64 }
+                      ? { opacity: [1, 0.72, 0], scale: 0.92, y: 70 }
                       : { opacity: 1, scale: 1, y: 0 }
                   }
-                  transition={{ duration: 0.58, ease: "easeOut" }}
+                  transition={{ duration: 0.95, ease: "easeOut" }}
                 >
                   <motion.div
                     className="intro__flap"
@@ -123,12 +123,12 @@ export function EnvelopeIntro() {
                     animate={{
                       rotateX: state === "opening" || state === "zooming" ? -174 : 0
                     }}
-                    transition={{ duration: 1.35, delay: 0.42, ease: [0.36, 0, 0.18, 1] }}
+                    transition={{ duration: 1.72, delay: 0.54, ease: [0.36, 0, 0.18, 1] }}
                   >
                     <span className="intro__flap-face" />
                     <span className="intro__seal">
                       <Image
-                        src="/images/seals/ks-wax-seal-centered.png"
+                        src="/images/seals/ks-wax-seal-aligned.png"
                         alt=""
                         width={170}
                         height={170}
