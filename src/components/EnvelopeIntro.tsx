@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 const SESSION_KEY = "ks-envelope-intro-played";
 
-type IntroState = "checking" | "ready" | "opening" | "settling" | "hidden";
+type IntroState = "checking" | "ready" | "opening" | "revealing" | "hidden";
 
 export function EnvelopeIntro() {
   const [state, setState] = useState<IntroState>("checking");
@@ -73,8 +73,8 @@ export function EnvelopeIntro() {
     }
 
     setState("opening");
-    timers.current.push(window.setTimeout(() => setState("settling"), 4100));
-    timers.current.push(window.setTimeout(finishIntro, 6600));
+    timers.current.push(window.setTimeout(() => setState("revealing"), 3200));
+    timers.current.push(window.setTimeout(finishIntro, 6200));
   }
 
   return (
@@ -89,76 +89,69 @@ export function EnvelopeIntro() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.16, ease: "easeOut" }}
         >
-          {state === "ready" || state === "opening" || state === "settling" ? (
+          {state === "ready" || state === "opening" || state === "revealing" ? (
             <button
               className="intro__open"
               type="button"
               onClick={openEnvelope}
               aria-label="Open the envelope"
-              disabled={state === "opening" || state === "settling"}
+              disabled={state === "opening" || state === "revealing"}
             >
               <span className="intro__stage" aria-hidden="true">
                 <motion.div
-                  className="intro__envelope-back"
+                  className="intro__envelope-shell"
                   initial={false}
                   animate={
-                    state === "settling"
-                      ? { opacity: 0, y: 230, scale: 0.96 }
-                      : state === "opening"
-                        ? { opacity: [1, 0.98, 0.82], y: [0, 84, 205], scale: 1 }
-                        : { opacity: 1, y: 0, scale: 1 }
+                    state === "revealing"
+                      ? { opacity: [1, 1, 0], y: [0, 285, 315], scale: [1, 1, 0.98] }
+                      : { opacity: 1, y: 0, scale: 1 }
                   }
                   transition={
-                    state === "settling"
-                      ? { duration: 1.4, ease: [0.42, 0, 0.18, 1] }
-                      : { duration: 3.25, delay: 0.74, ease: [0.18, 0.72, 0.16, 1] }
-                  }
-                />
-
-                <motion.div
-                  className="intro__envelope-front"
-                  initial={false}
-                  animate={
-                    state === "settling"
-                      ? { opacity: 0, y: 270, scale: 0.96 }
-                      : state === "opening"
-                        ? { opacity: [1, 0.98, 0.84], y: [0, 108, 248], scale: 1 }
-                        : { opacity: 1, y: 0, scale: 1 }
-                  }
-                  transition={
-                    state === "settling"
-                      ? { duration: 1.35, ease: [0.42, 0, 0.18, 1] }
-                      : { duration: 3.25, delay: 0.86, ease: [0.18, 0.72, 0.16, 1] }
+                    state === "revealing"
+                      ? { duration: 2.25, times: [0, 0.68, 1], ease: [0.34, 0, 0.15, 1] }
+                      : { duration: 0.4, ease: "easeOut" }
                   }
                 >
-                  <span className="intro__slot" />
-                  <div className="intro__pocket intro__pocket--left" />
-                  <div className="intro__pocket intro__pocket--right" />
-                  <div className="intro__pocket intro__pocket--bottom" />
-                </motion.div>
+                  <div className="intro__envelope-back" />
 
-                <motion.div
-                  className="intro__flap"
-                  initial={false}
-                  animate={{
-                    opacity: state === "settling" ? 0 : 1,
-                    rotateX: state === "opening" || state === "settling" ? -178 : 0,
-                    scale: state === "settling" ? 0.96 : 1,
-                    y: state === "settling" ? 232 : state === "opening" ? 104 : 0
-                  }}
-                  transition={{ duration: state === "settling" ? 1.2 : 2.2, delay: state === "settling" ? 0 : 0.36, ease: [0.36, 0, 0.18, 1] }}
-                >
-                  <span className="intro__flap-face" />
-                  <span className="intro__seal">
-                    <Image
-                      src="/images/seals/ks-wax-seal-aligned.png"
-                      alt=""
-                      width={170}
-                      height={170}
-                      priority
-                      sizes="112px"
-                    />
-                  </span>
+                  <motion.div
+                    className="intro__envelope-front"
+                    initial={false}
+                    animate={
+                      state === "opening" || state === "revealing"
+                        ? { y: 150 }
+                        : { y: 0 }
+                    }
+                    transition={{ duration: 3.15, delay: 0.62, ease: [0.18, 0.74, 0.16, 1] }}
+                  >
+                    <span className="intro__slot" />
+                    <div className="intro__pocket intro__pocket--left" />
+                    <div className="intro__pocket intro__pocket--right" />
+                    <div className="intro__pocket intro__pocket--bottom" />
+                  </motion.div>
+
+                  <motion.div
+                    className="intro__flap"
+                    initial={false}
+                    animate={{
+                      opacity: state === "revealing" ? 0 : 1,
+                      rotateX: state === "opening" || state === "revealing" ? -178 : 0,
+                      y: state === "opening" || state === "revealing" ? 24 : 0
+                    }}
+                    transition={{ duration: 2.35, delay: 0.26, ease: [0.36, 0, 0.18, 1] }}
+                  >
+                    <span className="intro__flap-face" />
+                    <span className="intro__seal">
+                      <Image
+                        src="/images/seals/ks-wax-seal-aligned.png"
+                        alt=""
+                        width={170}
+                        height={170}
+                        priority
+                        sizes="112px"
+                      />
+                    </span>
+                  </motion.div>
                 </motion.div>
               </span>
               <span className="intro__open-label">click to open</span>
