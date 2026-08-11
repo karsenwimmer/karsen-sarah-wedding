@@ -276,6 +276,10 @@ a {
 }
 
 .save-date-mark__names {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: clamp(0.06em, 1vw, 0.14em);
   margin: 0;
   color: var(--ink);
   font-family: var(--font-script), "Snell Roundhand", "Apple Chancery", cursive;
@@ -283,6 +287,10 @@ a {
   letter-spacing: 0;
   line-height: 0.78;
   white-space: nowrap;
+}
+
+.save-date-mark__amp {
+  margin-inline: 0.04em 0.12em;
 }
 
 .save-date-mark__date {
@@ -312,7 +320,7 @@ a {
 }
 
 .hero__mark .save-date-mark__names {
-  font-size: clamp(5.8rem, 12vw, 11.6rem);
+  font-size: clamp(5.4rem, 10.8vw, 10.6rem);
 }
 
 .section h2 {
@@ -1221,6 +1229,8 @@ html[data-envelope-intro="zooming"] .hero__mark {
 
 .intro__stage {
   position: relative;
+  --intro-envelope-width: min(52vw, 720px);
+  --intro-card-width: min(45vw, 640px);
   width: min(52vw, 760px);
   min-width: 600px;
   height: min(58vw, 610px);
@@ -1230,15 +1240,27 @@ html[data-envelope-intro="zooming"] .hero__mark {
   perspective: 1500px;
 }
 
-.intro__envelope {
-  position: relative;
-  width: min(52vw, 720px);
+.intro__envelope-back,
+.intro__envelope-front,
+.intro__flap {
+  position: absolute;
+  left: calc(50% - (var(--intro-envelope-width) / 2));
+  bottom: 0;
+  width: var(--intro-envelope-width);
   min-width: 560px;
   aspect-ratio: 1.34;
+}
+
+.intro__envelope-back,
+.intro__envelope-front {
   filter: drop-shadow(0 30px 46px rgb(32 32 30 / 0.15));
 }
 
-.intro__envelope::before {
+.intro__envelope-back {
+  z-index: 1;
+}
+
+.intro__envelope-back::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -1252,13 +1274,17 @@ html[data-envelope-intro="zooming"] .hero__mark {
     #f2eee3;
 }
 
+.intro__envelope-front {
+  z-index: 6;
+  pointer-events: none;
+}
+
 .intro__flap {
-  position: absolute;
   z-index: 8;
-  inset: 0;
   transform-origin: 50% 0%;
   border-radius: 8px 8px 0 0;
   transform-style: preserve-3d;
+  pointer-events: none;
 }
 
 .intro__flap-face {
@@ -1275,9 +1301,27 @@ html[data-envelope-intro="zooming"] .hero__mark {
     inset 0 -22px 40px rgb(178 154 104 / 0.08);
 }
 
+.intro__slot {
+  position: absolute;
+  z-index: 5;
+  left: 2.4%;
+  right: 2.4%;
+  top: 11.8%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(94 83 58 / 0.16) 14%,
+    rgb(94 83 58 / 0.22) 50%,
+    rgb(94 83 58 / 0.16) 86%,
+    transparent
+  );
+  box-shadow: 0 12px 24px rgb(32 32 30 / 0.08);
+}
+
 .intro__pocket {
   position: absolute;
-  z-index: 6;
+  z-index: 7;
   inset: 0;
   background:
     repeating-linear-gradient(0deg, rgb(255 253 247 / 0.09) 0 1px, transparent 1px 6px),
@@ -1291,6 +1335,15 @@ html[data-envelope-intro="zooming"] .hero__mark {
 
 .intro__pocket--right {
   clip-path: polygon(100% 12%, 50% 55%, 100% 100%);
+}
+
+.intro__pocket--bottom {
+  background:
+    repeating-linear-gradient(0deg, rgb(255 253 247 / 0.1) 0 1px, transparent 1px 6px),
+    repeating-linear-gradient(90deg, rgb(178 154 104 / 0.04) 0 1px, transparent 1px 7px),
+    linear-gradient(180deg, rgb(247 244 236 / 0.74), rgb(238 233 220 / 0.96)),
+    #eee9dc;
+  clip-path: polygon(0 48%, 50% 55%, 100% 48%, 100% 100%, 0 100%);
 }
 
 .intro__seal {
@@ -1313,12 +1366,18 @@ html[data-envelope-intro="zooming"] .hero__mark {
   object-fit: contain;
 }
 
-.intro__card {
+.intro__card-frame {
   position: absolute;
   z-index: 4;
-  bottom: 102px;
-  width: min(45vw, 640px);
+  left: calc(50% - (var(--intro-card-width) / 2));
+  bottom: 92px;
+  width: var(--intro-card-width);
   min-width: 500px;
+  transform-origin: 50% 58%;
+}
+
+.intro__card {
+  width: 100%;
   min-height: 400px;
   display: grid;
   align-content: center;
@@ -1411,7 +1470,7 @@ html[data-envelope-intro="zooming"] .hero__mark {
 
   .hero__mark .save-date-mark__names {
     max-width: none;
-    font-size: clamp(3.85rem, 16vw, 5.1rem);
+    font-size: clamp(3.45rem, 14.4vw, 4.55rem);
     white-space: nowrap;
   }
 
@@ -1513,14 +1572,18 @@ html[data-envelope-intro="zooming"] .hero__mark {
   }
 
   .intro__stage {
+    --intro-envelope-width: 94vw;
+    --intro-card-width: min(78vw, 360px);
     width: 96vw;
     min-width: 0;
     height: min(68svh, 590px);
     min-height: 450px;
   }
 
-  .intro__envelope {
-    width: 94vw;
+  .intro__envelope-back,
+  .intro__envelope-front,
+  .intro__flap {
+    left: calc(50% - (var(--intro-envelope-width) / 2));
     min-width: 0;
     aspect-ratio: 1.26;
   }
@@ -1532,16 +1595,21 @@ html[data-envelope-intro="zooming"] .hero__mark {
     height: 5.8rem;
   }
 
+  .intro__card-frame {
+    left: calc(50% - (var(--intro-card-width) / 2));
+    bottom: 74px;
+    min-width: 0;
+  }
+
   .intro__card {
     bottom: 74px;
-    width: min(78vw, 360px);
     min-width: 0;
     min-height: 300px;
     padding: 1.45rem 1.25rem;
   }
 
   .intro__card-mark .save-date-mark__names {
-    font-size: clamp(3rem, 14.5vw, 4.1rem);
+    font-size: clamp(2.65rem, 12.8vw, 3.6rem);
   }
 
   .intro__card-mark .save-date-mark__date {
@@ -1555,7 +1623,7 @@ html[data-envelope-intro="zooming"] .hero__mark {
 
 @media (max-width: 380px) {
   .hero__mark .save-date-mark__names {
-    font-size: clamp(3.35rem, 15.4vw, 4.45rem);
+    font-size: clamp(3.05rem, 13.8vw, 3.95rem);
   }
 
   .hero__mark .save-date-mark__date {
@@ -1583,13 +1651,16 @@ html[data-envelope-intro="zooming"] .hero__mark {
     min-height: 420px;
   }
 
+  .intro__stage {
+    --intro-card-width: 80vw;
+  }
+
   .intro__card {
-    width: 80vw;
     min-height: 280px;
   }
 
   .intro__card-mark .save-date-mark__names {
-    font-size: clamp(2.65rem, 13.2vw, 3.5rem);
+    font-size: clamp(2.35rem, 11.8vw, 3.08rem);
   }
 }
 

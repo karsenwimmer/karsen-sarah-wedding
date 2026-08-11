@@ -18,12 +18,16 @@ export function SaveDateMark({
   sealSize = 160,
   titleElement: TitleElement = "span"
 }: SaveDateMarkProps) {
+  const [firstName, secondName] = weddingConfig.couple.displayName.split(" & ");
+
   return (
     <div className={`save-date-mark ${className}`}>
       <SealMark className="save-date-mark__seal" priority={sealPriority} size={sealSize} />
       <p className="save-date-mark__kicker">Save the Date</p>
       <TitleElement className="save-date-mark__names" id={headingId}>
-        {weddingConfig.couple.displayName}
+        <span>{firstName}</span>
+        <span className="save-date-mark__amp">&amp;</span>
+        <span>{secondName}</span>
       </TitleElement>
       <p className="save-date-mark__date">{weddingConfig.date.shortLabel}</p>
       {includeVenue ? (
