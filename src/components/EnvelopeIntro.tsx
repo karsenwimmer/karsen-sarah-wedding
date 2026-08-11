@@ -73,8 +73,8 @@ export function EnvelopeIntro() {
     }
 
     setState("opening");
-    timers.current.push(window.setTimeout(() => setState("revealing"), 3200));
-    timers.current.push(window.setTimeout(finishIntro, 6200));
+    timers.current.push(window.setTimeout(() => setState("revealing"), 1900));
+    timers.current.push(window.setTimeout(finishIntro, 5600));
   }
 
   return (
@@ -99,59 +99,50 @@ export function EnvelopeIntro() {
             >
               <span className="intro__stage" aria-hidden="true">
                 <motion.div
-                  className="intro__envelope-shell"
+                  className="intro__envelope-body"
                   initial={false}
                   animate={
                     state === "revealing"
-                      ? { opacity: [1, 1, 0], y: [0, 285, 315], scale: [1, 1, 0.98] }
-                      : { opacity: 1, y: 0, scale: 1 }
+                      ? { opacity: [1, 1, 0], y: ["0vh", "66vh", "78vh"] }
+                      : { opacity: 1, y: "0vh" }
                   }
                   transition={
                     state === "revealing"
-                      ? { duration: 2.25, times: [0, 0.68, 1], ease: [0.34, 0, 0.15, 1] }
+                      ? { duration: 2.85, times: [0, 0.78, 1], ease: [0.26, 0.02, 0.12, 1] }
                       : { duration: 0.4, ease: "easeOut" }
                   }
                 >
-                  <div className="intro__envelope-back" />
+                  <span className="intro__envelope-edge" />
+                  <span className="intro__pocket intro__pocket--left" />
+                  <span className="intro__pocket intro__pocket--right" />
+                  <span className="intro__pocket intro__pocket--bottom" />
+                </motion.div>
 
-                  <motion.div
-                    className="intro__envelope-front"
-                    initial={false}
-                    animate={
-                      state === "opening" || state === "revealing"
-                        ? { y: 150 }
-                        : { y: 0 }
-                    }
-                    transition={{ duration: 3.15, delay: 0.62, ease: [0.18, 0.74, 0.16, 1] }}
-                  >
-                    <span className="intro__slot" />
-                    <div className="intro__pocket intro__pocket--left" />
-                    <div className="intro__pocket intro__pocket--right" />
-                    <div className="intro__pocket intro__pocket--bottom" />
-                  </motion.div>
-
-                  <motion.div
-                    className="intro__flap"
-                    initial={false}
-                    animate={{
-                      opacity: state === "revealing" ? 0 : 1,
-                      rotateX: state === "opening" || state === "revealing" ? -178 : 0,
-                      y: state === "opening" || state === "revealing" ? 24 : 0
-                    }}
-                    transition={{ duration: 2.35, delay: 0.26, ease: [0.36, 0, 0.18, 1] }}
-                  >
-                    <span className="intro__flap-face" />
-                    <span className="intro__seal">
-                      <Image
-                        src="/images/seals/ks-wax-seal-aligned.png"
-                        alt=""
-                        width={170}
-                        height={170}
-                        priority
-                        sizes="112px"
-                      />
-                    </span>
-                  </motion.div>
+                <motion.div
+                  className="intro__flap"
+                  initial={false}
+                  animate={{
+                    opacity: state === "revealing" ? [1, 1, 0] : 1,
+                    rotateX: state === "opening" || state === "revealing" ? -168 : 0,
+                    y: state === "opening" || state === "revealing" ? "-2.6vh" : "0vh"
+                  }}
+                  transition={{
+                    duration: state === "revealing" ? 2.25 : 1.55,
+                    times: state === "revealing" ? [0, 0.72, 1] : undefined,
+                    ease: [0.28, 0, 0.14, 1]
+                  }}
+                >
+                  <span className="intro__flap-face" />
+                  <span className="intro__seal">
+                    <Image
+                      src="/images/seals/ks-wax-seal-aligned.png"
+                      alt=""
+                      width={170}
+                      height={170}
+                      priority
+                      sizes="112px"
+                    />
+                  </span>
                 </motion.div>
               </span>
               <span className="intro__open-label">click to open</span>
