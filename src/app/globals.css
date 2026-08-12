@@ -545,7 +545,10 @@ html[data-envelope-intro="revealing"] .hero__details::before {
 
 .button:disabled {
   cursor: not-allowed;
-  opacity: 0.62;
+  opacity: 1;
+  color: rgb(77 89 72 / 0.52);
+  background: rgb(77 89 72 / 0.12);
+  border-color: rgb(77 89 72 / 0.22);
 }
 
 .countdown {
@@ -778,6 +781,11 @@ html[data-envelope-intro="revealing"] .hero__details::before {
   color: #813c33;
 }
 
+.form-status--bottom {
+  margin-top: 0.15rem;
+  background: rgb(255 253 247 / 0.56);
+}
+
 .mailing-form--complete {
   min-height: 260px;
   align-content: center;
@@ -871,6 +879,11 @@ html[data-envelope-intro="revealing"] .hero__details::before {
   color: rgb(32 32 30 / 0.64);
   font-size: 0.9rem;
   line-height: 1.65;
+}
+
+.form-help--submit {
+  margin-top: -0.9rem;
+  color: rgb(32 32 30 / 0.58);
 }
 
 .member-list {
