@@ -420,6 +420,13 @@ html[data-envelope-intro="revealing"] .hero__wash {
   animation: intro-site-reveal 820ms 1100ms ease forwards;
 }
 
+html[data-envelope-intro] .hero__mark {
+  position: relative;
+  z-index: 1;
+  opacity: 1;
+  visibility: visible;
+}
+
 html[data-envelope-intro] .hero .countdown,
 html[data-envelope-intro] .hero__note,
 html[data-envelope-intro] .calendar-actions,
@@ -1214,6 +1221,11 @@ html[data-envelope-intro="revealing"] .hero__details::before {
   place-items: center;
   overflow: hidden;
   background:
+    radial-gradient(circle at 18% 22%, rgb(119 109 84 / 0.026) 0 1px, transparent 2px),
+    radial-gradient(circle at 72% 64%, rgb(255 253 247 / 0.42) 0 1px, transparent 2px),
+    repeating-linear-gradient(0deg, rgb(114 101 73 / 0.012) 0 1px, transparent 1px 9px),
+    repeating-linear-gradient(90deg, rgb(114 101 73 / 0.01) 0 1px, transparent 1px 10px),
+    radial-gradient(ellipse 44% 36% at 46% 42%, rgb(255 253 247 / 0.52), transparent 68%),
     radial-gradient(ellipse 70% 72% at 50% 50%, rgb(255 253 247 / 0.5), rgb(247 244 236 / 0.86) 68%, var(--ivory)),
     var(--ivory);
   transition: opacity 500ms ease;
