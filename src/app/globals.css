@@ -413,13 +413,13 @@ html[data-envelope-intro] .hero::after,
 html[data-envelope-intro] .hero__image,
 html[data-envelope-intro] .hero__wash {
   opacity: 0;
-  clip-path: circle(0% at 50% 45%);
+  clip-path: ellipse(30% 24% at 50% 45%);
 }
 
 html[data-envelope-intro="revealing"] .hero::after,
 html[data-envelope-intro="revealing"] .hero__image,
 html[data-envelope-intro="revealing"] .hero__wash {
-  animation: intro-center-bloom 1050ms 860ms cubic-bezier(0.22, 0, 0.16, 1) forwards;
+  animation: intro-center-bloom 1650ms 760ms cubic-bezier(0.22, 0, 0.16, 1) forwards;
 }
 
 html[data-envelope-intro] .hero__mark {
@@ -434,24 +434,24 @@ html[data-envelope-intro] .hero__note,
 html[data-envelope-intro] .calendar-actions,
 html[data-envelope-intro] .hero .button {
   opacity: 0;
-  clip-path: circle(0% at 50% 50%);
+  clip-path: ellipse(36% 32% at 50% 50%);
   pointer-events: none;
 }
 
 html[data-envelope-intro] .hero__details::before {
   opacity: 0;
-  clip-path: circle(0% at 50% 36%);
+  clip-path: ellipse(42% 32% at 50% 42%);
 }
 
 html[data-envelope-intro="revealing"] .hero .countdown,
 html[data-envelope-intro="revealing"] .hero__note,
 html[data-envelope-intro="revealing"] .calendar-actions,
 html[data-envelope-intro="revealing"] .hero .button {
-  animation: intro-center-bloom 760ms 1120ms cubic-bezier(0.22, 0, 0.16, 1) forwards;
+  animation: intro-center-bloom 1250ms 1040ms cubic-bezier(0.22, 0, 0.16, 1) forwards;
 }
 
 html[data-envelope-intro="revealing"] .hero__details::before {
-  animation: intro-center-bloom 860ms 1040ms cubic-bezier(0.22, 0, 0.16, 1) forwards;
+  animation: intro-center-bloom 1350ms 960ms cubic-bezier(0.22, 0, 0.16, 1) forwards;
 }
 
 @keyframes intro-site-reveal {
@@ -463,17 +463,19 @@ html[data-envelope-intro="revealing"] .hero__details::before {
 @keyframes intro-center-bloom {
   0% {
     opacity: 0;
-    clip-path: circle(0% at 50% 45%);
-    filter: blur(3px);
+    clip-path: ellipse(30% 24% at 50% 45%);
+    filter: blur(8px);
   }
 
-  58% {
-    opacity: 0.82;
+  42% {
+    opacity: 0.55;
+    clip-path: ellipse(82% 70% at 50% 45%);
+    filter: blur(5px);
   }
 
   100% {
     opacity: 1;
-    clip-path: circle(150% at 50% 45%);
+    clip-path: ellipse(170% 145% at 50% 45%);
     filter: blur(0);
   }
 }
