@@ -22,14 +22,6 @@ export async function submitMailingInformation(
     };
   }
 
-  if (parsed.data.formStartedAt && Date.now() - parsed.data.formStartedAt < 1500) {
-    return {
-      status: "error",
-      message: "Please try again in a moment.",
-      fieldErrors: {}
-    };
-  }
-
   const rateLimit = checkSubmissionRateLimit(parsed.data.normalizedEmail);
 
   if (!rateLimit.allowed) {
