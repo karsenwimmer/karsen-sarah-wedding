@@ -413,11 +413,13 @@ html[data-envelope-intro] .hero::after,
 html[data-envelope-intro] .hero__image,
 html[data-envelope-intro] .hero__wash {
   opacity: 0;
+  clip-path: circle(0% at 50% 45%);
 }
 
+html[data-envelope-intro="revealing"] .hero::after,
 html[data-envelope-intro="revealing"] .hero__image,
 html[data-envelope-intro="revealing"] .hero__wash {
-  animation: intro-site-reveal 820ms 1100ms ease forwards;
+  animation: intro-center-bloom 1050ms 860ms cubic-bezier(0.22, 0, 0.16, 1) forwards;
 }
 
 html[data-envelope-intro] .hero__mark {
@@ -432,27 +434,47 @@ html[data-envelope-intro] .hero__note,
 html[data-envelope-intro] .calendar-actions,
 html[data-envelope-intro] .hero .button {
   opacity: 0;
+  clip-path: circle(0% at 50% 50%);
   pointer-events: none;
 }
 
 html[data-envelope-intro] .hero__details::before {
   opacity: 0;
+  clip-path: circle(0% at 50% 36%);
 }
 
 html[data-envelope-intro="revealing"] .hero .countdown,
 html[data-envelope-intro="revealing"] .hero__note,
 html[data-envelope-intro="revealing"] .calendar-actions,
 html[data-envelope-intro="revealing"] .hero .button {
-  animation: intro-site-reveal 720ms 1450ms ease forwards;
+  animation: intro-center-bloom 760ms 1120ms cubic-bezier(0.22, 0, 0.16, 1) forwards;
 }
 
 html[data-envelope-intro="revealing"] .hero__details::before {
-  animation: intro-site-reveal 720ms 1375ms ease forwards;
+  animation: intro-center-bloom 860ms 1040ms cubic-bezier(0.22, 0, 0.16, 1) forwards;
 }
 
 @keyframes intro-site-reveal {
   to {
     opacity: 1;
+  }
+}
+
+@keyframes intro-center-bloom {
+  0% {
+    opacity: 0;
+    clip-path: circle(0% at 50% 45%);
+    filter: blur(3px);
+  }
+
+  58% {
+    opacity: 0.82;
+  }
+
+  100% {
+    opacity: 1;
+    clip-path: circle(150% at 50% 45%);
+    filter: blur(0);
   }
 }
 
