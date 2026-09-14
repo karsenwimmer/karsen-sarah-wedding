@@ -20,6 +20,7 @@ This repository currently contains the save-the-date, mailing form, email notifi
 - Household mailing-information form
 - Supabase SQL migration for household storage, household members, submission events, and future RSVP fields
 - Server-side form validation, rate limiting, create/update persistence, and no anonymous Supabase table access
+- Secured daily Supabase keepalive through Vercel Cron without creating test submissions
 - Resend guest confirmation emails and couple notification emails
 - Password-protected private admin dashboard at `/admin`
 - Static Updates and FAQ sections
@@ -53,6 +54,7 @@ Copy `.env.example` to `.env.local` and fill in the Supabase values before testi
 ```bash
 SUPABASE_URL=...
 SUPABASE_SERVICE_ROLE_KEY=...
+CRON_SECRET=...
 RESEND_API_KEY=...
 RESEND_FROM_EMAIL=wedding@thewimmers.ca
 COUPLE_NOTIFICATION_EMAIL=...
@@ -66,6 +68,8 @@ supabase/migrations/202608060001_initial_household_schema.sql
 ```
 
 Until Supabase is connected, the form will render locally but show a connection message when submitted.
+
+The production deployment calls `/api/cron/supabase-keepalive` once daily at 09:00 UTC. The route performs a minimal read from the `households` table so a low-traffic Free Plan project remains active without adding fake guest records or sending emails. Set `CRON_SECRET` to a random value of at least 16 characters in the Vercel project; Vercel includes it automatically in the scheduled request's authorization header.
 
 ## Review Checklist
 
