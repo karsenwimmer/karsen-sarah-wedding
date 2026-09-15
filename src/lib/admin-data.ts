@@ -292,6 +292,26 @@ export async function saveAdminHousehold(
   return data;
 }
 
+export async function deleteAdminHousehold(householdId: string) {
+  await requireAdminAccess();
+
+  const supabase = createSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("households")
+    .delete()
+    .eq("id", householdId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data) {
+    throw new Error("Household not found.");
+  }
+}
+
 export function filterAdminHouseholds(
   households: AdminHousehold[],
   filters: {

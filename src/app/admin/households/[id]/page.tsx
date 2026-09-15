@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { AdminDeleteHousehold } from "@/components/AdminDeleteHousehold";
 import { AdminHouseholdForm } from "@/components/AdminHouseholdForm";
 import { hasAdminSession } from "@/lib/admin-auth";
 import { getAdminHousehold } from "@/lib/admin-data";
@@ -55,6 +56,7 @@ export default async function EditAdminHouseholdPage({
       ) : null}
 
       <AdminHouseholdForm household={household} />
+      <AdminDeleteHousehold householdId={household.id} householdName={household.householdName} />
     </main>
   );
 }

@@ -33,6 +33,7 @@ type AdminPageProps = {
     package?: string;
     q?: string;
     status?: string;
+    notice?: string;
   }>;
 };
 
@@ -197,6 +198,12 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </form>
         </div>
       </header>
+
+      {params?.notice === "deleted" ? (
+        <div className="admin-form-message admin-dashboard-message" role="status">
+          Household deleted successfully.
+        </div>
+      ) : null}
 
       <section className="admin-stats" aria-label="Invitation list summary">
         <div>

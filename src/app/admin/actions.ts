@@ -13,7 +13,12 @@ import {
   parseAdminHouseholdFormData
 } from "@/lib/admin-household-schema";
 import type { AdminHouseholdFormState } from "@/lib/admin-household-form-state";
-import { saveAdminHousehold } from "@/lib/admin-data";
+import {
+  deleteAdminHousehold as deleteAdminHouseholdRecord,
+  saveAdminHousehold
+} from "@/lib/admin-data";
+
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export async function loginAdmin(formData: FormData) {
   const password = formData.get("password");
@@ -94,7 +99,7 @@ export async function updateAdminHousehold(
 ): Promise<AdminHouseholdFormState> {
   await requireAdminActionSession();
 
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(householdId)) {
+  if (!uuidPattern.test(householdId)) {
     return {
       status: "error",
       message: "This household could not be identified.",
@@ -121,4 +126,50 @@ export async function updateAdminHousehold(
   revalidatePath("/admin");
   revalidatePath(`/admin/households/${householdId}`);
   redirect(`/admin/households/${householdId}?notice=updated`);
+}
+
+export async function deleteAdminHousehold(
+  householdId: string,
+  householdName: string,
+  _previousState: AdminHouseholdFormState,
+  formData: FormData
+): Promise<AdminHouseholdFormState> {
+  await requireAdminActionSession();
+
+  if (!uuidPattern.test(householdId)) {
+    return {
+      status: "error",
+      message: "This household could not be identified.",
+      fieldErrors: {}
+    };
+  }
+
+  const confirmation = formData.get("confirmation");
+
+  if (typeof confirmation !== "string" || confirmation.trim() !== householdName) {
+    return {
+      status: "error",
+      message: "Enter the household name exactly as shown before deleting it.",
+      fieldErrors: {
+        confirmation: "The household name does not match."
+      }
+    };
+  }
+
+  try {
+    await deleteAdminHouseholdRecord(householdId);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown household deletion error";
+
+    console.error("Could not delete admin household.", { errorMessage: message });
+
+    return {
+      status: "error",
+      message: "We could not delete this household. Please try again.",
+      fieldErrors: {}
+    };
+  }
+
+  revalidatePath("/admin");
+  redirect("/admin?notice=deleted");
 }

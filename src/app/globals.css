@@ -1590,6 +1590,61 @@ html[data-envelope-intro="revealing"] .hero__details::before {
   padding: 0.5rem 0 2rem;
 }
 
+.admin-dashboard-message {
+  width: min(1180px, 100%);
+}
+
+.admin-delete-panel {
+  width: min(920px, 100%);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin: 0 auto 2rem;
+  border: 1px solid rgb(154 74 63 / 0.34);
+  border-radius: 8px;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  background: rgb(255 242 238 / 0.6);
+}
+
+.admin-delete-panel > div:first-child {
+  max-width: 580px;
+}
+
+.admin-delete-panel h2 {
+  margin-bottom: 0.8rem;
+}
+
+.admin-button--danger {
+  flex: 0 0 auto;
+  border: 1px solid #813c33;
+  color: #fffdf7;
+  background: #813c33;
+}
+
+.admin-button--danger:hover:not(:disabled) {
+  border-color: #662d27;
+  background: #662d27;
+}
+
+.admin-button--danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-delete-confirmation {
+  width: min(100%, 380px);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.admin-delete-confirmation__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.65rem;
+}
+
 .intro {
   position: fixed;
   z-index: 100;
@@ -1986,6 +2041,16 @@ html[data-envelope-intro="revealing"] .hero__details::before {
   }
 
   .admin-editor__actions .button {
+    width: 100%;
+  }
+
+  .admin-delete-panel,
+  .admin-delete-confirmation__actions {
+    display: grid;
+  }
+
+  .admin-delete-panel .button,
+  .admin-delete-confirmation {
     width: 100%;
   }
 

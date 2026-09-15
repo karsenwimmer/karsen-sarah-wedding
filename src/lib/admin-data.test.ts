@@ -12,7 +12,12 @@ vi.mock("@/lib/supabase-admin", () => ({
   createSupabaseAdminClient: createSupabaseAdminClientMock
 }));
 
-import { filterAdminHouseholds, saveAdminHousehold, type AdminHousehold } from "@/lib/admin-data";
+import {
+  deleteAdminHousehold,
+  filterAdminHouseholds,
+  saveAdminHousehold,
+  type AdminHousehold
+} from "@/lib/admin-data";
 
 const household: AdminHousehold = {
   id: "ea329a88-d026-4314-99ac-de3bd9fffe7d",
@@ -98,6 +103,24 @@ describe("admin household data", () => {
         p_members: [{ first_name: "Alex", last_name: "Smith" }]
       })
     );
+  });
+
+  it("deletes a household by ID for an authenticated admin", async () => {
+    const maybeSingle = vi.fn().mockResolvedValue({
+      data: { id: household.id },
+      error: null
+    });
+    const select = vi.fn().mockReturnValue({ maybeSingle });
+    const eq = vi.fn().mockReturnValue({ select });
+    const deleteQuery = vi.fn().mockReturnValue({ eq });
+    const from = vi.fn().mockReturnValue({ delete: deleteQuery });
+    hasAdminSessionMock.mockResolvedValue(true);
+    createSupabaseAdminClientMock.mockReturnValue({ from });
+
+    await expect(deleteAdminHousehold(household.id)).resolves.toBeUndefined();
+    expect(from).toHaveBeenCalledWith("households");
+    expect(deleteQuery).toHaveBeenCalledOnce();
+    expect(eq).toHaveBeenCalledWith("id", household.id);
   });
 
   it("searches across household and member names", () => {
