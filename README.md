@@ -23,6 +23,7 @@ This repository currently contains the save-the-date, mailing form, email notifi
 - Secured daily Supabase keepalive through Vercel Cron without creating test submissions
 - Resend guest confirmation emails and couple notification emails
 - Password-protected private admin dashboard at `/admin`
+- Invitation-list management with manual household creation, editing, review statuses, access packages, search, and filters
 - Static Updates and FAQ sections
 - Noindex metadata and `robots.txt`
 - Vercel redirect config for `www.thewimmers.ca` to `thewimmers.ca`
@@ -65,7 +66,10 @@ Apply the Supabase migration in:
 
 ```text
 supabase/migrations/202608060001_initial_household_schema.sql
+supabase/migrations/202609140001_invitation_management.sql
 ```
+
+Apply migrations in filename order. The invitation-management migration preserves existing Save the Date submissions, classifies them as full-celebration households needing review, and enables incomplete manual records in the admin dashboard.
 
 Until Supabase is connected, the form will render locally but show a connection message when submitted.
 

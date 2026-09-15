@@ -9,8 +9,8 @@ import type {
   HouseholdRepository
 } from "@/lib/household-persistence";
 
-function toHouseholdRow(input: HouseholdSubmission) {
-  return {
+function toHouseholdRow(input: HouseholdSubmission, includeInvitationMetadata = false) {
+  const values = {
     household_name: input.householdName,
     primary_first_name: input.primaryFirstName,
     primary_last_name: input.primaryLastName,
@@ -27,6 +27,17 @@ function toHouseholdRow(input: HouseholdSubmission) {
     communication_consent: input.communicationConsent,
     confirmation_email_status: "not_configured",
     couple_notification_status: "not_configured"
+  };
+
+  if (!includeInvitationMetadata) {
+    return values;
+  }
+
+  return {
+    ...values,
+    invitation_source: "save_the_date",
+    invitation_status: "needs_review",
+    invitation_package: "full_celebration"
   };
 }
 
@@ -71,7 +82,7 @@ export function createSupabaseHouseholdRepository(): HouseholdRepository {
     async createHousehold(input: HouseholdSubmission) {
       const { data, error } = await supabase
         .from("households")
-        .insert(toHouseholdRow(input))
+        .insert(toHouseholdRow(input, true))
         .select("id")
         .single();
 
