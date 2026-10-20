@@ -107,7 +107,7 @@ export function RsvpDemo() {
     <a className={s.skip} href="#demo-main">Skip to invitation</a>
     <div className={s.demoBar}><span className={s.demoDot} />Wedding invitation demo<span className={s.demoBarDetail}>Fictional guests · No real RSVPs are sent</span></div>
     <header className={s.header}>
-      <a href="/demo/rsvp" className={s.brand} aria-label="Alex and Jamie invitation demo"><span className={s.brandMark}>a<span>&</span>j</span><span>THE WEDDING OF<br /><strong>ALEX & JAMIE</strong></span></a>
+      <a href="/demo/rsvp" className={s.brand} aria-label="Luca and Victoria invitation demo"><span className={s.brandMark}>l<span>&</span>v</span><span>THE WEDDING OF<br /><strong>LUCA & VICTORIA</strong></span></a>
       {invite ? <nav aria-label="Invitation navigation"><a href="#rsvp">Your RSVP</a><a href="#details">The details</a><button type="button" onClick={switchInvitation}>Change invitation ↗</button></nav> : <span className={s.headerDate}>12 JUNE 2027 · OAKVILLE</span>}
     </header>
 
@@ -119,18 +119,18 @@ export function RsvpDemo() {
             <Sprig className={s.sprigTop} /><Sprig className={s.sprigBottom} />
             <div className={s.paperContent}>
               <p className={s.eyebrow}>TOGETHER WITH THEIR FAMILIES</p>
-              <h1>Alex <span>&</span> Jamie</h1>
+              <h1>Luca <span>&</span> Victoria</h1>
               <p className={s.paperMessage}>joyfully invite you to celebrate<br />the beginning of their forever</p>
               <div className={s.paperRule} />
               <p className={s.paperDate}>Saturday, the twelfth of June</p>
               <p className={s.paperYear}>TWO THOUSAND AND TWENTY-SEVEN</p>
               <p className={s.paperLocation}>Oakville, Ontario</p>
-              <span className={s.paperSeal} aria-hidden="true">a & j</span>
+              <span className={s.paperSeal} aria-hidden="true">l & v</span>
             </div>
           </section>
           <section className={s.entryForm} aria-labelledby="entry-title">
             <p className={s.eyebrow}>A LITTLE CODE. A SPECIAL INVITATION.</p>
-            <h2 id="entry-title">We’ve saved<br />a place for you.</h2>
+            <h2 id="entry-title">We’ve saved<br /> a place for you.</h2>
             <p className={s.intro}>Enter the code from your invitation to find your guest list, share your RSVP, and see the plans for our day.</p>
             <form onSubmit={openInvitation}>
               <label className={s.field} htmlFor="invitation-code">Your invitation code</label>
@@ -142,7 +142,7 @@ export function RsvpDemo() {
             <p className={s.demoHint}>This is a preview with made-up names and wedding details. Responses are saved only in this browser.</p>
           </section>
         </div>
-        <div className={s.entryFoot}><span>ONE BEAUTIFUL DAY</span><span>YOUR PEOPLE. YOUR INVITATION. YOUR CELEBRATION.</span><span>ALEX & JAMIE · 2027</span></div>
+        <div className={s.entryFoot}><span>ONE BEAUTIFUL DAY</span><span>YOUR PEOPLE. YOUR INVITATION. YOUR CELEBRATION.</span><span>LUCA & VICTORIA · 2027</span></div>
       </> : <>
         <section className={s.welcome}>
           <p className={s.eyebrow}>{wedding.date} · {wedding.location}</p>
@@ -204,6 +204,6 @@ export function RsvpDemo() {
         </section>
       </>}
     </main>
-    <footer className={s.footer}><span>WITH LOVE, ALEX & JAMIE</span><span>A sample invitation, made for a real celebration.</span><span>DEMONSTRATION ONLY</span></footer>
+    <footer className={s.footer}><span>WITH LOVE, LUCA & VICTORIA</span><span>A sample invitation, made for a real celebration.</span><span>DEMONSTRATION ONLY</span></footer>
   </div>;
 }

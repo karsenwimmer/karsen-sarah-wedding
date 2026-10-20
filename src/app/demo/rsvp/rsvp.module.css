@@ -147,7 +147,7 @@
   .invitationArt { width: 100%; min-height: 0; padding: 38px 20px 29px; }
   .paperBorder { inset: 12px; border-radius: 170px 170px 0 0; }
   .paperContent { padding-top: 14px; }
-  .paperContent h1 { font-size: 55px; flex-direction: row; gap: 12px; line-height: 1.1; margin-block: 18px; }
+  .paperContent h1 { font-size: clamp(32px, 10.5vw, 46px); flex-direction: row; gap: 12px; line-height: 1.1; margin-block: 18px; }
   .paperContent h1 span { font-size: .6em; }
   .paperMessage { font-size: 17px; }
   .paperRule { margin-block: 14px; }
@@ -176,5 +176,5 @@
   .demoTools { gap: 10px; }
   .root input:not([type="radio"]), .root select, .root textarea { font-size: 16px; }
 }
-@media (max-width: 360px) { .main { width: calc(100% - 28px); } .paperContent h1 { font-size: 46px; gap: 9px; } .responsePanel { padding-inline: 16px; } .attendance { grid-template-columns: 1fr; } .sampleGrid { grid-template-columns: 1fr; } .sampleGrid button { display: flex; justify-content: space-between; } .header nav { gap: 9px; } }
+@media (max-width: 360px) { .main { width: calc(100% - 28px); } .paperContent h1 { gap: 9px; } .responsePanel { padding-inline: 16px; } .attendance { grid-template-columns: 1fr; } .sampleGrid { grid-template-columns: 1fr; } .sampleGrid button { display: flex; justify-content: space-between; } .header nav { gap: 9px; } }
 @media (prefers-reduced-motion: reduce) { .root *, .root *::before, .root *::after { scroll-behavior: auto; transition: none; } }

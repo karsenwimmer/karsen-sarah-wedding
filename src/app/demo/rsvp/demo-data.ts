@@ -1,6 +1,6 @@
 // Fictional, public fixtures. Real invitation access must be checked on the server.
 export const demoWedding = {
-  names: "Alex & Jamie",
+  names: "Luca & Victoria",
   date: "Saturday, June 12, 2027",
   location: "Oakville, Ontario",
   deadline: "May 12, 2027",
