@@ -1,16 +1,11 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
+import Image from "next/image";
+import { Emblem } from "./emblem";
 import { demoInvitations, demoWedding as wedding, emptyResponses, findInvitation, meals,
   readResponse, responseErrors, storageKey, type DemoInvitation, type GuestResponse } from "./demo-data";
 import s from "./rsvp.module.css";
-
-function Sprig({ className }: { className?: string }) {
-  return <svg className={className} viewBox="0 0 180 220" fill="none" aria-hidden="true">
-    <path d="M84 208C76 160 92 104 115 28M84 169L43 132M88 136L139 101M99 99L64 63M110 63L145 36" stroke="currentColor" strokeWidth="1.3" />
-    <path d="M44 134C13 129 11 103 17 86C41 94 54 112 44 134ZM88 138C103 103 132 101 156 105C142 129 121 145 88 138ZM99 100C65 97 50 76 51 47C80 53 97 73 99 100ZM111 65C122 38 144 26 166 28C155 52 139 65 111 65ZM115 30C102 12 108 1 116 0C128 9 128 21 115 30Z" fill="currentColor" opacity=".25" />
-  </svg>;
-}
 
 export function RsvpDemo() {
   const [code, setCode] = useState("");
@@ -107,17 +102,18 @@ export function RsvpDemo() {
     <a className={s.skip} href="#demo-main">Skip to invitation</a>
     <div className={s.demoBar}><span className={s.demoDot} />Wedding invitation demo<span className={s.demoBarDetail}>Fictional guests · No real RSVPs are sent</span></div>
     <header className={s.header}>
-      <a href="/demo/rsvp" className={s.brand} aria-label="Luca and Victoria invitation demo"><span className={s.brandMark}>l<span>&</span>v</span><span>THE WEDDING OF<br /><strong>LUCA & VICTORIA</strong></span></a>
-      {invite ? <nav aria-label="Invitation navigation"><a href="#rsvp">Your RSVP</a><a href="#details">The details</a><button type="button" onClick={switchInvitation}>Change invitation ↗</button></nav> : <span className={s.headerDate}>12 JUNE 2027 · OAKVILLE</span>}
+      <a href="/demo/rsvp" className={s.brand} aria-label="Luca and Victoria invitation demo"><Emblem className={s.brandMark} /><span>THE WEDDING OF<br /><strong>LUCA & VICTORIA</strong></span></a>
+      {invite ? <nav aria-label="Invitation navigation"><a href="#rsvp">Your RSVP</a><a href="#details">The details</a><button type="button" onClick={switchInvitation}>Change invitation ↗</button></nav> : <a className={s.headerDate} href="#invitation-entry">YOUR INVITATION <span aria-hidden="true">↓</span></a>}
     </header>
 
     <main id="demo-main" className={s.main}>
       {!invite ? <>
         <div className={s.entry}>
           <section className={s.invitationArt} aria-label="Sample wedding invitation">
-            <div className={s.paperBorder} />
-            <Sprig className={s.sprigTop} /><Sprig className={s.sprigBottom} />
+            <Image src="/images/demo/luca-victoria-oil-courtyard.webp" alt="" fill priority unoptimized sizes="100vw" className={s.heroPainting} />
+            <div className={s.paintingVeil} />
             <div className={s.paperContent}>
+              <Emblem className={s.heroEmblem} />
               <p className={s.eyebrow}>TOGETHER WITH THEIR FAMILIES</p>
               <h1>Luca <span>&</span> Victoria</h1>
               <p className={s.paperMessage}>joyfully invite you to celebrate<br />the beginning of their forever</p>
@@ -125,12 +121,13 @@ export function RsvpDemo() {
               <p className={s.paperDate}>Saturday, the twelfth of June</p>
               <p className={s.paperYear}>TWO THOUSAND AND TWENTY-SEVEN</p>
               <p className={s.paperLocation}>Oakville, Ontario</p>
-              <span className={s.paperSeal} aria-hidden="true">l & v</span>
+              <a href="#invitation-entry" className={s.heroLink}>Your invitation awaits <span aria-hidden="true">↓</span></a>
             </div>
           </section>
-          <section className={s.entryForm} aria-labelledby="entry-title">
+          <section id="invitation-entry" className={s.entryForm} aria-labelledby="entry-title">
+            <div className={s.flourish} aria-hidden="true">✧</div>
             <p className={s.eyebrow}>A LITTLE CODE. A SPECIAL INVITATION.</p>
-            <h2 id="entry-title">We’ve saved<br /> a place for you.</h2>
+            <h2 id="entry-title">A place, just for you.</h2>
             <p className={s.intro}>Enter the code from your invitation to find your guest list, share your RSVP, and see the plans for our day.</p>
             <form onSubmit={openInvitation}>
               <label className={s.field} htmlFor="invitation-code">Your invitation code</label>
@@ -139,12 +136,14 @@ export function RsvpDemo() {
               <button className={s.primary} type="submit">Open my invitation <span aria-hidden="true">→</span></button>
             </form>
             <div className={s.samples}><p>JUST EXPLORING? TRY A SAMPLE CODE</p><div className={s.sampleGrid}>{demoInvitations.map((sample) => <button key={sample.code} type="button" onClick={() => { setCode(sample.code); setCodeError(""); codeInput.current?.focus(); }}><strong>{sample.code}</strong><span>{sample.label} · {sample.guests.length} guests</span></button>)}</div></div>
-            <p className={s.demoHint}>This is a preview with made-up names and wedding details. Responses are saved only in this browser.</p>
+            <p className={s.demoHint}>This preview uses sample guests and wedding details. Responses are saved only in this browser.</p>
           </section>
         </div>
         <div className={s.entryFoot}><span>ONE BEAUTIFUL DAY</span><span>YOUR PEOPLE. YOUR INVITATION. YOUR CELEBRATION.</span><span>LUCA & VICTORIA · 2027</span></div>
       </> : <>
         <section className={s.welcome}>
+          <div className={s.welcomePainting} aria-hidden="true" />
+          <Emblem className={s.welcomeEmblem} />
           <p className={s.eyebrow}>{wedding.date} · {wedding.location}</p>
           <h1 ref={heading} tabIndex={-1}>{confirmed ? "Your reply, with love." : `You’re invited, ${invite.household}.`}</h1>
           <p>{invite.reception ? "We’d love to celebrate our ceremony and reception with you." : "We’d love for you to join us at our wedding ceremony."}</p>
@@ -188,7 +187,7 @@ export function RsvpDemo() {
             </>}
           </section>
           <aside id="details" className={s.details} aria-label="Wedding details">
-            <div className={s.detailsIntro}><p className={s.eyebrow}>THE WEDDING OF</p><h2>{wedding.names}</h2><p>{wedding.date}</p><Sprig className={s.detailsSprig} /></div>
+            <div className={s.detailsIntro}><Emblem className={s.detailsEmblem} /><p className={s.eyebrow}>THE WEDDING OF</p><h2>{wedding.names}</h2><p>{wedding.date}</p></div>
             <section className={s.detailBlock}><span className={s.detailIcon} aria-hidden="true">01</span><div><p className={s.eyebrow}>THE CEREMONY · {wedding.ceremony.time}</p><h3>{wedding.ceremony.name}</h3><p>{wedding.ceremony.address}</p><p className={s.fieldHint}>Please arrive 15 minutes before the ceremony.</p></div></section>
             {invite.reception && <section className={s.detailBlock}><span className={s.detailIcon} aria-hidden="true">02</span><div><p className={s.eyebrow}>THE RECEPTION · {wedding.reception.time}</p><h3>{wedding.reception.name}</h3><p>{wedding.reception.address}</p><p className={s.fieldHint}>Dinner, dancing, and a few happy tears.</p></div></section>}
             <section className={s.detailSection}><p className={s.eyebrow}>THE ORDER OF THE DAY</p><ol className={s.timeline}><li><time>1:45 PM</time><span>Arrive & settle in</span></li><li><time>2:00 PM</time><span>We say “I do”</span></li>{invite.reception && <><li><time>4:30 PM</time><span>Cocktails & conversation</span></li><li><time>6:00 PM</time><span>Dinner & toasts</span></li><li><time>8:00 PM</time><span>Meet us on the dance floor</span></li></>}</ol></section>
