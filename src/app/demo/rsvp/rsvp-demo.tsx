@@ -102,7 +102,7 @@ export function RsvpDemo() {
     <a className={s.skip} href="#demo-main">Skip to invitation</a>
     {invite && <div className={s.demoBar}><span className={s.demoDot} />Wedding invitation demo<span className={s.demoBarDetail}>Fictional guests · No real RSVPs are sent</span></div>}
     <header className={s.header}>
-      <a href="/demo/rsvp" className={s.brand} aria-label="Luca and Victoria invitation demo"><Emblem className={s.brandMark} /><span>THE WEDDING OF<br /><strong>LUCA & VICTORIA</strong></span></a>
+      <a href="/demo/rsvp" className={s.brand} aria-label="Luca and Victoria invitation demo"><Emblem className={s.brandMark} compact /><span>THE WEDDING OF<br /><strong>LUCA & VICTORIA</strong></span></a>
       {invite ? <nav aria-label="Invitation navigation"><a href="#rsvp">Your RSVP</a><a href="#details">The details</a><button type="button" onClick={switchInvitation}>Change invitation ↗</button></nav> : <span className={s.demoBadge} aria-label="Demonstration only. No real RSVPs are sent.">DEMO</span>}
     </header>
 
@@ -119,7 +119,6 @@ export function RsvpDemo() {
               <Emblem className={s.heroEmblem} />
               <p className={s.eyebrow}>YOU’RE INVITED TO CELEBRATE</p>
               <h1>Luca <span>&</span> Victoria</h1>
-              <p className={s.paperMessage}>joyfully invite you to celebrate<br />the beginning of their forever</p>
               <div className={s.paperRule} />
               <p className={s.paperDate}>{wedding.date}</p>
               <p className={s.paperLocation}>Oakville, Ontario</p>
@@ -129,9 +128,9 @@ export function RsvpDemo() {
             <h2 id="entry-title"><label htmlFor="invitation-code">Enter your code</label></h2>
             <p id="code-help" className={s.codeExplanation}>You’ll find it on your invitation.</p>
             <form onSubmit={openInvitation}>
-              <div className={s.codeBar}>
+              <div className={`${s.codeBar} ${codeError ? s.codeBarError : ""}`}>
                 <input ref={codeInput} id="invitation-code" className={s.codeInput} value={code} onChange={(event) => { setCode(event.target.value); setCodeError(""); }} autoCapitalize="characters" autoCorrect="off" autoComplete="off" spellCheck={false} maxLength={24} placeholder="Enter code" aria-invalid={Boolean(codeError)} aria-describedby={codeError ? "code-help code-error" : "code-help"} required />
-                <button className={s.codeSubmit} type="submit" aria-label="Open my invitation"><span aria-hidden="true">→</span></button>
+                <button className={s.codeSubmit} type="submit" aria-label="Open my invitation"><Arrow /></button>
               </div>
               {codeError && <p id="code-error" className={s.error} role="alert">{codeError}</p>}
             </form>
@@ -139,10 +138,9 @@ export function RsvpDemo() {
         </div>
       </> : <>
         <section className={s.welcome}>
-          <div className={s.welcomePainting} aria-hidden="true" />
-          <Emblem className={s.welcomeEmblem} />
-          <p className={s.eyebrow}>{wedding.date} · {wedding.location}</p>
-          <h1 ref={heading} tabIndex={-1}>{confirmed ? "Your reply, with love." : `You’re invited, ${invite.household}.`}</h1>
+          <p className={s.eyebrow}>{confirmed ? "WITH LOVE & THANKS" : "AN INVITATION FOR"}</p>
+          <h1 ref={heading} tabIndex={-1}>{invite.household}</h1>
+          <p className={s.welcomeDate}>{wedding.date} <span aria-hidden="true">·</span> {wedding.location}</p>
           <p>{invite.reception ? "We’d love to celebrate our ceremony and reception with you." : "We’d love for you to join us at our wedding ceremony."}</p>
           <span className={s.tag}>{invite.reception ? "CEREMONY & RECEPTION" : "CEREMONY INVITATION"} <span aria-hidden="true">·</span> {invite.guests.length} INVITED GUESTS</span>
         </section>
@@ -158,7 +156,7 @@ export function RsvpDemo() {
                 return <div className={s.summaryGuest} key={guest.id}><strong>{guest.name}</strong><span>{answer.attendance === "yes" ? "Joyfully attending" : "Respectfully declining"}</span>{answer.attendance === "yes" && invite.reception && <small>{meals.find((meal) => meal.id === answer.meal)?.label}</small>}{answer.dietary && <small>Dietary requirements: {answer.dietary}</small>}</div>;
               })}</div>
               {note && <div className={s.noteSummary}><strong>Your note</strong><p>{note}</p></div>}
-              <button type="button" className={s.primary} onClick={() => { setConfirmed(false); focusHeading(); }}>Edit my response <span aria-hidden="true">↗</span></button>
+              <button type="button" className={s.primary} onClick={() => { setConfirmed(false); focusHeading(); }}>Edit my response <Arrow /></button>
               <p className={s.fieldHint}>In the live version, guests can update their reply until {wedding.deadline}.</p>
             </> : <>
               <p className={s.eyebrow}>KINDLY REPLY BY {wedding.deadline.toUpperCase()}</p>
@@ -178,13 +176,13 @@ export function RsvpDemo() {
                   </fieldset>;
                 })}
                 <label className={s.field} htmlFor="guest-note">A note for the couple <span className={s.optional}>(optional)</span><textarea id="guest-note" rows={3} value={note} onChange={(event) => setNote(event.target.value)} maxLength={1000} placeholder="Leave a little love…" /></label>
-                <button className={s.primary} type="submit">Save demo RSVP <span aria-hidden="true">→</span></button>
+                <button className={s.primary} type="submit">Save demo RSVP <Arrow /></button>
                 <p className={s.fieldHint}>Demo only. No email is sent and no real guest list is updated.</p>
               </form>
             </>}
           </section>
           <aside id="details" className={s.details} aria-label="Wedding details">
-            <div className={s.detailsIntro}><Emblem className={s.detailsEmblem} /><p className={s.eyebrow}>THE WEDDING OF</p><h2>{wedding.names}</h2><p>{wedding.date}</p></div>
+            <div className={s.detailsIntro}><p className={s.eyebrow}>THE WEDDING OF</p><h2>Luca <span>&</span> Victoria</h2><p>{wedding.date}</p><div className={s.paperRule} aria-hidden="true" /></div>
             <section className={s.detailBlock}><span className={s.detailIcon} aria-hidden="true">01</span><div><p className={s.eyebrow}>THE CEREMONY · {wedding.ceremony.time}</p><h3>{wedding.ceremony.name}</h3><p>{wedding.ceremony.address}</p><p className={s.fieldHint}>Please arrive 15 minutes before the ceremony.</p></div></section>
             {invite.reception && <section className={s.detailBlock}><span className={s.detailIcon} aria-hidden="true">02</span><div><p className={s.eyebrow}>THE RECEPTION · {wedding.reception.time}</p><h3>{wedding.reception.name}</h3><p>{wedding.reception.address}</p><p className={s.fieldHint}>Dinner, dancing, and a few happy tears.</p></div></section>}
             <section className={s.detailSection}><p className={s.eyebrow}>THE ORDER OF THE DAY</p><ol className={s.timeline}><li><time>1:45 PM</time><span>Arrive & settle in</span></li><li><time>2:00 PM</time><span>We say “I do”</span></li>{invite.reception && <><li><time>4:30 PM</time><span>Cocktails & conversation</span></li><li><time>6:00 PM</time><span>Dinner & toasts</span></li><li><time>8:00 PM</time><span>Meet us on the dance floor</span></li></>}</ol></section>
@@ -202,4 +200,8 @@ export function RsvpDemo() {
     </main>
     {invite && <footer className={s.footer}><span>WITH LOVE, LUCA & VICTORIA</span><span>A sample invitation, made for a real celebration.</span><span>DEMONSTRATION ONLY</span></footer>}
   </div>;
+}
+
+function Arrow() {
+  return <svg className={s.arrow} viewBox="0 0 28 20" fill="none" aria-hidden="true"><path d="M2 10h23M18 3l7 7-7 7" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 }
