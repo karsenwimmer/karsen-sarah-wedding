@@ -1,6 +1,6 @@
 // Public, fictional households for design review only. These codes grant no real access.
 export type Guest = { id: string; name: string; child?: boolean };
-export type Invite = { code: string; name: string; reception: boolean; guests: Guest[] };
+export type Invite = { code: string; name: string; reception: boolean; guests: Guest[]; mealsOpen?: boolean };
 export const invitations: Invite[] = [
   { code: "HARBOUR", name: "Avery & Jordan", reception: true,
     guests: [{ id: "avery", name: "Avery Morgan" }, { id: "jordan", name: "Jordan Morgan" }] },
@@ -30,7 +30,7 @@ export function validateAnswers(invite: Invite, answers: Answer[]) {
   for (const guest of invite.guests) {
     const answer = answers.find(item => item.id === guest.id);
     if (!answer || !["yes", "no"].includes(answer.attending)) errors[guest.id] = "Please let us know if you’ll be joining us.";
-    else if (invite.reception && answer.attending === "yes" &&
+    else if (invite.reception && invite.mealsOpen !== false && answer.attending === "yes" &&
       !mealOptions.some(meal => meal.value === answer.meal && (guest.child || meal.value !== "children"))) {
       errors[guest.id] = "Please choose a meal for this guest.";
     }
@@ -41,7 +41,7 @@ export function cleanAnswers(invite: Invite, answers: Answer[]): Answer[] {
   return invite.guests.map(guest => {
     const answer = answers.find(item => item.id === guest.id)!;
     return { id: guest.id, attending: answer.attending,
-      meal: invite.reception && answer.attending === "yes" ? answer.meal : "",
+      meal: invite.reception && invite.mealsOpen !== false && answer.attending === "yes" ? answer.meal : "",
       dietary: answer.attending === "yes" ? answer.dietary.trim() : "" };
   });
 }
