@@ -110,8 +110,11 @@ export function RsvpDemo() {
       {!invite ? <>
         <div className={s.entry}>
           <section className={s.invitationArt} aria-label="Sample wedding invitation">
-            <Image src="/images/demo/luca-victoria-oil-courtyard.webp" alt="" fill priority unoptimized sizes="100vw" className={s.heroPainting} />
-            <div className={s.paintingVeil} />
+            <div className={s.paperBorder} />
+            <div className={s.paintingPanel}>
+              <Image src="/images/demo/luca-victoria-oil-courtyard.webp" alt="" fill priority unoptimized sizes="(max-width: 760px) 90vw, 500px" className={s.heroPainting} />
+              <div className={s.paintingVeil} />
+            </div>
             <div className={s.paperContent}>
               <Emblem className={s.heroEmblem} />
               <p className={s.eyebrow}>TOGETHER WITH THEIR FAMILIES</p>
@@ -121,7 +124,6 @@ export function RsvpDemo() {
               <p className={s.paperDate}>Saturday, the twelfth of June</p>
               <p className={s.paperYear}>TWO THOUSAND AND TWENTY-SEVEN</p>
               <p className={s.paperLocation}>Oakville, Ontario</p>
-              <a href="#invitation-entry" className={s.heroLink}>Your invitation awaits <span aria-hidden="true">↓</span></a>
             </div>
           </section>
           <section id="invitation-entry" className={s.entryForm} aria-labelledby="entry-title">

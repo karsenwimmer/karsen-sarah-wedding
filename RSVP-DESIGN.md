@@ -1,8 +1,8 @@
 # Luca & Victoria invitation design
 
-The invitation uses an original Impressionist oil-style courtyard painting, an uppercase gold L & V oval emblem, Bodoni Moda display lettering, and Source Sans 3 interface text. The palette is warm porcelain, muted blush, taupe, plum, and antique gold. Fonts and styles are scoped to the demo route.
+The invitation uses an original Impressionist oil-style courtyard painting, an uppercase gold L & V oval emblem, Bodoni Moda display lettering, and Source Sans 3 interface text. The palette is dusty sage (#A8B39F), pale sage (#E8EDE3), warm cream (#FAF7F0), eucalyptus (#435747), and antique gold (#AE8B50). The entry layout pairs a framed invitation and oil painting on the left with code entry on the right. On mobile the compact invitation card sits above the form. Fonts and styles are scoped to the demo route.
 
-The background is illustrative, not a representation of the real wedding venue. Existing invitation codes, invited guests, meal choices, saved responses and reset behaviour are unchanged.
+The painting is illustrative, not a representation of the real wedding venue. Existing invitation codes, invited guests, meal choices, saved responses and reset behaviour are unchanged.
 
 Artwork: `public/images/demo/luca-victoria-oil-courtyard.webp`
 
