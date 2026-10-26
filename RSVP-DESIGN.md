@@ -1,12 +1,12 @@
 # Luca & Victoria invitation design
 
-The invitation uses an original Impressionist oil-style courtyard painting, a custom gold botanical monogram with outlined L | V initials, an open circular frame, and fine leafy branches at the upper left and lower right. Its simplified header variant keeps the same initials and botanical silhouette, Bodoni Moda display lettering, and Source Sans 3 interface text. The palette is dusty sage (#A8B39F), pale sage (#E6ECDF), warm cream (#FBF8F1), eucalyptus (#3F5344), and antique gold (#9A773E). The framed card has a subtle procedural paper grain, restrained double border and soft shadow. The names lead the typography, with one invitation caption and June 12, 2026 as the date.
+The invitation uses an original Impressionist oil-style courtyard painting, the approved generated gold L | V PNG monogram with one clean circle and leafy sprays, Bodoni Moda display lettering, and Source Sans 3 interface text. The palette is dusty sage (#A8B39F), pale sage (#E6ECDF), warm cream (#FBF8F1), eucalyptus (#3F5344), and antique gold (#9A773E). The framed card has a subtle procedural paper grain, restrained double border and soft shadow. The names lead the typography, with one invitation caption and June 12, 2026 as the date.
 
 The desktop entry pairs the invitation with a narrower code form. On mobile the card sits above “Enter your code”, one explanation and an input with an arrow submit button. The entry fits standard phone viewports; natural overflow remains available for enlarged text. The RSVP screen introduces the household with “An invitation for”, uses consistent rectangular controls and selected states, and keeps wedding details quieter with fewer borders and repeated emblems. Fonts, texture and styles remain scoped to the demo route.
 
 The painting is illustrative, not a representation of the real wedding venue. Existing invitation codes, invited guests, meal choices, saved responses and reset behaviour are unchanged.
 
-Monogram export: `public/images/demo/luca-victoria-monogram.svg` (transparent vector, generated from the Emblem component).
+Active monogram: `public/images/demo/luca-victoria-monogram-generated.png` (1254 × 1254 transparent PNG, built-in Image Generation). The header and card share this exact image. The previous SVG is retained only as an unused historical asset. See `monogram-generation-notes.md` for the generation prompt.
 
 Artwork: `public/images/demo/luca-victoria-oil-courtyard.webp`
 

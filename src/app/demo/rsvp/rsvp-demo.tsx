@@ -102,7 +102,7 @@ export function RsvpDemo() {
     <a className={s.skip} href="#demo-main">Skip to invitation</a>
     {invite && <div className={s.demoBar}><span className={s.demoDot} />Wedding invitation demo<span className={s.demoBarDetail}>Fictional guests · No real RSVPs are sent</span></div>}
     <header className={s.header}>
-      <a href="/demo/rsvp" className={s.brand} aria-label="Luca and Victoria invitation demo"><Emblem className={s.brandMark} compact /><span>THE WEDDING OF<br /><strong>LUCA & VICTORIA</strong></span></a>
+      <a href="/demo/rsvp" className={s.brand} aria-label="Luca and Victoria invitation demo"><Emblem className={s.brandMark} /><span>THE WEDDING OF<br /><strong>LUCA & VICTORIA</strong></span></a>
       {invite ? <nav aria-label="Invitation navigation"><a href="#rsvp">Your RSVP</a><a href="#details">The details</a><button type="button" onClick={switchInvitation}>Change invitation ↗</button></nav> : <span className={s.demoBadge} aria-label="Demonstration only. No real RSVPs are sent.">DEMO</span>}
     </header>
 
