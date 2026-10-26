@@ -10,12 +10,12 @@ export const metadata: Metadata = {
     title: "Karsen & Sarah | Your invitation",
     description: "July 17, 2027 · Oakville, Ontario",
     url: "/invitation",
-    images: [{ url: "/images/bronte-harbour-watercolour.webp", width: 1665, height: 968 }]
+    images: [{ url: "/images/invitation-sailboats-v1.webp", width: 1536, height: 1024 }]
   },
   twitter: {
     card: "summary_large_image", title: "Karsen & Sarah | Your invitation",
     description: "July 17, 2027 · Oakville, Ontario",
-    images: ["/images/bronte-harbour-watercolour.webp"]
+    images: ["/images/invitation-sailboats-v1.webp"]
   }
 };
 
