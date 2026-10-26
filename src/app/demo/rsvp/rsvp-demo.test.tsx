@@ -4,7 +4,7 @@ import { RsvpDemo } from "./rsvp-demo";
 import { demoInvitations, readResponse, storageKey } from "./demo-data";
 
 function open(code = "ROSE24") {
-  fireEvent.change(screen.getByLabelText("Your invitation code"), { target: { value: code } });
+  fireEvent.change(screen.getByRole("textbox", { name: "Enter your code" }), { target: { value: code } });
   fireEvent.click(screen.getByRole("button", { name: /Open my invitation/ }));
 }
 

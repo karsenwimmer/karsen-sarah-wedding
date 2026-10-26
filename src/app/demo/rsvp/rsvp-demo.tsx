@@ -28,7 +28,7 @@ export function RsvpDemo() {
     event.preventDefault();
     const found = findInvitation(code);
     if (!found) {
-      setCodeError("We couldn’t find that invitation. Try one of the sample codes below.");
+      setCodeError("We couldn’t find that invitation. Please check the code on your invite and try again.");
       codeInput.current?.focus();
       return;
     }
@@ -98,12 +98,12 @@ export function RsvpDemo() {
 
   const attending = answers.filter((answer) => answer.attendance === "yes").length;
 
-  return <div className={s.root}>
+  return <div className={`${s.root} ${!invite ? s.entryRoot : ""}`}>
     <a className={s.skip} href="#demo-main">Skip to invitation</a>
-    <div className={s.demoBar}><span className={s.demoDot} />Wedding invitation demo<span className={s.demoBarDetail}>Fictional guests · No real RSVPs are sent</span></div>
+    {invite && <div className={s.demoBar}><span className={s.demoDot} />Wedding invitation demo<span className={s.demoBarDetail}>Fictional guests · No real RSVPs are sent</span></div>}
     <header className={s.header}>
       <a href="/demo/rsvp" className={s.brand} aria-label="Luca and Victoria invitation demo"><Emblem className={s.brandMark} /><span>THE WEDDING OF<br /><strong>LUCA & VICTORIA</strong></span></a>
-      {invite ? <nav aria-label="Invitation navigation"><a href="#rsvp">Your RSVP</a><a href="#details">The details</a><button type="button" onClick={switchInvitation}>Change invitation ↗</button></nav> : <a className={s.headerDate} href="#invitation-entry">YOUR INVITATION <span aria-hidden="true">↓</span></a>}
+      {invite ? <nav aria-label="Invitation navigation"><a href="#rsvp">Your RSVP</a><a href="#details">The details</a><button type="button" onClick={switchInvitation}>Change invitation ↗</button></nav> : <span className={s.demoBadge} aria-label="Demonstration only. No real RSVPs are sent.">DEMO</span>}
     </header>
 
     <main id="demo-main" className={s.main}>
@@ -117,31 +117,26 @@ export function RsvpDemo() {
             </div>
             <div className={s.paperContent}>
               <Emblem className={s.heroEmblem} />
-              <p className={s.eyebrow}>TOGETHER WITH THEIR FAMILIES</p>
+              <p className={s.eyebrow}>YOU’RE INVITED TO CELEBRATE</p>
               <h1>Luca <span>&</span> Victoria</h1>
               <p className={s.paperMessage}>joyfully invite you to celebrate<br />the beginning of their forever</p>
               <div className={s.paperRule} />
-              <p className={s.paperDate}>Saturday, the twelfth of June</p>
-              <p className={s.paperYear}>TWO THOUSAND AND TWENTY-SEVEN</p>
+              <p className={s.paperDate}>{wedding.date}</p>
               <p className={s.paperLocation}>Oakville, Ontario</p>
             </div>
           </section>
           <section id="invitation-entry" className={s.entryForm} aria-labelledby="entry-title">
-            <div className={s.flourish} aria-hidden="true">✧</div>
-            <p className={s.eyebrow}>A LITTLE CODE. A SPECIAL INVITATION.</p>
-            <h2 id="entry-title">A place, just for you.</h2>
-            <p className={s.intro}>Enter the code from your invitation to find your guest list, share your RSVP, and see the plans for our day.</p>
+            <h2 id="entry-title"><label htmlFor="invitation-code">Enter your code</label></h2>
+            <p id="code-help" className={s.codeExplanation}>You’ll find it on your invitation.</p>
             <form onSubmit={openInvitation}>
-              <label className={s.field} htmlFor="invitation-code">Your invitation code</label>
-              <input ref={codeInput} id="invitation-code" className={s.codeInput} value={code} onChange={(event) => { setCode(event.target.value); setCodeError(""); }} autoCapitalize="characters" autoCorrect="off" autoComplete="off" spellCheck={false} maxLength={24} placeholder="e.g. ROSE24" aria-invalid={Boolean(codeError)} aria-describedby={codeError ? "code-error" : "code-help"} required />
-              {codeError ? <p id="code-error" className={s.error} role="alert">{codeError}</p> : <p id="code-help" className={s.fieldHint}>You’ll find this on your printed invitation.</p>}
-              <button className={s.primary} type="submit">Open my invitation <span aria-hidden="true">→</span></button>
+              <div className={s.codeBar}>
+                <input ref={codeInput} id="invitation-code" className={s.codeInput} value={code} onChange={(event) => { setCode(event.target.value); setCodeError(""); }} autoCapitalize="characters" autoCorrect="off" autoComplete="off" spellCheck={false} maxLength={24} placeholder="Enter code" aria-invalid={Boolean(codeError)} aria-describedby={codeError ? "code-help code-error" : "code-help"} required />
+                <button className={s.codeSubmit} type="submit" aria-label="Open my invitation"><span aria-hidden="true">→</span></button>
+              </div>
+              {codeError && <p id="code-error" className={s.error} role="alert">{codeError}</p>}
             </form>
-            <div className={s.samples}><p>JUST EXPLORING? TRY A SAMPLE CODE</p><div className={s.sampleGrid}>{demoInvitations.map((sample) => <button key={sample.code} type="button" onClick={() => { setCode(sample.code); setCodeError(""); codeInput.current?.focus(); }}><strong>{sample.code}</strong><span>{sample.label} · {sample.guests.length} guests</span></button>)}</div></div>
-            <p className={s.demoHint}>This preview uses sample guests and wedding details. Responses are saved only in this browser.</p>
           </section>
         </div>
-        <div className={s.entryFoot}><span>ONE BEAUTIFUL DAY</span><span>YOUR PEOPLE. YOUR INVITATION. YOUR CELEBRATION.</span><span>LUCA & VICTORIA · 2027</span></div>
       </> : <>
         <section className={s.welcome}>
           <div className={s.welcomePainting} aria-hidden="true" />
@@ -205,6 +200,6 @@ export function RsvpDemo() {
         </section>
       </>}
     </main>
-    <footer className={s.footer}><span>WITH LOVE, LUCA & VICTORIA</span><span>A sample invitation, made for a real celebration.</span><span>DEMONSTRATION ONLY</span></footer>
+    {invite && <footer className={s.footer}><span>WITH LOVE, LUCA & VICTORIA</span><span>A sample invitation, made for a real celebration.</span><span>DEMONSTRATION ONLY</span></footer>}
   </div>;
 }

@@ -1,9 +1,9 @@
 // Fictional, public fixtures. Real invitation access must be checked on the server.
 export const demoWedding = {
   names: "Luca & Victoria",
-  date: "Saturday, June 12, 2027",
+  date: "June 12, 2026",
   location: "Oakville, Ontario",
-  deadline: "May 12, 2027",
+  deadline: "May 12, 2026",
   ceremony: { name: "The Garden Chapel", address: "12 Chapel Lane, Oakville, ON", time: "2:00 PM" },
   reception: { name: "Willow House", address: "48 Willow Road, Oakville, ON", time: "4:30 PM" }
 };

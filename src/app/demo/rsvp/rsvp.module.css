@@ -226,4 +226,49 @@
   .attendance { grid-template-columns: 1fr; }
   .responsePanel { padding-inline: 17px; }
 }
+.entryRoot { min-height: 100svh; display: flex; flex-direction: column; }
+.entryRoot .header { min-height: 72px; padding-block: 9px; }
+.entryRoot .brandMark { width: 37px; height: 46px; }
+.demoBadge { font-size: 9px; letter-spacing: .16em; color: #5c6b5d; }
+.entryRoot .main { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.entryRoot .entry { width: min(1060px, calc(100% - 80px)); padding: 20px 0; gap: clamp(40px, 6vw, 85px); }
+.entryRoot .invitationArt { display: flex; flex-direction: column; align-items: center; gap: 18px; min-height: clamp(370px, calc(100svh - 120px), 580px); padding: 24px; }
+.entryRoot .paperContent { flex: 0 0 auto; }
+.entryRoot .paintingPanel { position: relative; order: 2; flex: 1; width: 100%; min-height: 135px; height: auto; left: auto; right: auto; bottom: auto; }
+.entryRoot .heroEmblem { width: 64px; height: 76px; margin-bottom: 11px; }
+.entryRoot .paperContent h1 { margin-block: 10px; }
+.entryRoot .paperDate { font-style: normal; font-size: 22px; }
+.entryRoot .entryForm { padding: 0; }
+.entryRoot .entryForm h2 { font-family: var(--font-body), Arial, sans-serif; font-size: 22px; font-style: normal; font-weight: 500; line-height: 1.4; letter-spacing: 0; margin: 0 0 4px; }
+.codeExplanation { margin: 0 0 14px !important; color: var(--demo-muted); font-size: 14px; line-height: 1.6; }
+.codeBar { display: flex; align-items: center; gap: 5px; padding: 4px; background: var(--paper); border: 1px solid #aebea2; border-radius: 6px; }
+.codeBar:focus-within { outline: 2px solid #587051; outline-offset: 3px; }
+.root .codeBar input { flex: 1; min-width: 0; min-height: 44px; margin: 0; padding: 8px 12px; border: 0; background: transparent; border-radius: 0; font-size: 16px; }
+.root .codeBar input:focus-visible { outline: none; }
+.root .codeBar input::placeholder { font-size: 15px; letter-spacing: .04em; }
+.codeSubmit { flex-shrink: 0; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 4px; background: #435747; color: #faf7f0; font-size: 24px !important; line-height: 1; }
+.codeSubmit:hover { background: #314633; }
+.entryRoot .error { font-size: 12px; line-height: 1.5; }
+@media (max-width: 760px) {
+  .entryRoot .header { min-height: 58px; padding: 7px 18px; }
+  .entryRoot .brandMark { width: 31px; height: 39px; }
+  .entryRoot .brand { gap: 10px; }
+  .entryRoot .entry { width: min(410px, calc(100% - 36px)); padding: 14px 0; gap: 18px; }
+  .entryRoot .invitationArt { min-height: clamp(290px, calc(100svh - 245px), 385px); gap: 12px; padding: 16px; }
+  .entryRoot .paintingPanel { min-height: 110px; }
+  .entryRoot .heroEmblem { width: 49px; height: 58px; margin-bottom: 8px; }
+  .entryRoot .paperContent h1 { font-size: clamp(29px, 8.4vw, 36px); margin: 7px 0; }
+  .entryRoot .paperRule { margin: 7px 0 10px; }
+  .entryRoot .paperDate { font-size: 19px; }
+  .entryRoot .entryForm { padding: 0 2px; }
+  .entryRoot .entryForm h2 { font-size: 20px; }
+  .codeExplanation { font-size: 13px; margin-bottom: 12px !important; }
+}
+@media (max-width: 760px) and (max-height: 600px) {
+  .entryRoot .entry { gap: 14px; padding: 10px 0; }
+  .entryRoot .invitationArt { gap: 10px; padding: 13px; }
+  .entryRoot .heroEmblem { width: 41px; height: 49px; margin-bottom: 6px; }
+  .entryRoot .paperContent > .eyebrow { font-size: 6px; }
+  .entryRoot .paperContent h1 { font-size: 29px; margin: 6px 0; }
+}
 @media (prefers-reduced-motion: reduce) { .root *, .root *::before, .root *::after { scroll-behavior: auto; transition: none; } }
