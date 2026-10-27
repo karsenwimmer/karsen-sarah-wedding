@@ -336,3 +336,55 @@
   .heroContent .heroInvitation { font-size: 19px; }
   .heroContent .heroDate span { font-size: 6px; }
 }
+
+/* The opening uses the save-the-date's exact stationery typography and spacing. */
+.root .header { min-height: 72px; padding: .85rem clamp(1rem, 4vw, 3rem); }
+.root .header .seal { width: 3.35rem; height: 3.35rem; }
+.root .hero { min-height: calc(100svh - 105px); }
+.root .heroContent { width: min(100%, 1100px); max-width: none; min-height: calc(100svh - 105px); padding: clamp(2rem, 5vh, 4rem) clamp(1.25rem, 5vw, 5rem) clamp(2rem, 6vh, 4rem); display: grid; justify-items: center; align-content: center; text-align: center; }
+.root .invitationMark { display: grid; justify-items: center; width: min(100%, 920px); font-family: var(--font-display), Georgia, serif; color: var(--green); }
+.root .invitationMark :global(.save-date-mark__kicker) { margin: 0 0 .55rem; color: var(--green); font-family: var(--font-display), Georgia, serif; font-size: .92rem; font-weight: 600; letter-spacing: .12em; line-height: 1.1; text-transform: uppercase; }
+.root .invitationMark :global(.save-date-mark__names) { display: flex; align-items: baseline; justify-content: center; gap: clamp(.1em, 1.1vw, .22em); margin: 0; color: var(--ink); font-family: var(--font-script), "Snell Roundhand", "Apple Chancery", cursive; font-size: clamp(5.4rem, 10.8vw, 10.6rem); font-weight: 400; letter-spacing: 0; line-height: .78; white-space: nowrap; }
+.root .invitationMark :global(.save-date-mark__names) > span { display: inline; margin: 0; }
+.root .invitationMark :global(.save-date-mark__names) > :global(.save-date-mark__amp) { margin-inline: .12em .24em; }
+.root .invitationMark :global(.save-date-mark__date) { margin: clamp(1rem, 2.3vw, 1.45rem) 0 0; color: var(--green); font-family: var(--font-script), "Snell Roundhand", "Apple Chancery", cursive; font-size: clamp(2rem, 4vw, 3.6rem); font-weight: 400; line-height: .95; }
+.heroContent :global(.countdown) { color: var(--ink); }
+.heroContent :global(.countdown__label) { font-family: var(--font-display), Georgia, serif; }
+.root .heroContent { line-height: 1.5; }
+.entryGate { width: min(100%, 390px); margin-top: 1.65rem; position: relative; }
+.entryGate .codeForm { max-width: none; width: 100%; margin: 0; text-align: center; }
+.entryGate .codeForm > label { margin: 0 0 .7rem; color: var(--green); font-family: var(--font-display), Georgia, serif; font-size: 1.45rem; font-weight: 500; line-height: 1.25; }
+.entryGate .codeBar { background: #fffdf7b8; border-color: #b29a6899; transition: outline-color .18s, box-shadow .18s; }
+.entryGate .codeBar:focus-within { outline-color: #b29a68; }
+.entryGate .codeForm[data-highlighted=true] .codeBar { border-color: #b29a68; outline: 2px solid #b29a68; outline-offset: 4px; box-shadow: 0 0 0 8px #b29a6824, 0 0 26px #b29a6833; }
+.entryGate .hint { margin-top: .65rem; min-height: 1.4em; color: #5c6254; font-family: var(--font-display), Georgia, serif; font-size: 1rem; line-height: 1.4; }
+.entryGate .previewCodes { max-width: none; width: 100%; margin: 10px 0 0; font-size: 9px; text-align: center; }
+.entryGate .previewCodes summary { min-height: 26px; }
+.entryGate .error { background: #fffdf7c9; padding: 7px 10px; }
+.lockedRoot { display: flex; flex-direction: column; height: 100svh; min-height: 0; overflow: hidden; }
+.lockedRoot .header, .lockedRoot .previewBar { flex-shrink: 0; }
+.lockedRoot main { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+.lockedRoot .hero { flex: 1; min-height: 0; height: 100%; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
+.lockedRoot .heroContent { min-height: 100%; }
+@media (max-width: 760px) {
+  .root .header { padding: .65rem 1.15rem; min-height: 68px; }
+  .root .header .seal { width: 2.8rem; height: 2.8rem; }
+  .root .heroContent { padding: 2rem 1.15rem 2.2rem; min-height: calc(100svh - 100px); }
+  .root .invitationMark :global(.save-date-mark__seal) { width: 6.55rem; height: 6.55rem; margin-bottom: 1.35rem; transform: translateY(-.65rem); }
+  .root .invitationMark :global(.save-date-mark__names) { font-size: clamp(3rem, 13.2vw, 4.2rem); max-width: none; white-space: nowrap; }
+  .root .invitationMark :global(.save-date-mark__date) { font-size: clamp(2.15rem, 9vw, 2.9rem); }
+  .root .invitationMark :global(.save-date-mark__kicker) { font-size: .85rem; }
+  .heroContent :global(.countdown) { width: min(100%, 560px); }
+  .entryGate { margin-top: 1.4rem; width: min(100%, 355px); }
+  .entryGate .codeForm > label { font-size: 1.35rem; }
+  .entryGate .hint { font-size: .92rem; }
+  .lockedRoot .heroContent { min-height: 100%; }
+}
+@media (max-width: 380px) {
+  .root .invitationMark :global(.save-date-mark__names) { font-size: clamp(2.86rem, 12.8vw, 3.75rem); }
+  .root .invitationMark :global(.save-date-mark__date) { font-size: 2.1rem; }
+}
+@media (max-height: 650px) {
+  .lockedRoot .heroContent { padding-block: 1.5rem; }
+  .lockedRoot .invitationMark :global(.save-date-mark__seal) { width: 5.4rem; height: 5.4rem; margin-bottom: 1.15rem; transform: none; }
+}

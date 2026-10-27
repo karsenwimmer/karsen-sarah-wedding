@@ -21,3 +21,9 @@ Real invitations use server actions and the existing Supabase database. Only ena
 Real response persistence is implemented and covered by service and UI tests. No real invitation code has been issued or used for a live submission in this task. Real menu selections remain closed until the menu is finalized; attendance and dietary information can be saved for an enabled invitation. Preview menus stay within public fixtures. Confirmation email and admin response reporting remain future work.
 
 Before sending formal invitations: finalize ceremony, addresses, schedule, dress code, transportation, RSVP deadline and meals; issue random individual household codes (8–32 uppercase letters/digits); enable appropriate households; add final deadline enforcement, confirmation emails and reporting. Keep the save-the-date homepage until the couple is ready to switch.
+
+## Simple code entrance
+
+The opening reuses the save-the-date monogram, exact script name and date styling, serif RSVP label and shared live Countdown component. Code entry sits immediately beneath the timer. There is no envelope or opening animation. The rest of the page and footer render only for a recognized invitation.
+
+Before entry, wheel, touch, keyboard and inner-scroll attempts add a temporary gold outline/glow to the code field and update its help text. Typing clears the highlight. The locked root fills the viewport; on short or zoomed screens, only the introduction can scroll so the field remains reachable. A valid code removes the gate and restores normal page scrolling. Listeners and timers clean up on entry and unmount.

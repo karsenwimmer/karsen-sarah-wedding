@@ -6,13 +6,47 @@ import { lookupInvitation, saveInvitationReply } from "./actions";
 
 vi.mock("./actions", () => ({ lookupInvitation: vi.fn(), saveInvitationReply: vi.fn() }));
 function open(code = "HARBOUR") {
-  fireEvent.change(screen.getByLabelText("Your invitation code"), { target: { value: code } });
+  fireEvent.change(screen.getByLabelText("Enter the Code"), { target: { value: code } });
   fireEvent.click(screen.getByRole("button", { name: "Open invitation" }));
 }
 beforeEach(() => { window.localStorage.clear(); vi.spyOn(window, "scrollTo").mockImplementation(() => {}); });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.mocked(lookupInvitation).mockReset(); vi.mocked(saveInvitationReply).mockReset(); });
 
 describe("Karsen and Sarah invitation", () => {
+  it("shows the RSVP heading, scripted date and countdown before code entry, with details locked", () => {
+    render(<Invitation />);
+    expect(screen.getByText("RSVP", { exact: true })).toBeVisible();
+    expect(screen.queryByText("TOGETHER WITH OUR FAMILIES")).not.toBeInTheDocument();
+    expect(screen.getByText("07 - 17 - 27")).toBeVisible();
+    const countdown = screen.getByLabelText("Countdown to July 17, 2027");
+    const code = screen.getByLabelText("Enter the Code");
+    expect(countdown.compareDocumentPosition(code) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(document.getElementById("the-day")).not.toBeInTheDocument();
+    expect(document.getElementById("your-rsvp")).not.toBeInTheDocument();
+    expect(screen.queryByText("WITH LOVE, ALWAYS.")).not.toBeInTheDocument();
+  });
+  it("highlights code entry for wheel, keyboard and touch scrolling, and clears it when typing", () => {
+    render(<Invitation />);
+    const input = screen.getByLabelText("Enter the Code");
+    const gate = input.closest("form")!;
+    expect(fireEvent.wheel(window, { deltaY: 220 })).toBe(true);
+    expect(gate).toHaveAttribute("data-highlighted", "true");
+    expect(screen.getByText("Enter your code to explore the rest of the page.")).toBeVisible();
+    fireEvent.change(input, { target: { value: "H" } });
+    expect(gate).not.toHaveAttribute("data-highlighted");
+    fireEvent.keyDown(input, { key: " " });
+    expect(gate).not.toHaveAttribute("data-highlighted");
+    fireEvent.keyDown(window, { key: "PageDown" });
+    expect(gate).toHaveAttribute("data-highlighted", "true");
+    fireEvent.change(input, { target: { value: "HA" } });
+    fireEvent.touchStart(window, { touches: [{ clientY: 300 }] });
+    fireEvent.touchMove(window, { touches: [{ clientY: 220 }] });
+    expect(gate).toHaveAttribute("data-highlighted", "true");
+    open();
+    expect(document.getElementById("the-day")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Enter the Code")).not.toBeInTheDocument();
+  });
+
   it("rejects invalid codes, opens the selected household and puts RSVP before the combined details", () => {
     render(<Invitation />); open("not-real");
     expect(screen.getByRole("alert")).toHaveTextContent("isn’t part of this preview");
