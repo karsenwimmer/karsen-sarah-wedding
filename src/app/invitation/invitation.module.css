@@ -351,12 +351,22 @@
 .heroContent :global(.countdown) { color: var(--ink); }
 .heroContent :global(.countdown__label) { font-family: var(--font-display), Georgia, serif; }
 .root .heroContent { line-height: 1.5; }
+.readabilityCloud { position: relative; isolation: isolate; display: grid; justify-items: center; width: min(100%, 680px); }
+.readabilityCloud::before { content: ""; position: absolute; z-index: -1; pointer-events: none; inset: -1.2rem -4rem -2rem; background: radial-gradient(ellipse at 50% 30%, #fffdf7b8 0%, #fffdf78c 30%, #fffdf738 56%, transparent 75%), radial-gradient(ellipse at 50% 76%, #ffffffd1 0%, #ffffff99 27%, #ffffff33 52%, transparent 72%); filter: blur(14px); }
 .entryGate { width: min(100%, 390px); margin-top: 1.65rem; position: relative; }
 .entryGate .codeForm { max-width: none; width: 100%; margin: 0; text-align: center; }
 .entryGate .codeForm > label { margin: 0 0 .7rem; color: var(--green); font-family: var(--font-display), Georgia, serif; font-size: 1.45rem; font-weight: 500; line-height: 1.25; }
-.entryGate .codeBar { background: #fffdf7b8; border-color: #b29a6899; transition: outline-color .18s, box-shadow .18s; }
+.entryGate .codeBar { position: relative; background: #fffdf7b8; border-color: #b29a6899; transition: outline-color .18s, box-shadow .18s; }
+.entryGate .codeBar::before { content: ""; position: absolute; pointer-events: none; inset: -6px; border-radius: 3px; padding: 2px; opacity: 0; background: conic-gradient(from var(--code-orbit-angle), transparent 0deg, #b29a6833 55deg, #b99750 95deg, #ecd49b 125deg, transparent 155deg, transparent 360deg); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
 .entryGate .codeBar:focus-within { outline-color: #b29a68; }
-.entryGate .codeForm[data-highlighted=true] .codeBar { border-color: #b29a68; outline: 2px solid #b29a68; outline-offset: 4px; box-shadow: 0 0 0 8px #b29a6824, 0 0 26px #b29a6833; }
+.entryGate .codeForm[data-highlighted=true] .codeBar { border-color: #b29a68; outline: 1px solid #b29a684d; outline-offset: 5px; box-shadow: 0 0 0 8px #b29a6814, 0 0 26px #b29a682b; }
+.entryGate .codeForm[data-highlighted=true] .codeBar::before { opacity: 1; animation: codeOrbit 1.8s linear infinite; }
+@property --code-orbit-angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+@keyframes codeOrbit { to { --code-orbit-angle: 360deg; } }
+@media (prefers-reduced-motion: reduce) {
+  .entryGate .codeForm[data-highlighted=true] .codeBar { outline: 2px solid #b29a68; outline-offset: 4px; }
+  .entryGate .codeForm[data-highlighted=true] .codeBar::before { display: none; }
+}
 .entryGate .hint { margin-top: .65rem; min-height: 1.4em; color: #5c6254; font-family: var(--font-display), Georgia, serif; font-size: 1rem; line-height: 1.4; }
 .entryGate .previewCodes { max-width: none; width: 100%; margin: 10px 0 0; font-size: 9px; text-align: center; }
 .entryGate .previewCodes summary { min-height: 26px; }
@@ -375,6 +385,7 @@
   .root .invitationMark :global(.save-date-mark__date) { font-size: clamp(2.15rem, 9vw, 2.9rem); }
   .root .invitationMark :global(.save-date-mark__kicker) { font-size: .85rem; }
   .heroContent :global(.countdown) { width: min(100%, 560px); }
+  .readabilityCloud::before { inset: -.8rem -2rem -1.5rem; filter: blur(11px); }
   .entryGate { margin-top: 1.4rem; width: min(100%, 355px); }
   .entryGate .codeForm > label { font-size: 1.35rem; }
   .entryGate .hint { font-size: .92rem; }
