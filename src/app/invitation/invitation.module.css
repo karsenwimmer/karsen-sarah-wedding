@@ -356,7 +356,10 @@
 .entryGate { width: min(100%, 390px); margin-top: 1.65rem; position: relative; }
 .entryGate .codeForm { max-width: none; width: 100%; margin: 0; text-align: center; }
 .entryGate .codeForm > label { margin: 0 0 .7rem; color: var(--green); font-family: var(--font-display), Georgia, serif; font-size: 1.45rem; font-weight: 500; line-height: 1.25; }
-.entryGate .codeBar { position: relative; background: #fffdf7b8; border-color: #b29a6899; transition: outline-color .18s, box-shadow .18s; }
+.entryGate .codeBar { position: relative; background: #fffdf7; border-color: #77816b; box-shadow: 0 5px 18px #38432c1a; transition: outline-color .18s, box-shadow .18s; }
+.root .entryGate .codeBar input::placeholder { color: #59624f; opacity: 1; font-size: 13px; }
+.entryGate .codeBar button { width: auto; display: inline-flex; align-items: center; justify-content: center; gap: .45rem; padding: 0 .9rem; font-family: var(--font-display), Georgia, serif; font-size: 1.1rem; font-weight: 500; white-space: nowrap; }
+.entryGate .codeBar button span { font-size: 1.25rem; line-height: 1; }
 .entryGate .codeBar::before { content: ""; position: absolute; pointer-events: none; inset: -6px; border-radius: 3px; padding: 2px; opacity: 0; background: conic-gradient(from var(--code-orbit-angle), transparent 0deg, #b29a6833 55deg, #b99750 95deg, #ecd49b 125deg, transparent 155deg, transparent 360deg); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
 .entryGate .codeBar:focus-within { outline-color: #b29a68; }
 .entryGate .codeForm[data-highlighted=true] .codeBar { border-color: #b29a68; outline: 1px solid #b29a684d; outline-offset: 5px; box-shadow: 0 0 0 8px #b29a6814, 0 0 26px #b29a682b; }
