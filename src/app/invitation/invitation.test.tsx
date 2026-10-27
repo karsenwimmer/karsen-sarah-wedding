@@ -7,7 +7,7 @@ import { lookupInvitation, saveInvitationReply } from "./actions";
 vi.mock("./actions", () => ({ lookupInvitation: vi.fn(), saveInvitationReply: vi.fn() }));
 function open(code = "HARBOUR") {
   fireEvent.change(screen.getByLabelText("Enter the Code"), { target: { value: code } });
-  fireEvent.click(screen.getByRole("button", { name: "Open invitation" }));
+  fireEvent.click(screen.getByRole("button", { name: "Continue to invitation" }));
 }
 beforeEach(() => { window.localStorage.clear(); vi.spyOn(window, "scrollTo").mockImplementation(() => {}); });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.mocked(lookupInvitation).mockReset(); vi.mocked(saveInvitationReply).mockReset(); });
