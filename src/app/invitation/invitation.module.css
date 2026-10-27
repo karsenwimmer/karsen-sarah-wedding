@@ -342,7 +342,7 @@
 .root .header .seal { width: 3.35rem; height: 3.35rem; }
 .root .hero { min-height: calc(100svh - 105px); }
 .root .heroContent { width: min(100%, 1100px); max-width: none; min-height: calc(100svh - 105px); padding: clamp(2rem, 5vh, 4rem) clamp(1.25rem, 5vw, 5rem) clamp(2rem, 6vh, 4rem); display: grid; justify-items: center; align-content: center; text-align: center; }
-.root .invitationMark { display: grid; justify-items: center; width: min(100%, 920px); font-family: var(--font-display), Georgia, serif; color: var(--green); }
+.root .invitationMark { position: relative; z-index: 1; display: grid; justify-items: center; width: min(100%, 920px); font-family: var(--font-display), Georgia, serif; color: var(--green); }
 .root .invitationMark :global(.save-date-mark__kicker) { margin: 0 0 .55rem; color: var(--green); font-family: var(--font-display), Georgia, serif; font-size: .92rem; font-weight: 600; letter-spacing: .12em; line-height: 1.1; text-transform: uppercase; }
 .root .invitationMark :global(.save-date-mark__names) { display: flex; align-items: baseline; justify-content: center; gap: clamp(.1em, 1.1vw, .22em); margin: 0; color: var(--ink); font-family: var(--font-script), "Snell Roundhand", "Apple Chancery", cursive; font-size: clamp(5.4rem, 10.8vw, 10.6rem); font-weight: 400; letter-spacing: 0; line-height: .78; white-space: nowrap; }
 .root .invitationMark :global(.save-date-mark__names) > span { display: inline; margin: 0; }
