@@ -180,6 +180,7 @@ export function Invitation() {
             <h1 className="save-date-mark__names" id="wedding-title" ref={heading} tabIndex={-1}><span>Karsen</span><span className="save-date-mark__amp">&amp;</span><span>Sarah</span></h1>
             <p className="save-date-mark__date">{wedding.date.shortLabel}</p>
           </div>
+          <div className={s.readabilityCloud}>
           <Countdown />
           {!invite ? <div className={s.entryGate}>
             <form onSubmit={openInvitation} className={s.codeForm} aria-busy={busy} data-highlighted={codeHighlighted || undefined}>
@@ -190,6 +191,7 @@ export function Invitation() {
             </form>
             <details className={s.previewCodes}><summary>Explore the preview</summary><p>Try a fictional invitation.</p><div>{invitations.map(sample => <button type="button" key={sample.code} onClick={() => { setCode(sample.code); setCodeError(""); setCodeHighlighted(false); codeInput.current?.focus(); }} disabled={busy}><span>{sample.code}</span><small>{sample.code === "HARBOUR" ? "A couple" : sample.code === "FAMILY" ? "A family" : "Church celebration"}</small></button>)}</div></details>
           </div> : <><p className={s.invitedEvents}>{invite.reception ? "Ceremony & reception · Bronte Harbour" : "Church celebration · Oakville"}</p><a className={s.primary} href={confirmed ? "#the-day" : "#your-rsvp"}>{confirmed ? "Explore the day" : "Kindly reply"}<span aria-hidden="true">↓</span></a></>}
+          </div>
         </div>
       </section>
       {invite && <>
