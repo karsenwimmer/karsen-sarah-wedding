@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
+import { Countdown } from "@/components/Countdown";
+import { SealMark } from "@/components/SealMark";
 import { weddingConfig as wedding } from "@/config/wedding";
 import { createGoogleCalendarUrl, createIcsCalendarFile, createOutlookCalendarUrl, type CalendarEvent } from "@/lib/calendar";
 import { blankAnswers, cleanAnswers, findInvite, invitations, mealOptions, readReply, replyKey, validateAnswers, type Answer, type Invite, type Reply } from "./preview-data";
@@ -32,6 +34,8 @@ export function Invitation() {
   const [confirmed, setConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [codeHighlighted, setCodeHighlighted] = useState(false);
+  const hero = useRef<HTMLElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const responseHeading = useRef<HTMLHeadingElement>(null);
   const form = useRef<HTMLFormElement>(null);
@@ -47,9 +51,44 @@ export function Invitation() {
       setSavedReply(saved); setConfirmed(Boolean(saved));
     } catch { /* Guests can still enter a code when browser storage is unavailable. */ }
   }, []);
+  useEffect(() => {
+    if (invite) return;
+    let timeout: number | undefined;
+    let touchY: number | null = null;
+    function highlightCode() {
+      setCodeHighlighted(true);
+      window.clearTimeout(timeout);
+      timeout = window.setTimeout(() => setCodeHighlighted(false), 2600);
+    }
+    function onWheel(event: WheelEvent) { if (Math.abs(event.deltaY) > 0) highlightCode(); }
+    function onTouchStart(event: TouchEvent) { touchY = event.touches[0]?.clientY ?? null; }
+    function onTouchMove(event: TouchEvent) {
+      if (touchY !== null && Math.abs((event.touches[0]?.clientY ?? touchY) - touchY) > 10) highlightCode();
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      const target = event.target;
+      if (target instanceof Element && target.closest("input, textarea, select, button, summary, a, [contenteditable=true]")) return;
+      if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "End", " "].includes(event.key)) highlightCode();
+    }
+    function onScroll() { if ((hero.current?.scrollTop ?? 0) > 0) highlightCode(); }
+    const gate = hero.current;
+    window.addEventListener("wheel", onWheel, { passive: true });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("keydown", onKeyDown);
+    gate?.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.clearTimeout(timeout);
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("keydown", onKeyDown);
+      gate?.removeEventListener("scroll", onScroll);
+    };
+  }, [invite]);
   function displayInvitation(found: Invite, saved: Reply | null, isPreview: boolean) {
     setInvite(found); setPreview(isPreview); setAnswers(saved?.answers ?? blankAnswers(found)); setNote(saved?.note ?? "");
-    setSavedReply(saved); setConfirmed(Boolean(saved)); setErrors({}); setCodeError(""); setSaveError(""); setMenuOpen(false);
+    setSavedReply(saved); setConfirmed(Boolean(saved)); setErrors({}); setCodeError(""); setSaveError(""); setMenuOpen(false); setCodeHighlighted(false);
     window.scrollTo({ top: 0, behavior: "instant" });
     requestAnimationFrame(() => heading.current?.focus({ preventScroll: true }));
   }
@@ -75,7 +114,7 @@ export function Invitation() {
   function changeInvitation() {
     if (busy) return;
     try { window.localStorage.removeItem(ACTIVE_PREVIEW); } catch { /* Do not clear replies or unrelated data. */ }
-    setInvite(null); setCode(""); setCodeError(""); setMenuOpen(false); setSaveError("");
+    setInvite(null); setCode(""); setCodeError(""); setMenuOpen(false); setSaveError(""); setCodeHighlighted(false);
     window.scrollTo({ top: 0, behavior: "instant" });
     requestAnimationFrame(() => codeInput.current?.focus({ preventScroll: true }));
   }
@@ -122,23 +161,38 @@ export function Invitation() {
     const link = document.createElement("a"); link.href = url; link.download = "karsen-and-sarah.ics"; link.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   const attending = answers.filter(answer => answer.attending === "yes").length;
-  return <div className={s.root}>
+  return <div className={`${s.root} ${!invite ? s.lockedRoot : ""}`}>
     <a className={s.skip} href="#invitation-main">Skip to invitation</a>
     {preview && <div className={s.previewBar}><span>INVITATION PREVIEW</span><p>Sample households · Real invitations are not being sent yet</p></div>}
     <header className={s.header}>
-      <a className={s.brand} href="#invitation-main" aria-label="Karsen and Sarah invitation"><Seal /><span>KARSEN <i>&</i> SARAH</span></a>
+      <a className={s.brand} href="#invitation-main" aria-label="Karsen and Sarah invitation"><Seal />{invite && <span>KARSEN <i>&</i> SARAH</span>}</a>
       {invite ? <><button className={s.menuToggle} type="button" aria-expanded={menuOpen} aria-controls="invitation-nav" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? "Close" : "Menu"}<span aria-hidden="true">{menuOpen ? "−" : "+"}</span></button>
         <nav id="invitation-nav" className={`${s.nav} ${menuOpen ? s.navOpen : ""}`} aria-label="Wedding navigation" onClick={() => setMenuOpen(false)}><a className={s.navRsvp} href="#your-rsvp">Your RSVP <span aria-hidden="true">↗</span></a><a href="#the-day">The day</a><a href="#dress-code">Dress code</a><a href="#transportation">Transportation</a><a href="#questions">Questions</a></nav></> : <p className={s.headerDate}>JULY 17, 2027 <span>·</span> OAKVILLE</p>}
     </header>
     <main id="invitation-main">
-      <section className={s.hero} aria-labelledby="wedding-title">
+      <section ref={hero} className={s.hero} aria-labelledby="wedding-title">
         <Image className={s.heroBackground} src="/images/invitation-sailboats-v1.webp" alt="" fill priority sizes="100vw" />
         <div className={s.heroWash} aria-hidden="true" />
-        <div className={s.heroContent}><Seal large /><p className={s.eyebrow}>TOGETHER WITH OUR FAMILIES</p><h1 id="wedding-title" ref={heading} tabIndex={-1}>Karsen <span>& Sarah</span></h1><p className={s.heroInvitation}>joyfully invite you to celebrate our wedding</p><div className={s.heroDate}><strong>July 17, 2027</strong><span>SATURDAY · OAKVILLE, ONTARIO</span></div>
-          {invite ? <><p className={s.invitedEvents}>{invite.reception ? "Ceremony & reception · Bronte Harbour" : "Church celebration · Oakville"}</p><a className={s.primary} href={confirmed ? "#the-day" : "#your-rsvp"}>{confirmed ? "Explore the day" : "Kindly reply"}<span aria-hidden="true">↓</span></a></> : <a className={s.primary} href="#open-invitation">Open your invitation <span aria-hidden="true">↓</span></a>}
+        <div className={s.heroContent}>
+          <div className={`${s.invitationMark} save-date-mark hero__mark`}>
+            <SealMark className="save-date-mark__seal" priority size={160} />
+            <p className="save-date-mark__kicker">RSVP</p>
+            <h1 className="save-date-mark__names" id="wedding-title" ref={heading} tabIndex={-1}><span>Karsen</span><span className="save-date-mark__amp">&amp;</span><span>Sarah</span></h1>
+            <p className="save-date-mark__date">{wedding.date.shortLabel}</p>
+          </div>
+          <Countdown />
+          {!invite ? <div className={s.entryGate}>
+            <form onSubmit={openInvitation} className={s.codeForm} aria-busy={busy} data-highlighted={codeHighlighted || undefined}>
+              <label htmlFor="invitation-code">Enter the Code</label>
+              <div className={s.codeBar}><input id="invitation-code" ref={codeInput} value={code} onChange={event => { setCode(event.target.value); setCodeError(""); setCodeHighlighted(false); }} placeholder="Your invitation code" maxLength={64} autoCapitalize="characters" autoComplete="off" autoCorrect="off" spellCheck={false} aria-invalid={Boolean(codeError)} aria-describedby={codeError ? "code-help code-error" : "code-help"} disabled={busy} required /><button type="submit" aria-label="Open invitation" disabled={busy}><span aria-hidden="true">{busy ? "…" : "↗"}</span></button></div>
+              <p id="code-help" className={s.hint} aria-live="polite">{codeHighlighted ? "Enter your code to explore the rest of the page." : "You’ll find this on your printed invitation."}</p>
+              {codeError && <p className={s.error} id="code-error" role="alert">{codeError}</p>}
+            </form>
+            <details className={s.previewCodes}><summary>Explore the preview</summary><p>Try a fictional invitation.</p><div>{invitations.map(sample => <button type="button" key={sample.code} onClick={() => { setCode(sample.code); setCodeError(""); setCodeHighlighted(false); codeInput.current?.focus(); }} disabled={busy}><span>{sample.code}</span><small>{sample.code === "HARBOUR" ? "A couple" : sample.code === "FAMILY" ? "A family" : "Church celebration"}</small></button>)}</div></details>
+          </div> : <><p className={s.invitedEvents}>{invite.reception ? "Ceremony & reception · Bronte Harbour" : "Church celebration · Oakville"}</p><a className={s.primary} href={confirmed ? "#the-day" : "#your-rsvp"}>{confirmed ? "Explore the day" : "Kindly reply"}<span aria-hidden="true">↓</span></a></>}
         </div>
       </section>
-      {!invite ? <section className={s.entrySection} id="open-invitation" aria-labelledby="entry-title"><Sprig /><p className={s.eyebrow}>YOUR INVITATION</p><h2 id="entry-title">A place for you.</h2><p>Enter the code from your invitation to reply and explore the details of our day.</p><form onSubmit={openInvitation} className={s.codeForm} aria-busy={busy}><label htmlFor="invitation-code">Your invitation code</label><div className={s.codeBar}><input id="invitation-code" ref={codeInput} value={code} onChange={event => { setCode(event.target.value); setCodeError(""); }} placeholder="Enter your code" maxLength={64} autoCapitalize="characters" autoComplete="off" autoCorrect="off" spellCheck={false} aria-invalid={Boolean(codeError)} aria-describedby={codeError ? "code-help code-error" : "code-help"} disabled={busy} required /><button type="submit" aria-label="Open invitation" disabled={busy}><span aria-hidden="true">{busy ? "…" : "↗"}</span></button></div><p id="code-help" className={s.hint}>You’ll find this on your printed invitation.</p>{codeError && <p className={s.error} id="code-error" role="alert">{codeError}</p>}</form><details className={s.previewCodes}><summary>Explore the preview</summary><p>These fictional invitations let us try each guest experience.</p><div>{invitations.map(sample => <button type="button" key={sample.code} onClick={() => { setCode(sample.code); setCodeError(""); codeInput.current?.focus(); }}><span>{sample.code}</span><small>{sample.code === "HARBOUR" ? "A couple" : sample.code === "FAMILY" ? "A family" : "Church celebration"}</small></button>)}</div></details></section> : <>
+      {invite && <>
         <div className={s.householdNote}><p>An invitation for <strong>{invite.name}</strong></p><button type="button" className={s.textButton} onClick={changeInvitation}>Change invitation <span aria-hidden="true">↗</span></button></div>
         {confirmed ? <section className={s.collapsedReply} id="your-rsvp" aria-label="Saved RSVP"><span className={s.savedCheck} aria-hidden="true">✓</span><div><h2 ref={responseHeading} tabIndex={-1}>{preview ? "Your preview RSVP is saved." : "Your RSVP is saved."}</h2><p>{attending ? "We can’t wait to celebrate with you." : "Thank you for letting us know."} <span>{attending} attending · {answers.length - attending} declining</span></p><small>{preview ? "Saved in this browser · No real RSVP or email sent" : "Saved to your invitation · Available when you return with your code"}</small></div><div className={s.editPrompt}><p>Need to make a change? Feel free.</p><button type="button" className={s.textButton} onClick={editReply}>Edit your RSVP <span aria-hidden="true">↗</span></button></div></section> : <section className={s.rsvpSection} id="your-rsvp">
           <aside className={s.rsvpAside}><p className={s.eyebrow}>YOUR REPLY</p><h2>We’ve saved<br />a place <em>for you.</em></h2><Sprig /><p>Please reply for each person on your invitation. We’re looking forward to celebrating together.</p><div className={s.rsvpNote}><span>BEFORE YOU REPLY</span><p>{preview ? "This is a design preview. Names and meal choices are samples. No real RSVP or email will be sent." : "Your response will be saved to your invitation. Return with your code whenever you need to review it."}</p><p>The RSVP deadline will be added before invitations go out.</p></div><a href={`mailto:${wedding.contact.email}`} className={s.textLink}>A question for us? <span aria-hidden="true">↗</span></a></aside>
@@ -170,6 +224,6 @@ export function Invitation() {
         <section className={s.memories}><Sprig /><p className={s.eyebrow}>A LITTLE MORE TO COME</p><h2>The moments in between.</h2><p>{invite.reception ? "A place for your photos and a little wedding-day fun. We’ll share our guest photo album and activity links here when they’re ready." : "We’ll share a guest photo album here so we can remember the day through your eyes."}</p><div><span>GUEST PHOTO ALBUM · COMING SOON</span>{invite.reception && <span>WEDDING QUIZ · COMING SOON</span>}</div></section>
       </>}
     </main>
-    <footer className={s.footer}><div><span className={s.footerNames}>Karsen & Sarah</span><p>July 17, 2027 · Oakville, Ontario</p></div><span>WITH LOVE, ALWAYS.</span>{invite && <button className={s.textButton} type="button" onClick={changeInvitation}>Change invitation <span aria-hidden="true">↗</span></button>}</footer>
+    {invite && <footer className={s.footer}><div><span className={s.footerNames}>Karsen & Sarah</span><p>July 17, 2027 · Oakville, Ontario</p></div><span>WITH LOVE, ALWAYS.</span>{invite && <button className={s.textButton} type="button" onClick={changeInvitation}>Change invitation <span aria-hidden="true">↗</span></button>}</footer>}
   </div>;
 }
