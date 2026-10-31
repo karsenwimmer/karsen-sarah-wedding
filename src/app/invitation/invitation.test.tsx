@@ -86,6 +86,9 @@ describe("Karsen and Sarah invitation", () => {
     render(<Invitation />); enterCode("not-real");
     expect(screen.getByRole("alert")).toHaveTextContent("isn’t part of this preview");
     await open("har-bour ");
+    expect(screen.getByRole("heading", { name: "Avery and Jordan, we’ve saved a place for you." })).toBeVisible();
+    expect(screen.getByText("Please make your decisions and choices for each guest here.")).toBeVisible();
+    expect(screen.queryByText("An invitation for")).not.toBeInTheDocument();
     expect(screen.getByRole("group", { name: /Avery Morgan/ })).toBeVisible();
     expect(screen.queryByText("Alex Parker")).not.toBeInTheDocument();
     expect(document.getElementById("your-rsvp")!.compareDocumentPosition(document.getElementById("the-day")!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
@@ -129,6 +132,7 @@ describe("Karsen and Sarah invitation", () => {
     const view = render(<Invitation />); await open("FAMILY"); view.unmount(); render(<Invitation />);
     expect(screen.getByLabelText("Enter the Code")).toBeVisible();
     await open("FAMILY");
+    expect(screen.getByRole("heading", { name: "The Parker Family, we’ve saved a place for you." })).toBeVisible();
     expect(screen.getByRole("group", { name: /Ellie Parker/ })).toBeVisible();
     fireEvent.click(within(screen.getByRole("group", { name: /Ellie Parker/ })).getByLabelText("Joyfully accepts"));
     fireEvent.click(within(screen.getByRole("group", { name: /Alex Parker/ })).getByLabelText("Joyfully accepts"));
