@@ -10,7 +10,6 @@ import { blankAnswers, cleanAnswers, findInvite, invitations, mealOptions, readR
 import { lookupInvitation, saveInvitationReply } from "./actions";
 import s from "./invitation.module.css";
 
-const ACTIVE_PREVIEW = "ks-invitation-preview:active";
 function Seal({ large = false }: { large?: boolean }) {
   return <Image className={large ? s.sealLarge : s.seal} src="/images/seals/ks-flat-seal-transparent.png" alt="Karsen and Sarah monogram" width={large ? 120 : 52} height={large ? 120 : 52} priority />;
 }
@@ -41,16 +40,6 @@ export function Invitation() {
   const form = useRef<HTMLFormElement>(null);
   const codeInput = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    // Remember only public preview codes here. Real invitation access codes stay out of browser storage.
-    try {
-      const found = findInvite(window.localStorage.getItem(ACTIVE_PREVIEW) ?? "");
-      if (!found) return;
-      const saved = readReply(found, window.localStorage.getItem(replyKey(found)));
-      setInvite(found); setAnswers(saved?.answers ?? blankAnswers(found)); setNote(saved?.note ?? "");
-      setSavedReply(saved); setConfirmed(Boolean(saved));
-    } catch { /* Guests can still enter a code when browser storage is unavailable. */ }
-  }, []);
   useEffect(() => {
     if (invite) return;
     let timeout: number | undefined;
@@ -97,7 +86,7 @@ export function Invitation() {
     const found = findInvite(code);
     if (found) {
       let saved = null;
-      try { saved = readReply(found, window.localStorage.getItem(replyKey(found))); window.localStorage.setItem(ACTIVE_PREVIEW, found.code); } catch { /* Preview remains usable. */ }
+      try { saved = readReply(found, window.localStorage.getItem(replyKey(found))); } catch { /* Preview remains usable. */ }
       displayInvitation(found, saved, true); return;
     }
     if (!/^[A-Z0-9]{8,32}$/.test(code.toUpperCase().replace(/[\s-]/g, ""))) {
@@ -113,7 +102,6 @@ export function Invitation() {
   }
   function changeInvitation() {
     if (busy) return;
-    try { window.localStorage.removeItem(ACTIVE_PREVIEW); } catch { /* Do not clear replies or unrelated data. */ }
     setInvite(null); setCode(""); setCodeError(""); setMenuOpen(false); setSaveError(""); setCodeHighlighted(false);
     window.scrollTo({ top: 0, behavior: "instant" });
     requestAnimationFrame(() => codeInput.current?.focus({ preventScroll: true }));

@@ -14,6 +14,8 @@ afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.mocked(lookupInvitation).m
 
 describe("Karsen and Sarah invitation", () => {
   it("shows the RSVP heading, scripted date and countdown before code entry, with details locked", () => {
+    // Older trial visits remembered a sample code. It must no longer bypass entry.
+    window.localStorage.setItem("ks-invitation-preview:active", "HARBOUR");
     render(<Invitation />);
     expect(screen.getByText("RSVP", { exact: true })).toBeVisible();
     expect(screen.queryByText("TOGETHER WITH OUR FAMILIES")).not.toBeInTheDocument();
@@ -76,6 +78,9 @@ describe("Karsen and Sarah invitation", () => {
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
     expect(screen.queryByText("We’ve saved")).not.toBeInTheDocument();
     view.unmount(); render(<Invitation />);
+    expect(screen.getByLabelText("Enter the Code")).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Edit your RSVP" })).not.toBeInTheDocument();
+    open();
     expect(screen.getByRole("button", { name: "Edit your RSVP" })).toBeVisible();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Edit your RSVP" }));
@@ -89,6 +94,8 @@ describe("Karsen and Sarah invitation", () => {
   });
   it("restores an unanswered preview expanded, while switching households does not leak answers", () => {
     const view = render(<Invitation />); open("FAMILY"); view.unmount(); render(<Invitation />);
+    expect(screen.getByLabelText("Enter the Code")).toBeVisible();
+    open("FAMILY");
     expect(screen.getByRole("group", { name: /Ellie Parker/ })).toBeVisible();
     fireEvent.click(within(screen.getByRole("group", { name: /Ellie Parker/ })).getByLabelText("Joyfully accepts"));
     fireEvent.click(within(screen.getByRole("group", { name: /Alex Parker/ })).getByLabelText("Joyfully accepts"));

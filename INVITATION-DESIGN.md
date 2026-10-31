@@ -14,7 +14,7 @@ The original RSVP form design is retained. Successful saves collapse the whole f
 
 ## Response storage
 
-Public sample codes remain fictional and browser-local, with the last selected sample remembered in this browser. No real access codes or live responses are cached in browser storage.
+Public sample codes remain fictional and browser-local. During design trials, every visit starts at code entry, including browsers with a previously remembered sample code. Saved sample replies remain available after re-entering the same code. No real access codes or live responses are cached in browser storage.
 
 Real invitations use server actions and the existing Supabase database. Only enabled, unrevoked `households.rsvp_short_code` records grant access. Every save rechecks access and validates the current invited guest IDs. Replies are appended to `submission_events` with `event_type=rsvp_response` and `source=formal_invitation`; the latest matching event is authoritative. Household RSVP timestamps are updated after the event is saved. The schema is unchanged, and no fixtures are inserted into the real guest list. New server actions use the existing IP rate-limiting helper.
 
