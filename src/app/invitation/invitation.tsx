@@ -13,6 +13,9 @@ import s from "./invitation.module.css";
 function Seal({ large = false }: { large?: boolean }) {
   return <Image className={large ? s.sealLarge : s.seal} src="/images/seals/ks-flat-seal-transparent.png" alt="Karsen and Sarah monogram" width={large ? 120 : 52} height={large ? 120 : 52} priority />;
 }
+function Lock() {
+  return <svg className={s.lockIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path className={s.lockShackle} d="M8 10V6a4 4 0 0 1 8 0v4" /><rect x="5" y="10" width="14" height="11" rx="2" /><circle cx="12" cy="15" r="1" /><path d="M12 16v2" /></svg>;
+}
 function Sprig() {
   return <svg width="95" height="40" viewBox="0 0 95 40" fill="none" aria-hidden="true"><path d="M4 30Q48 37 91 7M27 31L21 15M46 27L43 9M62 21L65 5M75 15L86 18" stroke="currentColor" strokeWidth=".8"/><path d="M23 24C9 21 13 10 13 10C24 10 27 18 23 24ZM44 19C32 14 37 4 37 4C48 7 49 14 44 19ZM63 15C56 6 66 1 66 1C72 8 68 13 63 15ZM78 15C87 9 93 17 93 17C84 24 78 20 78 15ZM47 27C38 34 29 30 29 30C34 23 41 23 47 27ZM65 22C57 31 49 29 49 29C52 21 58 19 65 22Z" fill="currentColor" opacity=".5"/></svg>;
 }
@@ -32,16 +35,32 @@ export function Invitation() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [confirmed, setConfirmed] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [unlocking, setUnlocking] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [codeHighlighted, setCodeHighlighted] = useState(false);
   const hero = useRef<HTMLElement>(null);
-  const heading = useRef<HTMLHeadingElement>(null);
+  const unlockTimer = useRef<number | undefined>(undefined);
+  const mounted = useRef(true);
   const responseHeading = useRef<HTMLHeadingElement>(null);
   const form = useRef<HTMLFormElement>(null);
   const codeInput = useRef<HTMLInputElement>(null);
+  const gateBusy = busy || unlocking;
 
   useEffect(() => {
-    if (invite) return;
+    mounted.current = true;
+    return () => { mounted.current = false; window.clearTimeout(unlockTimer.current); };
+  }, []);
+  useEffect(() => {
+    if (!invite) return;
+    const frame = requestAnimationFrame(() => {
+      responseHeading.current?.focus({ preventScroll: true });
+      document.getElementById("your-rsvp")?.scrollIntoView({ behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [invite]);
+
+  useEffect(() => {
+    if (invite || gateBusy) return;
     let timeout: number | undefined;
     let touchY: number | null = null;
     function highlightCode() {
@@ -74,15 +93,17 @@ export function Invitation() {
       window.removeEventListener("keydown", onKeyDown);
       gate?.removeEventListener("scroll", onScroll);
     };
-  }, [invite]);
+  }, [invite, gateBusy]);
   function displayInvitation(found: Invite, saved: Reply | null, isPreview: boolean) {
-    setInvite(found); setPreview(isPreview); setAnswers(saved?.answers ?? blankAnswers(found)); setNote(saved?.note ?? "");
-    setSavedReply(saved); setConfirmed(Boolean(saved)); setErrors({}); setCodeError(""); setSaveError(""); setMenuOpen(false); setCodeHighlighted(false);
-    window.scrollTo({ top: 0, behavior: "instant" });
-    requestAnimationFrame(() => heading.current?.focus({ preventScroll: true }));
+    if (!mounted.current) return;
+    setUnlocking(true); setCodeError(""); setCodeHighlighted(false);
+    unlockTimer.current = window.setTimeout(() => {
+      setInvite(found); setPreview(isPreview); setAnswers(saved?.answers ?? blankAnswers(found)); setNote(saved?.note ?? "");
+      setSavedReply(saved); setConfirmed(Boolean(saved)); setErrors({}); setSaveError(""); setMenuOpen(false); setUnlocking(false);
+    }, window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? 0 : 650);
   }
   async function openInvitation(event: FormEvent) {
-    event.preventDefault(); if (busy) return;
+    event.preventDefault(); if (gateBusy) return;
     const found = findInvite(code);
     if (found) {
       let saved = null;
@@ -165,19 +186,19 @@ export function Invitation() {
           <div className={`${s.invitationMark} save-date-mark hero__mark`}>
             <SealMark className="save-date-mark__seal" priority size={160} />
             <p className="save-date-mark__kicker">RSVP</p>
-            <h1 className="save-date-mark__names" id="wedding-title" ref={heading} tabIndex={-1}><span>Karsen</span><span className="save-date-mark__amp">&amp;</span><span>Sarah</span></h1>
+            <h1 className="save-date-mark__names" id="wedding-title" tabIndex={-1}><span>Karsen</span><span className="save-date-mark__amp">&amp;</span><span>Sarah</span></h1>
             <p className="save-date-mark__date">{wedding.date.shortLabel}</p>
           </div>
           <div className={s.readabilityCloud}>
           <Countdown />
           {!invite ? <div className={s.entryGate}>
-            <form onSubmit={openInvitation} className={s.codeForm} aria-busy={busy} data-highlighted={codeHighlighted || undefined}>
+            <form onSubmit={openInvitation} className={s.codeForm} aria-busy={gateBusy} data-highlighted={codeHighlighted || undefined}>
               <label htmlFor="invitation-code">Enter the Code</label>
-              <div className={s.codeBar}><input id="invitation-code" ref={codeInput} value={code} onChange={event => { setCode(event.target.value); setCodeError(""); setCodeHighlighted(false); }} placeholder="Your invitation code" maxLength={64} autoCapitalize="characters" autoComplete="off" autoCorrect="off" spellCheck={false} aria-invalid={Boolean(codeError)} aria-describedby={codeError ? "code-help code-error" : "code-help"} disabled={busy} required /><button type="submit" aria-label="Continue to invitation" disabled={busy}>{busy ? "Checking…" : <>Continue <span aria-hidden="true">→</span></>}</button></div>
-              <p id="code-help" className={s.hint} aria-live="polite">{codeHighlighted ? "Enter your code to explore the rest of the page." : "You’ll find this on your printed invitation."}</p>
+              <div className={s.codeBar}><input id="invitation-code" ref={codeInput} value={code} onChange={event => { setCode(event.target.value); setCodeError(""); setCodeHighlighted(false); }} placeholder="Your invitation code" maxLength={64} autoCapitalize="characters" autoComplete="off" autoCorrect="off" spellCheck={false} aria-invalid={Boolean(codeError)} aria-describedby={codeError ? "code-help code-error" : "code-help"} disabled={gateBusy} required /><button type="submit" aria-label={unlocking ? "Invitation unlocked" : "Unlock invitation"} data-unlocked={unlocking || undefined} disabled={gateBusy}>{unlocking ? "Unlocked" : busy ? "Checking…" : "Unlock"}<Lock /></button></div>
+              <p id="code-help" className={s.hint} aria-live="polite">{unlocking ? "Your invitation is unlocked." : codeHighlighted ? "Enter your code to explore the rest of the page." : "You’ll find this on your printed invitation."}</p>
               {codeError && <p className={s.error} id="code-error" role="alert">{codeError}</p>}
             </form>
-            <details className={s.previewCodes}><summary>Explore the preview</summary><p>Try a fictional invitation.</p><div>{invitations.map(sample => <button type="button" key={sample.code} onClick={() => { setCode(sample.code); setCodeError(""); setCodeHighlighted(false); codeInput.current?.focus(); }} disabled={busy}><span>{sample.code}</span><small>{sample.code === "HARBOUR" ? "A couple" : sample.code === "FAMILY" ? "A family" : "Church celebration"}</small></button>)}</div></details>
+            <details className={s.previewCodes}><summary>Explore the preview</summary><p>Try a fictional invitation.</p><div>{invitations.map(sample => <button type="button" key={sample.code} onClick={() => { setCode(sample.code); setCodeError(""); setCodeHighlighted(false); codeInput.current?.focus(); }} disabled={gateBusy}><span>{sample.code}</span><small>{sample.code === "HARBOUR" ? "A couple" : sample.code === "FAMILY" ? "A family" : "Church celebration"}</small></button>)}</div></details>
           </div> : <><p className={s.invitedEvents}>{invite.reception ? "Ceremony & reception · Bronte Harbour" : "Church celebration · Oakville"}</p><a className={s.primary} href={confirmed ? "#the-day" : "#your-rsvp"}>{confirmed ? "Explore the day" : "Kindly reply"}<span aria-hidden="true">↓</span></a></>}
           </div>
         </div>
