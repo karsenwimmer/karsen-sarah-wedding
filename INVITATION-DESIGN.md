@@ -24,6 +24,6 @@ Before sending formal invitations: finalize ceremony, addresses, schedule, dress
 
 ## Simple code entrance
 
-The opening reuses the save-the-date monogram, exact script name and date styling, serif RSVP label and shared live Countdown component. Code entry sits immediately beneath the timer. There is no envelope or opening animation. The rest of the page and footer render only for a recognized invitation.
+The opening reuses the save-the-date monogram, exact script name and date styling, serif RSVP label and shared live Countdown component. Code entry sits immediately beneath the timer, with an Unlock button and line-art lock icon. A recognized code opens the lock for 650ms, then reveals the page and smoothly scrolls to the RSVP form or saved reply, moving keyboard focus to its heading. Invalid codes keep the lock closed. Reduced-motion guests skip the animation and scroll instantly. The transition timer cleans up on unmount. There is no envelope animation. The rest of the page and footer render only for a recognized invitation.
 
 Before entry, wheel, touch, keyboard and inner-scroll attempts add a temporary gold outline/glow to the code field and update its help text. Typing clears the highlight. The locked root fills the viewport; on short or zoomed screens, only the introduction can scroll so the field remains reachable. A valid code removes the gate and restores normal page scrolling. Listeners and timers clean up on entry and unmount.
