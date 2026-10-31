@@ -8,9 +8,9 @@ Use case: precise-object-edit. Asset type: watercolor background for Karsen and 
 
 ## Page structure
 
-Centered, full-width opening → personalized household note → expanded RSVP or compact saved-reply strip → combined schedule and venues → Dress Code → Transportation → FAQs → photos and activity placeholders.
+Centered, full-width opening → personalized RSVP section or compact saved-reply strip → combined schedule and venues → Dress Code → Transportation → FAQs → photos and activity placeholders.
 
-The original RSVP form design is retained. Successful saves collapse the whole form area; editing restores its answers. Canceling an edit restores the last saved response. Failed saves leave the form open and never claim success.
+The RSVP introduction greets the household by name and explains that choices are made for each guest. It stays sticky on the left while the form scrolls naturally on the right, matching the save-the-date contact layout. On narrow or short screens it stays in normal document flow. Household identity also remains on the saved-reply strip; Change invitation is available with the introduction and in the footer. The separate household banner is removed. Successful saves collapse the whole form area; editing restores its answers. Canceling an edit restores the last saved response. Failed saves leave the form open and never claim success.
 
 ## Response storage
 
