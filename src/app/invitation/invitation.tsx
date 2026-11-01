@@ -242,12 +242,12 @@ export function Invitation() {
       {invite && <div className={s.invitationDetails} data-entering={entrancePhase === "revealing" || undefined}>
         <section className={s.rsvpSection} id="your-rsvp" aria-labelledby="rsvp-heading">
           <header className={s.rsvpIntro}>
-            <h2 id="rsvp-heading" ref={entryHeading} tabIndex={-1}><span className={s.householdGreeting}>{invite.name.replace(/\s*&\s*/g, " and ")},</span>we’ve saved a place <em>for you.</em></h2>
+            <h2 id="rsvp-heading" ref={entryHeading} tabIndex={-1}><span className={s.householdGreeting}>{invite.name.replace(/\s*&\s*/g, " and ")},</span><span className={s.welcomeLine}>we’ve saved a place <em>for you.</em></span></h2>
             <Sprig />
             <p>{confirmed ? "Your reply is saved. You can review or edit it below." : "Please make your decisions and choices for each guest here."}</p>
             <p className={s.replyDeadline}>Your choices can be changed up until <time dateTime="2027-05-01">May 1, 2027</time>.</p>
           </header>
-          {confirmed ? <div className={s.collapsedReply} role="region" aria-label="Saved RSVP"><span className={s.savedCheck} aria-hidden="true">✓</span><div><h3 ref={responseHeading} tabIndex={-1}>{preview ? "Your preview RSVP is saved." : "Your RSVP is saved."}</h3><p>{attending ? "We can’t wait to celebrate with you." : "Thank you for letting us know."} <span>{attending} attending · {answers.length - attending} declining</span></p><small>{preview ? "Saved in this browser · No real RSVP or email sent" : "Saved to your invitation · Available when you return with your code"}</small></div><div className={s.editPrompt}><p>Need to make a change? Feel free.</p><button type="button" className={s.textButton} onClick={editReply}>Edit your RSVP <span aria-hidden="true">↗</span></button></div></div> :
+          <div className={s.rsvpResponse}>{confirmed ? <div className={s.collapsedReply} role="region" aria-label="Saved RSVP"><span className={s.savedCheck} aria-hidden="true">✓</span><div><h3 ref={responseHeading} tabIndex={-1}>{preview ? "Your preview RSVP is saved." : "Your RSVP is saved."}</h3><p>{attending ? "We can’t wait to celebrate with you." : "Thank you for letting us know."} <span>{attending} attending · {answers.length - attending} declining</span></p><small>{preview ? "Saved in this browser · No real RSVP or email sent" : "Saved to your invitation · Available when you return with your code"}</small></div><div className={s.editPrompt}><p>Need to make a change? Feel free.</p><button type="button" className={s.textButton} onClick={editReply}>Edit your RSVP <span aria-hidden="true">↗</span></button></div></div> :
           <div className={s.responsePaper}><div className={s.paperTop}><span>K & S</span><span>17 JULY 2027</span></div>
 <form ref={form} onSubmit={submit} noValidate aria-busy={busy}><fieldset disabled={busy} className={s.formFields}>
               <h3 ref={responseHeading} tabIndex={-1}>Will you be joining us?</h3><p className={s.formIntro}>{invite.reception ? "Your invitation includes our ceremony and reception." : "Your invitation includes our church celebration."}</p>
@@ -259,7 +259,7 @@ export function Invitation() {
             </fieldset></form>
             <div className={s.paperBottom}><Sprig /><span>WITH LOVE, KARSEN & SARAH</span></div>
           </div>
-          }
+          }</div>
           <div className={s.rsvpLinks}><a href={`mailto:${wedding.contact.email}`} className={s.textLink}>A question for us? <span aria-hidden="true">↗</span></a><button type="button" className={s.textButton} onClick={changeInvitation}>Change invitation <span aria-hidden="true">↗</span></button></div>
         </section>
         <section className={s.daySection} id="the-day"><div className={s.sectionIntro}><SectionHeading label="THE DAY" title="Every moment, together." /><p>Saturday, July 17, 2027<br />The places to be, and the moments we’ll share.</p></div><ol className={s.eventList}>
