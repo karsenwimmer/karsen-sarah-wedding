@@ -215,8 +215,9 @@
 .heroContent .heroDate strong { font-size: 37px; line-height: 1.2; }
 .heroContent .heroDate span { font-size: 8px; letter-spacing: .19em; }
 .invitedEvents { font-size: 11px; color: var(--ink); margin-top: 17px !important; }
-.heroContent .primary { margin-top: 22px; background: #dcc28c; color: var(--ink); border: 1px solid #b18b49; box-shadow: 0 3px 12px #8d703f14; }
-.heroContent .primary:hover { background: #d1af6b; }
+.heroContent .primary { margin-top: 22px; background: #fffdf7db; color: var(--gold); border: 1px solid #b18b49; box-shadow: 0 3px 12px #8d703f14; }
+.heroContent .primary:hover { background: #f5eddb; }
+.heroContent .primary:focus-visible { outline-color: #b18b49; }
 .entrySection { padding: 50px 25px 65px; max-width: 600px; margin: auto; text-align: center; }
 .entrySection > svg { color: var(--gold); margin: 0 auto 18px; }
 .entrySection > .eyebrow { justify-content: center; }
@@ -340,13 +341,15 @@
 .entryGate { width: min(100%, 390px); margin-top: 1.65rem; position: relative; }
 .entryGate .codeForm { max-width: none; width: 100%; margin: 0; text-align: center; }
 .entryGate .codeForm > label { margin: 0 0 .7rem; color: var(--ink); font-family: var(--font-display), Georgia, serif; font-size: 1.45rem; font-weight: 500; line-height: 1.25; }
-.entryGate .codeBar { position: relative; background: #fffdf7; border-color: #7896ad; box-shadow: 0 5px 18px #314e6b1a; transition: outline-color .18s, box-shadow .18s; }
+.entryGate .codeBar { position: relative; background: #fffdf7; border-color: #b18b49; box-shadow: 0 5px 18px #8d703f1a; transition: outline-color .18s, box-shadow .18s; }
 .root .entryGate .codeBar input::placeholder { color: var(--ink); opacity: 1; font-size: 13px; }
-.entryGate .codeBar button { width: auto; display: inline-flex; align-items: center; justify-content: center; gap: .45rem; padding: 0 .9rem; font-family: var(--font-display), Georgia, serif; font-size: 1.1rem; font-weight: 500; white-space: nowrap; }
+.entryGate .codeBar button { width: auto; display: inline-flex; align-items: center; justify-content: center; gap: .45rem; padding: 0 .9rem; border: 1px solid #b18b49; background: transparent; color: var(--gold); font-family: var(--font-display), Georgia, serif; font-size: 1.1rem; font-weight: 500; white-space: nowrap; transition: background .2s; }
+.entryGate .codeBar button:hover { background: #f5eddb; }
+.entryGate .codeBar button:focus-visible { outline-color: #b18b49; }
 .entryGate .codeBar button span { font-size: 1.25rem; line-height: 1; }
 .lockIcon { width: 19px; height: 19px; flex-shrink: 0; overflow: visible; }
 .lockShackle { transform-origin: 16px 10px; transition: transform .38s ease; }
-.entryGate .codeBar button[data-unlocked=true] { opacity: 1; background: #305570; }
+.entryGate .codeBar button[data-unlocked=true] { opacity: 1; background: #f5eddb; }
 .entryGate .codeBar button[data-unlocked=true] .lockShackle { transform: rotate(28deg); }
 .entryGate .codeBar::before { content: ""; position: absolute; pointer-events: none; inset: -6px; border-radius: 3px; padding: 2px; opacity: 0; background: conic-gradient(from var(--code-orbit-angle), transparent 0deg, #b29a6833 55deg, #b99750 95deg, #ecd49b 125deg, transparent 155deg, transparent 360deg); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
 .entryGate .codeBar:focus-within { outline-color: #b29a68; }
