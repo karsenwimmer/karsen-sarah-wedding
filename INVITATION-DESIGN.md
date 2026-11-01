@@ -8,11 +8,11 @@ Use case: precise-object-edit. Asset type: watercolor background for Karsen and 
 
 ## Page structure
 
-The invitation palette uses powder blue section backgrounds, muted navy buttons and text, antique gold details, and warm ivory paper. The household names lead the RSVP introduction at a larger scale than the greeting; individual guest names on the form are also larger. The former “Your reply” label is removed. These styles remain scoped to the invitation route.
+The invitation palette uses a warm beige RSVP section, near-black headings matching the hero, muted blue buttons, antique gold details, and ivory paper. The centered household greeting sits above a form capped at 960px. Regular body text is 16–18px, field labels are 16px, and supporting text is generally 14px. Small decorative uppercase labels remain 12px. All styles remain scoped to the invitation route.
 
 Centered, full-width opening → personalized RSVP section or compact saved-reply strip → combined schedule and venues → Dress Code → Transportation → FAQs → photos and activity placeholders.
 
-The RSVP introduction greets the household by name and explains that choices are made for each guest. The displayed change deadline is May 1, 2027. It stays sticky on the left while the form scrolls naturally on the right, matching the save-the-date contact layout. On narrow or short screens it stays in normal document flow. Household identity also remains on the saved-reply strip; Change invitation is available with the introduction and in the footer. The separate household banner is removed. Successful saves collapse the whole form area; editing restores its answers. Canceling an edit restores the last saved response. Failed saves leave the form open and never claim success.
+The centered RSVP introduction greets the household by name and explains that choices are made for each guest. The displayed change deadline is May 1, 2027. Successful saves collapse the form into a compact response card beneath the greeting; editing restores its answers. Canceling an edit restores the last saved response. Failed saves leave the form open and never claim success. Change invitation is available beneath the form and in the footer.
 
 ## Response storage
 
@@ -26,6 +26,6 @@ Before sending formal invitations: finalize ceremony, addresses, schedule, dress
 
 ## Simple code entrance
 
-The opening reuses the save-the-date monogram, exact script name and date styling, serif RSVP label and shared live Countdown component. Code entry sits immediately beneath the timer, with an Unlock button and line-art lock icon. A recognized code opens the lock for 650ms, then reveals the page and smoothly scrolls to the RSVP form or saved reply, moving keyboard focus to its heading. Invalid codes keep the lock closed. Reduced-motion guests skip the animation and scroll instantly. The transition timer cleans up on unmount. There is no envelope animation. The rest of the page and footer render only for a recognized invitation.
+The opening reuses the save-the-date monogram, exact script name and date styling, serif RSVP label and shared live Countdown component. After a recognized code, a full-screen ivory veil and large gold line-art lock appear. The shackle opens, then the veil dissolves while the unlocked page fades in and an eased 1150ms scroll moves to the centered household greeting. The full sequence lasts about 2.2 seconds. Invalid codes keep the page locked. Reduced-motion guests skip the overlay, fades, and animated scroll. Wheel, touch, pointer, or navigation-key input can interrupt the scroll. Timers, animation frames, and event listeners clean up on unmount. There is no envelope animation. Real invitation data is rendered only after server verification.
 
 Before entry, wheel, touch, keyboard and inner-scroll attempts add a temporary gold outline/glow to the code field and update its help text. Typing clears the highlight. The locked root fills the viewport; on short or zoomed screens, only the introduction can scroll so the field remains reachable. A valid code removes the gate and restores normal page scrolling. Listeners and timers clean up on entry and unmount.
