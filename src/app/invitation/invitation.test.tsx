@@ -34,13 +34,16 @@ describe("Karsen and Sarah invitation", () => {
     expect(screen.getByLabelText("Enter the Code")).toBeDisabled();
     expect(document.getElementById("your-rsvp")).not.toBeInTheDocument();
     await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(screen.getByRole("status")).toHaveAttribute("data-phase", "unlocking");
+    expect(document.getElementById("your-rsvp")).not.toBeInTheDocument();
+    await act(async () => { await vi.advanceTimersByTimeAsync(2400); });
     expect(document.getElementById("your-rsvp")).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveAttribute("data-phase", "revealing");
-    await act(async () => { await vi.advanceTimersByTimeAsync(600); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(900); });
     const midway = vi.mocked(window.scrollTo).mock.calls.at(-1)![0] as ScrollToOptions;
     expect(midway.top).toBeGreaterThan(0);
     expect(midway.top).toBeLessThan(1200);
-    await act(async () => { await vi.advanceTimersByTimeAsync(650); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Avery and Jordan, we’ve saved a place for you." })).toHaveFocus();
   });
@@ -48,7 +51,7 @@ describe("Karsen and Sarah invitation", () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "setInterval", "clearInterval", "performance", "Date"] });
     vi.mocked(window.matchMedia).mockReturnValue({ matches: false } as MediaQueryList);
     render(<Invitation />); enterCode();
-    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(3400); });
     await act(async () => { await vi.advanceTimersByTimeAsync(200); });
     fireEvent.wheel(window, { deltaY: 100 });
     const calls = vi.mocked(window.scrollTo).mock.calls.length;

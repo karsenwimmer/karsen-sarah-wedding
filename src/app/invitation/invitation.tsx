@@ -8,6 +8,7 @@ import { weddingConfig as wedding } from "@/config/wedding";
 import { createGoogleCalendarUrl, createIcsCalendarFile, createOutlookCalendarUrl, type CalendarEvent } from "@/lib/calendar";
 import { blankAnswers, cleanAnswers, findInvite, invitations, mealOptions, readReply, replyKey, validateAnswers, type Answer, type Invite, type Reply } from "./preview-data";
 import { lookupInvitation, saveInvitationReply } from "./actions";
+import { OrnateLock } from "./ornate-lock";
 import s from "./invitation.module.css";
 
 function Seal({ large = false }: { large?: boolean }) {
@@ -77,7 +78,7 @@ export function Invitation() {
       cleanup(); setEntrancePhase("idle");
     }
     function scroll(time: number) {
-      const progress = Math.min(1, (time - started) / 1150);
+      const progress = Math.min(1, (time - started) / 1800);
       const eased = progress < .5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2;
       window.scrollTo({ top: startY + (endY - startY) * eased, behavior: "instant" });
       if (progress < 1) frame = window.requestAnimationFrame(scroll);
@@ -133,7 +134,7 @@ export function Invitation() {
     unlockTimer.current = window.setTimeout(() => {
       setInvite(found); setPreview(isPreview); setAnswers(saved?.answers ?? blankAnswers(found)); setNote(saved?.note ?? "");
       setSavedReply(saved); setConfirmed(Boolean(saved)); setErrors({}); setSaveError(""); setMenuOpen(false); setEntrancePhase(reducedMotion ? "idle" : "revealing");
-    }, reducedMotion ? 0 : 1000);
+    }, reducedMotion ? 0 : 3400);
   }
   async function openInvitation(event: FormEvent) {
     event.preventDefault(); if (gateBusy) return;
@@ -205,7 +206,7 @@ export function Invitation() {
   }
   const attending = answers.filter(answer => answer.attending === "yes").length;
   return <div className={`${s.root} ${!invite ? s.lockedRoot : ""}`}>
-    {entrancePhase !== "idle" && <div className={s.entranceOverlay} data-phase={entrancePhase} role="status" aria-label="Opening your invitation"><Lock /><span className={s.entranceStatus}>Opening your invitation.</span></div>}
+    {entrancePhase !== "idle" && <div className={s.entranceOverlay} data-phase={entrancePhase} role="status" aria-label="Opening your invitation"><OrnateLock /><span className={s.entranceStatus}>Opening your invitation.</span></div>}
     <a className={s.skip} href="#invitation-main">Skip to invitation</a>
     {preview && <div className={s.previewBar}><span>INVITATION PREVIEW</span><p>Sample households · Real invitations are not being sent yet</p></div>}
     <header className={s.header} inert={entrancePhase === "unlocking"}>
