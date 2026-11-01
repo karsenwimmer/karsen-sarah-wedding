@@ -18,23 +18,44 @@ beforeEach(() => {
   vi.spyOn(window, "scrollTo").mockImplementation(() => {});
   vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: true })));
   Element.prototype.scrollIntoView = vi.fn();
+  vi.spyOn(window, "requestAnimationFrame").mockImplementation(callback => window.setTimeout(() => callback(performance.now()), 16));
+  vi.spyOn(window, "cancelAnimationFrame").mockImplementation(id => window.clearTimeout(id));
 });
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.unstubAllGlobals(); Reflect.deleteProperty(Element.prototype, "scrollIntoView"); vi.restoreAllMocks(); vi.mocked(lookupInvitation).mockReset(); vi.mocked(saveInvitationReply).mockReset(); });
 
 describe("Karsen and Sarah invitation", () => {
-  it("opens the lock before revealing the page, then scrolls and focuses the RSVP section", async () => {
-    vi.useFakeTimers();
+  it("opens a large lock before revealing the page, then slowly scrolls and focuses the greeting", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "setInterval", "clearInterval", "performance", "Date"] });
     vi.mocked(window.matchMedia).mockReturnValue({ matches: false } as MediaQueryList);
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({ top: 1200 } as DOMRect);
     render(<Invitation />);
     enterCode();
-    expect(screen.getByRole("button", { name: "Invitation unlocked" })).toBeDisabled();
-    expect(screen.getByText("Your invitation is unlocked.")).toBeVisible();
+    expect(screen.getByRole("status", { name: "Opening your invitation" })).toHaveAttribute("data-phase", "unlocking");
+    expect(screen.getByLabelText("Enter the Code")).toBeDisabled();
     expect(document.getElementById("your-rsvp")).not.toBeInTheDocument();
-    await act(async () => { await vi.advanceTimersByTimeAsync(700); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
     expect(document.getElementById("your-rsvp")).toBeInTheDocument();
-    await act(async () => { await vi.advanceTimersByTimeAsync(17); });
-    expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "start" });
-    expect(screen.getByRole("heading", { name: "Will you be joining us?" })).toHaveFocus();
+    expect(screen.getByRole("status")).toHaveAttribute("data-phase", "revealing");
+    await act(async () => { await vi.advanceTimersByTimeAsync(600); });
+    const midway = vi.mocked(window.scrollTo).mock.calls.at(-1)![0] as ScrollToOptions;
+    expect(midway.top).toBeGreaterThan(0);
+    expect(midway.top).toBeLessThan(1200);
+    await act(async () => { await vi.advanceTimersByTimeAsync(650); });
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Avery and Jordan, we’ve saved a place for you." })).toHaveFocus();
+  });
+  it("lets a guest interrupt the automatic scroll", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "setInterval", "clearInterval", "performance", "Date"] });
+    vi.mocked(window.matchMedia).mockReturnValue({ matches: false } as MediaQueryList);
+    render(<Invitation />); enterCode();
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(200); });
+    fireEvent.wheel(window, { deltaY: 100 });
+    const calls = vi.mocked(window.scrollTo).mock.calls.length;
+    await act(async () => { await vi.advanceTimersByTimeAsync(2000); });
+    expect(window.scrollTo).toHaveBeenCalledTimes(calls);
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(document.getElementById("your-rsvp")).toBeInTheDocument();
   });
   it("skips the motion for reduced-motion guests and keeps rejected codes locked", async () => {
     vi.mocked(lookupInvitation).mockResolvedValue({ ok: false, message: "Please check your code." });
@@ -43,6 +64,7 @@ describe("Karsen and Sarah invitation", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Please check your code.");
     expect(screen.getByRole("button", { name: "Unlock invitation" })).not.toHaveAttribute("data-unlocked");
     expect(Element.prototype.scrollIntoView).not.toHaveBeenCalled();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
     await open();
     await waitFor(() => expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith({ behavior: "instant", block: "start" }));
   });

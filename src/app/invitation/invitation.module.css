@@ -70,20 +70,12 @@
 .calendar a, .calendar button { border: 0; background: transparent; color: var(--accent); font-size: 10px; padding: 8px 0; min-height: 40px; }
 .calendar a span, .calendar button span { margin-left: 14px; }
 .rsvpSection { background: var(--pale-blue); padding: 80px 7%; display: grid; grid-template-columns: .75fr 1.1fr; gap: 10%; align-items: start; border-block: 1px solid #c9d9e6; }
-.rsvpAside { max-width: 400px; padding-block: 20px; }
-.rsvpAside h2 { font-size: clamp(36px, 3.6vw, 50px); margin: 0 0 24px; overflow-wrap: anywhere; }
 .householdGreeting { display: block; margin-bottom: .4em; font-size: clamp(52px, 5.3vw, 78px); line-height: 1.02; color: var(--accent); }
-.rsvpAside h2 em { color: var(--accent); font-weight: 400; }
-.rsvpAside > svg { color: var(--gold); margin-bottom: 22px; }
-.rsvpAside > p:not(.eyebrow) { max-width: 290px; font-size: 13px; color: #566d7e; }
-.rsvpAside > .replyDeadline { margin-top: 15px; font-size: 11px; line-height: 1.6; color: #687c8b; }
 .rsvpLinks { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 22px; margin-top: 25px; padding-top: 15px; border-top: 1px solid #bacbd9; }
 .rsvpLinks .textButton { font-size: 10px; }
 .rsvpLinks .textButton, .rsvpLinks .textLink { min-height: 44px; }
-.collapsedReply .savedHousehold { margin-bottom: 10px; font-family: var(--font-display), Georgia, serif; font-size: clamp(24px, 2.4vw, 34px); line-height: 1.1; color: var(--accent); }
 .textLink { display: inline-block; color: var(--accent); font-size: 11px; border-bottom: 1px solid #b5a075; padding-bottom: 5px; min-height: 35px; }
 .textLink > span { padding-left: 20px; }
-.rsvpAside .textLink { margin-top: 0; }
 .responsePaper { background: var(--paper); border: 1px solid #cdbb92; padding: 23px clamp(22px, 3.4vw, 48px) 25px; box-shadow: 0 15px 40px #56676b0b; position: relative; min-width: 0; }
 .responsePaper::before { content: ''; pointer-events: none; position: absolute; inset: 7px; border: 1px solid #e5dfd0; }
 .paperTop { display: flex; justify-content: space-between; align-items: center; gap: 20px; border-bottom: 1px solid var(--line); padding-bottom: 15px; margin-bottom: 30px; color: var(--gold); }
@@ -132,19 +124,14 @@
 .footer p { font-size: 8px; color: var(--muted); }
 .footer > span { font-size: 7px; letter-spacing: .16em; color: var(--muted); }
 @media (min-width: 1500px) { .rsvpSection { padding-inline: max(7%, calc((100vw - 1240px) / 2)); } }
-@media (min-width: 901px) and (min-height: 650px) {
-  .rsvpAside { position: sticky; top: 7rem; min-height: calc(100svh - 9rem); display: grid; align-content: center; }
-}
 @media (max-width: 900px) {
   .rsvpSection { grid-template-columns: 1fr; gap: 35px; }
-  .rsvpAside { max-width: 600px; }
 }
 @media (max-width: 1000px) {
   .hero { padding-inline: 5%; gap: 6%; min-height: 600px; }
   .nav { gap: 20px; }
   .rsvpSection { column-gap: 6%; padding-inline: 5%; }
   .responsePaper { padding-inline: 25px; }
-  .rsvpAside h2 { font-size: 38px; }
   .attendance { grid-template-columns: 1fr; }
 }
 @media (max-width: 700px) {
@@ -181,12 +168,7 @@
   .calendar > div { flex-wrap: wrap; gap: 22px; }
   .calendar a span, .calendar button span { margin-left: 9px; }
   .rsvpSection { grid-template-columns: 1fr; gap: 35px; padding: 45px 20px; }
-  .rsvpAside { max-width: none; padding: 0 5px; }
-  .rsvpAside h2 { font-size: 40px; margin-block: 0 20px; }
   .householdGreeting { font-size: clamp(50px, 13.5vw, 64px); }
-  .rsvpAside > svg { margin-bottom: 15px; }
-  .rsvpAside > p:not(.eyebrow) { max-width: 320px; font-size: 12px; }
-  .rsvpAside .textLink { margin-top: 17px; }
   .responsePaper { padding: 20px 23px; }
   .paperTop { margin-bottom: 25px; }
   .responsePaper form > h3 { font-size: 34px; }
@@ -407,4 +389,121 @@
 @media (max-height: 650px) {
   .lockedRoot .heroContent { padding-block: 1.5rem; }
   .lockedRoot .invitationMark :global(.save-date-mark__seal) { width: 5.4rem; height: 5.4rem; margin-bottom: 1.15rem; transform: none; }
+}
+
+/* A single, quiet entrance that opens into the centered invitation. */
+.root { --ink: #20201e; font-size: 18px; }
+.root h1, .root h2, .root h3 { color: var(--ink); }
+.root #rsvp-heading:focus, .collapsedReply h3:focus { outline: none; }
+.entranceOverlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: #f8f5edcc; backdrop-filter: blur(3px); animation: veilArrives .25s ease both; }
+.entranceOverlay > .lockIcon { width: clamp(112px, 13vw, 152px); height: auto; color: #a58445; stroke-width: 1; }
+.entranceOverlay .lockShackle { animation: ceremonialUnlock .55s .25s cubic-bezier(.22,.61,.36,1) both; }
+.entranceOverlay[data-phase=revealing] { animation: veilLeaves .45s ease both; pointer-events: none; }
+.entranceStatus { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.invitationDetails[data-entering=true] { animation: invitationAppears .9s ease both; }
+@keyframes veilArrives { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ceremonialUnlock { from { transform: rotate(0); } to { transform: rotate(28deg); } }
+@keyframes veilLeaves { from { opacity: 1; } to { opacity: 0; } }
+@keyframes invitationAppears { from { opacity: 0; } to { opacity: 1; } }
+
+/* The guest's greeting leads, with a wider paper form beneath it. */
+.root .rsvpSection { display: flex; flex-direction: column; align-items: center; gap: 0; background: #f5f0e6; border-color: #ded4c0; padding: clamp(56px, 7vw, 96px) clamp(20px, 5vw, 72px); }
+.rsvpIntro { width: min(100%, 960px); margin: 0 auto 44px; text-align: center; }
+.rsvpIntro h2 { margin: 0; color: var(--ink); font-size: clamp(32px, 3.7vw, 48px); line-height: 1.1; overflow-wrap: anywhere; }
+.rsvpIntro .householdGreeting { margin-bottom: .24em; color: var(--ink); font-size: clamp(48px, 6.2vw, 80px); line-height: 1.05; }
+.rsvpIntro h2 em { color: inherit; font-weight: 400; }
+.rsvpIntro > svg { display: block; margin: 24px auto 18px; color: var(--gold); }
+.rsvpIntro > p { max-width: 680px; margin: 0 auto; font-size: 18px; line-height: 1.7; color: #52616b; }
+.rsvpIntro > .replyDeadline { margin-top: 12px; font-size: 14px; }
+.rsvpIntro time { white-space: nowrap; }
+.root .responsePaper { width: min(100%, 960px); padding: 32px clamp(24px, 4vw, 56px) 36px; background: #fffdf8; }
+.rsvpLinks { width: min(100%, 960px); justify-content: center; gap: 12px 32px; margin-top: 24px; border: 0; padding-top: 0; }
+.root .rsvpLinks .textLink, .root .rsvpLinks .textButton { font-size: 14px !important; min-height: 44px; }
+.root .paperTop { margin-bottom: 32px; padding-bottom: 20px; }
+.paperTop > span:first-child { font-size: 30px; }
+.paperTop > span:last-child { font-size: 14px; letter-spacing: .08em; }
+.root .formFields > h3 { margin: 0 0 14px; font-size: clamp(32px, 3.5vw, 42px); }
+.formIntro { font-size: 16px; margin-bottom: 34px !important; line-height: 1.7; }
+.guest { margin-bottom: 30px; padding-bottom: 30px; }
+.guest legend { font-size: clamp(30px, 3vw, 36px); margin-bottom: 16px; gap: 14px; }
+.guest legend > span { font-size: 16px; }
+.guest legend > small { font-size: 12px; }
+.attendance { gap: 12px; }
+.attendance label { min-height: 56px; font-size: 16px; padding: 14px 16px; gap: 12px; line-height: 1.5; }
+.root .attendance input { width: 16px; height: 16px; }
+.guestDetails { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: 24px; }
+.guestDetails > div:only-child { grid-column: 1 / -1; }
+.guestDetails label, .messageField label { font-size: 16px; line-height: 1.6; margin-bottom: 9px; }
+.guestDetails label small, .messageField label small { font-size: 12px; }
+.root .guestDetails input, .root .guestDetails select, .root .messageField textarea { font-size: 16px; line-height: 1.6; padding: 13px 14px; min-height: 50px; background-color: #ffffff80; }
+.root .guestDetails input::placeholder, .root .messageField textarea::placeholder { font-size: 14px; }
+.root .messageField textarea { min-height: 130px; }
+.root .submit { margin-top: 28px; min-height: 58px; font-size: 16px !important; padding: 15px 22px; }
+.saveHint, .error { font-size: 14px; line-height: 1.7; }
+.paperBottom > span { font-size: 12px; letter-spacing: .12em; }
+.root .cancelEdit { font-size: 14px !important; min-height: 44px; }
+.root .collapsedReply { width: min(100%, 960px); background: #fffdf8; border: 1px solid #cdbb92; padding: 30px; grid-template-columns: 40px 1fr; gap: 20px; }
+.collapsedReply h3 { margin-bottom: 12px; font-size: 32px; }
+.collapsedReply > div > p, .collapsedReply small { font-size: 14px; line-height: 1.7; }
+.collapsedReply .editPrompt { grid-column: 2; text-align: left; }
+.collapsedReply .editPrompt p { font-size: 20px !important; }
+.root .editPrompt .textButton { font-size: 16px !important; min-height: 44px; }
+
+/* Comfortable text sizes throughout the invitation. */
+.nav { font-size: 14px; gap: 22px; }
+.brand > span { font-size: 12px; }
+.headerDate { font-size: 12px; }
+.previewBar { font-size: 14px; }
+.previewBar > span { font-size: 11px; }
+.eyebrow { font-size: 12px; }
+.primary, .textButton, .textLink { font-size: 16px !important; }
+.root .menuToggle { font-size: 16px !important; }
+.entryGate { width: min(100%, 440px); }
+.entryGate .codeForm > label { font-size: 26px; }
+.root .entryGate .codeBar input::placeholder { font-size: 16px; }
+.entryGate .codeBar button { font-size: 18px; }
+.entryGate .hint { font-size: 16px; }
+.entryGate .previewCodes { font-size: 14px; }
+.previewCodes button > span { font-size: 14px; }
+.previewCodes small { font-size: 12px; }
+.heroContent :global(.countdown__label) { font-size: 14px; }
+.invitedEvents { font-size: 16px; }
+.sectionIntro > p, .eventCopy > p:not(.eyebrow), .dressSection > p, .transportSection > div > p, .transportRows article p, .faqSection > div:first-child > p, .faqList details > p, .memories > p:not(.eyebrow) { font-size: 17px; line-height: 1.8; }
+.calendar > span, .eventTime > p, .detailNote, .memories > div span, .footer > span { font-size: 12px; }
+.footer p { font-size: 14px; }
+.calendar a, .calendar button { font-size: 16px; }
+.faqList summary { font-size: 28px; }
+.root .footer > button { font-size: 14px !important; }
+@media (max-width: 700px) {
+  .root { font-size: 16px; }
+  .root .rsvpSection { padding: 44px 18px 48px; }
+  .rsvpIntro { margin-bottom: 30px; }
+  .rsvpIntro .householdGreeting { font-size: clamp(44px, 11vw, 62px); }
+  .rsvpIntro h2 { font-size: 32px; }
+  .rsvpIntro > p { font-size: 16px; }
+  .rsvpIntro > .replyDeadline { font-size: 14px; }
+  .root .responsePaper { padding: 25px 22px 30px; }
+  .paperTop { gap: 12px; }
+  .paperTop > span:first-child { font-size: 26px; }
+  .paperTop > span:last-child { font-size: 12px; letter-spacing: .04em; }
+  .attendance { grid-template-columns: 1fr; gap: 10px; }
+  .attendance label { font-size: 16px; }
+  .guestDetails { grid-template-columns: 1fr; gap: 18px; }
+  .guest legend { font-size: 30px; }
+  .guestDetails label small, .messageField label small { font-size: 12px; }
+  .root .collapsedReply { padding: 24px 20px; gap: 14px; grid-template-columns: 30px 1fr; }
+  .collapsedReply h3 { font-size: 28px; }
+  .savedCheck { width: 28px; height: 28px; }
+  .previewBar p { font-size: 12px; }
+  .brand > span { font-size: 10px; letter-spacing: .1em; }
+  .headerDate { font-size: 10px; }
+  .entryGate { width: min(100%, 355px); }
+  .root .entryGate .codeBar input::placeholder { font-size: 15px; }
+  .entryGate .hint { font-size: 15px; }
+  .heroContent :global(.countdown__label) { font-size: 12px; }
+  .sectionIntro > p, .eventCopy > p:not(.eyebrow), .dressSection > p, .transportSection > div > p, .transportRows article p, .faqSection > div:first-child > p, .faqList details > p, .memories > p:not(.eyebrow) { font-size: 16px; }
+  .faqList summary { font-size: 25px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .entranceOverlay { display: none; }
 }
