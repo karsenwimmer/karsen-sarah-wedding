@@ -206,7 +206,6 @@ export function Invitation() {
       {invite && <>
         {confirmed ? <section className={s.collapsedReply} id="your-rsvp" aria-label="Saved RSVP"><span className={s.savedCheck} aria-hidden="true">✓</span><div><p className={s.savedHousehold}>{invite.name}</p><h2 ref={responseHeading} tabIndex={-1}>{preview ? "Your preview RSVP is saved." : "Your RSVP is saved."}</h2><p>{attending ? "We can’t wait to celebrate with you." : "Thank you for letting us know."} <span>{attending} attending · {answers.length - attending} declining</span></p><small>{preview ? "Saved in this browser · No real RSVP or email sent" : "Saved to your invitation · Available when you return with your code"}</small></div><div className={s.editPrompt}><p>Need to make a change? Feel free.</p><button type="button" className={s.textButton} onClick={editReply}>Edit your RSVP <span aria-hidden="true">↗</span></button></div></section> : <section className={s.rsvpSection} id="your-rsvp" aria-labelledby="rsvp-heading">
           <aside className={s.rsvpAside}>
-            <p className={s.eyebrow}>YOUR REPLY</p>
             <h2 id="rsvp-heading"><span className={s.householdGreeting}>{invite.name.replace(/\s*&\s*/g, " and ")},</span>we’ve saved a place <em>for you.</em></h2>
             <Sprig />
             <p>Please make your decisions and choices for each guest here.</p>

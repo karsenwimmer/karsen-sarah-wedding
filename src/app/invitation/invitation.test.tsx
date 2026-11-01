@@ -89,6 +89,7 @@ describe("Karsen and Sarah invitation", () => {
     expect(screen.getByRole("heading", { name: "Avery and Jordan, we’ve saved a place for you." })).toBeVisible();
     expect(screen.getByText("Please make your decisions and choices for each guest here.")).toBeVisible();
     expect(screen.queryByText("An invitation for")).not.toBeInTheDocument();
+    expect(screen.queryByText("YOUR REPLY")).not.toBeInTheDocument();
     expect(screen.getByRole("group", { name: /Avery Morgan/ })).toBeVisible();
     expect(screen.queryByText("Alex Parker")).not.toBeInTheDocument();
     expect(document.getElementById("your-rsvp")!.compareDocumentPosition(document.getElementById("the-day")!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
