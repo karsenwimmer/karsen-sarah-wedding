@@ -411,14 +411,11 @@
 @keyframes veilLeaves { from { opacity: 1; } to { opacity: 0; } }
 @keyframes invitationAppears { from { opacity: 0; } to { opacity: 1; } }
 
-/* The stationery reveals from the personal greeting to the reply card. */
-.rsvpIntro .householdGreeting { animation: stationeryAppears 1.4s .65s ease both; }
-.welcomeLine { display: block; animation: stationeryAppears 1.4s .95s ease both; }
-.rsvpIntro > svg { animation: stationeryAppears 1.3s 1.15s ease both; }
-.rsvpIntro > p { animation: stationeryAppears 1.4s 1.3s ease both; }
-.rsvpIntro > .replyDeadline { animation-delay: 1.55s; }
-.rsvpResponse { width: min(100%, 960px); animation: stationeryAppears 1.6s 1.8s ease both; }
-.rsvpLinks { animation: stationeryAppears 1.3s 2.2s ease both; }
+/* Three beats: the household name, a pause, the welcome, then the reply. */
+.rsvpIntro .householdGreeting { animation: stationeryAppears 1.2s .6s ease both; }
+.welcomeLine { display: block; animation: stationeryAppears 1.2s 3.2s ease both; }
+.rsvpIntro > svg, .rsvpIntro > p, .rsvpLinks { animation: stationeryAppears 1.6s 4.8s ease both; }
+.rsvpResponse { width: min(100%, 960px); animation: stationeryAppears 1.6s 4.8s ease both; }
 .rsvpResponse:focus-within, .rsvpLinks:focus-within { opacity: 1 !important; }
 @keyframes stationeryAppears { from { opacity: 0; } to { opacity: 1; } }
 
