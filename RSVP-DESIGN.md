@@ -1,17 +1,15 @@
-# Luca & Victoria invitation design
+# Victoria & Luca invitation design
 
-The invitation uses an original Impressionist oil-style courtyard painting, the approved generated gold L | V PNG monogram with one clean circle and leafy sprays, Bodoni Moda display lettering, and Source Sans 3 interface text. The palette is dusty sage (#A8B39F), pale sage (#E6ECDF), warm cream (#FBF8F1), eucalyptus (#3F5344), and antique gold (#9A773E). The framed card has a subtle procedural paper grain, restrained double border and soft shadow. The names lead the typography, with one invitation caption and June 12, 2026 as the date.
+Route: `/demo/rsvp`. The redesign is scoped to this route. The homepage and separate `/invitation` preview are preserved.
 
-The desktop entry pairs the invitation with a narrower code form. On mobile the card sits above “Enter your code”, one explanation and an input with an arrow submit button. The entry fits standard phone viewports; natural overflow remains available for enlarged text. The RSVP screen introduces the household with “An invitation for”, uses consistent rectangular controls and selected states, and keeps wedding details quieter with fewer borders and repeated emblems. Fonts, texture and styles remain scoped to the demo route.
+The reference card guides the composition: warm ivory (#FAF8F1), olive-sage ink (#536542), a pale sage surround (#E9EDDF), an upright Cormorant Garamond serif with spaced uppercase full names, and Source Sans 3 for form controls. The generated sage V | L wildflower PNG replaces the gold monogram. The invitation uses “with full hearts, joyfully invite you to their wedding”.
 
-The painting is illustrative, not a representation of the real wedding venue. Existing invitation codes, invited guests, meal choices, saved responses and reset behaviour are unchanged.
+The desktop entrance is one shared paper panel with invitation text and code entry on the left and the approved watercolour portrait on the right. On mobile, the order is monogram, names, date, a softly faded portrait crop, and code entry. A larger complete portrait appears with the wedding details after code entry. Standard phone entrances fit one screen, with natural overflow retained for enlarged text or error messages.
 
-Active monogram: `public/images/demo/luca-victoria-monogram-generated.png` (1254 × 1254 transparent PNG, built-in Image Generation). The header and card share this exact image. The previous SVG is retained only as an unused historical asset. See `monogram-generation-notes.md` for the generation prompt.
+Active assets:
+- `public/images/demo/luca-victoria-wildflower-monogram.png`: 512 × 512 transparent PNG, resized from the approved generated sage wildflower monogram.
+- `public/images/demo/luca-victoria-watercolour-portrait.webp`: 1000 × 1252 WebP with alpha, optimized from the approved hybrid portrait PNG. The real couple retains photographic detail, while the garden and pergola have a watercolour treatment. Original generated PNG and prompt remain in the project workspace.
 
-Artwork: `public/images/demo/luca-victoria-oil-courtyard.webp`
+The previous gold monogram and courtyard painting remain historical assets and are not used by this route.
 
-Generation: built-in Image Generation tool. Original PNG retained in the generation library; the website uses an optimized WebP.
-
-Final generation prompt:
-
-Use case: stylized-concept. Asset type: original background painting for a romantic formal wedding invitation website. Create a refined oil painting on linen of an intimate Italian garden courtyard at late afternoon: warm pale limestone loggias and graceful arches on either side, a distant small ornamental fountain, climbing pale blush roses, dusky plum flowers and silvery foliage, weathered terracotta pots, a quiet stone pathway leading into luminous open space. Impressionist oil painting with visible soft bristle strokes and delicate scumbling, gently textured matte paint, atmospheric and beautiful, muted and light rather than heavy. Wide landscape composition, architectural and floral detail concentrated along left and right edges, quiet light champagne and porcelain negative space in the central 45 percent and upper centre to allow overlaid website lettering. Color palette warm porcelain, muted blush, dusty mauve, mushroom taupe, restrained deep aubergine shadows and antique gold sunlight; no blue harbour, no waterfront or boathouse. No people, no lettering, no emblems, no border, no typography, no watermark. Not watercolor: no watery washes, no ink outlines. This is only a painting asset, not a website mockup.
+Invitation codes, fictional guest fixtures, meal selections, browser storage keys, RSVP validation, saved response editing and demo reset behavior are unchanged. The current demo date and fictional locations are retained pending confirmation of the reference card’s event details. No real RSVP backend or email integration is added.

@@ -4,10 +4,10 @@ import Image from "next/image";
 export function Emblem({ className }: { className?: string }) {
   return <Image
     className={className}
-    src="/images/demo/luca-victoria-monogram-generated.png"
+    src="/images/demo/luca-victoria-wildflower-monogram.png"
     alt=""
-    width={1254}
-    height={1254}
+    width={512}
+    height={512}
     loading="eager"
     unoptimized
     style={{ objectFit: "contain" }}
