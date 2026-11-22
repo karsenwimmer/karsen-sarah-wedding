@@ -1,11 +1,11 @@
-// Fictional, public fixtures. Real invitation access must be checked on the server.
+// Event details supplied by the couple. Guest fixtures below are fictional and public.
+// Real invitation access must be checked on the server.
 export const demoWedding = {
   names: "Luca & Victoria",
-  date: "June 12, 2026",
-  location: "Oakville, Ontario",
-  deadline: "May 12, 2026",
-  ceremony: { name: "The Garden Chapel", address: "12 Chapel Lane, Oakville, ON", time: "2:00 PM" },
-  reception: { name: "Willow House", address: "48 Willow Road, Oakville, ON", time: "4:30 PM" }
+  date: "August 28, 2027",
+  location: "Mississauga, Ontario",
+  ceremony: { name: "Saints Peter and Paul Parish", address: "4070 Central Parkway East, Mississauga, Ontario", time: "12:00 PM" },
+  reception: { name: "Reception to follow", note: "Venue and timing details will be shared here." }
 };
 
 export type DemoGuest = { id: string; name: string; child?: boolean };

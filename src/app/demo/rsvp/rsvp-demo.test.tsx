@@ -12,6 +12,54 @@ beforeEach(() => { window.localStorage.clear(); vi.spyOn(window, "scrollTo").moc
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 describe("isolated wedding RSVP demo", () => {
+  it("shows the confirmed date without locations on entry and reveals the ceremony only after opening", () => {
+    render(<RsvpDemo />);
+    const hero = screen.getByRole("heading", { level: 1 });
+    const portrait = screen.getByRole("img", { name: /Victoria and Luca holding hands/ });
+    expect(screen.getByText("August 28, 2027")).toBeVisible();
+    expect(screen.queryByText(/Mississauga|Central Parkway|Saints Peter and Paul/)).not.toBeInTheDocument();
+    open();
+    expect(screen.getByRole("heading", { level: 1 })).toBe(hero);
+    expect(screen.getByRole("img", { name: /Victoria and Luca holding hands/ })).toBe(portrait);
+    expect(screen.queryByRole("textbox", { name: "Enter your code" })).not.toBeInTheDocument();
+    const welcome = screen.getByRole("heading", { name: "Jordan & Taylor" });
+    const instructions = screen.getByRole("heading", { name: "Will you be joining us?" });
+    const response = screen.getByRole("heading", { name: "Your response" });
+    const details = screen.getByRole("heading", { name: "Locations" });
+    expect(welcome.compareDocumentPosition(instructions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(instructions.compareDocumentPosition(response) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    for (const name of ["Locations", "Itinerary", "Dress code", "FAQs"]) {
+      expect(screen.getByRole("region", { name })).toBeVisible();
+    }
+    expect(screen.queryByText(/We’d love to celebrate|We can’t wait to share|Explore the wedding details|Please reply for each person/)).not.toBeInTheDocument();
+    expect(response.compareDocumentPosition(details) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Saints Peter and Paul Parish" })).toBeVisible();
+    expect(screen.getByText("4070 Central Parkway East, Mississauga, Ontario")).toBeVisible();
+    expect(screen.getByText("Ceremony at 12:00 PM")).toBeVisible();
+    expect(screen.queryByText(/Oakville|Willow House|May 12, 2026|June 12, 2026/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Change invitation" }));
+    expect(screen.queryByText(/Mississauga|Central Parkway|Saints Peter and Paul/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Your response" })).not.toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "Enter your code" })).toHaveValue("");
+    expect(screen.getByRole("heading", { level: 1 })).toBe(hero);
+  });
+
+  it("lands above the welcome opening and skips animation for reduced motion", () => {
+    const frames: FrameRequestCallback[] = [];
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => { frames.push(callback); return frames.length; });
+    vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: true })));
+    const view = render(<RsvpDemo />);
+    open();
+    const region = screen.getByRole("region", { name: "Jordan & Taylor" });
+    vi.spyOn(region, "getBoundingClientRect").mockReturnValue({ top: 900 } as DOMRect);
+    frames.shift()!(0);
+    expect(window.scrollTo).toHaveBeenLastCalledWith({ top: 868, behavior: "instant" });
+    expect(screen.getByRole("heading", { name: "Jordan & Taylor" })).toHaveFocus();
+    expect(frames).toHaveLength(0);
+    view.unmount();
+    vi.unstubAllGlobals();
+  });
+
   it("rejects unknown codes and opens only the selected household with a normalized code", () => {
     render(<RsvpDemo />);
     open("INVALID");
@@ -32,10 +80,12 @@ describe("isolated wedding RSVP demo", () => {
     fireEvent.click(within(taylor).getByLabelText("Respectfully declining"));
     fireEvent.click(screen.getByRole("button", { name: /Save demo RSVP/ }));
     expect(screen.getByRole("alert")).toHaveTextContent("choose a meal");
+    expect(screen.getByLabelText("Meal for Jordan")).toHaveAttribute("aria-invalid", "true");
     fireEvent.change(screen.getByLabelText("Meal for Jordan"), { target: { value: "salmon" } });
     fireEvent.change(screen.getByLabelText(/Dietary requirements for Jordan/), { target: { value: "No nuts" } });
     fireEvent.click(screen.getByRole("button", { name: /Save demo RSVP/ }));
     expect(screen.getByText("DEMO RESPONSE SAVED")).toBeVisible();
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Victoria Pacheco");
     expect(screen.getByText("Lemon & dill salmon")).toBeVisible();
     expect(screen.getByText("Dietary requirements: No nuts")).toBeVisible();
     expect(window.localStorage.getItem(storageKey(demoInvitations[0]))).toContain('"attendance":"no"');
@@ -57,8 +107,8 @@ describe("isolated wedding RSVP demo", () => {
     expect(within(screen.getByLabelText("Meal for Avery")).getByRole("option", { name: "Children’s meal" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Try another code/ }));
     open("FERN26");
-    expect(screen.queryByText("Willow House")).not.toBeInTheDocument();
-    expect(screen.queryByText("Dinner & toasts")).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Reception to follow" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Reception · details to come")).not.toBeInTheDocument();
     for (const radio of screen.getAllByRole("radio", { name: "Joyfully attending" })) fireEvent.click(radio);
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Save demo RSVP/ }));

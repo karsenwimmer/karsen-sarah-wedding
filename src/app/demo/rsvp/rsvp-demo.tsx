@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
 import { Emblem } from "./emblem";
 import { demoInvitations, demoWedding as wedding, emptyResponses, findInvitation, meals,
@@ -18,11 +18,73 @@ export function RsvpDemo() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [resetting, setResetting] = useState(false);
   const [resetNotice, setResetNotice] = useState("");
+  const welcome = useRef<HTMLElement>(null);
+  const instructions = useRef<HTMLDivElement>(null);
+  const scrollFrame = useRef<number | null>(null);
   const heading = useRef<HTMLHeadingElement>(null);
+  const responseHeading = useRef<HTMLHeadingElement>(null);
   const codeInput = useRef<HTMLInputElement>(null);
   const form = useRef<HTMLFormElement>(null);
 
-  function focusHeading() { requestAnimationFrame(() => heading.current?.focus()); }
+  useEffect(() => {
+    const stop = () => {
+      if (scrollFrame.current !== null) cancelAnimationFrame(scrollFrame.current);
+      scrollFrame.current = null;
+    };
+    const stopOnKey = (event: KeyboardEvent) => {
+      if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " ", "Tab", "Escape"].includes(event.key)) stop();
+    };
+    window.addEventListener("wheel", stop, { passive: true });
+    window.addEventListener("touchstart", stop, { passive: true });
+    window.addEventListener("keydown", stopOnKey);
+    return () => {
+      stop();
+      window.removeEventListener("wheel", stop);
+      window.removeEventListener("touchstart", stop);
+      window.removeEventListener("keydown", stopOnKey);
+    };
+  }, []);
+
+  useEffect(() => {
+    const element = instructions.current;
+    if (!element) return;
+    const measure = () => element.style.setProperty("--instructions-height", `${element.getBoundingClientRect().height}px`);
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [invite]);
+
+  function focusHeading(response = false) {
+    if (scrollFrame.current !== null) cancelAnimationFrame(scrollFrame.current);
+    scrollFrame.current = requestAnimationFrame(() => {
+      scrollFrame.current = null;
+      const target = response ? responseHeading.current : heading.current;
+      target?.focus({ preventScroll: true });
+      const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      if (response) {
+        target?.scrollIntoView?.({ block: "start", behavior: reducedMotion ? "auto" : "smooth" });
+        return;
+      }
+      if (!welcome.current) return;
+      const start = window.scrollY;
+      const end = Math.max(0, welcome.current.getBoundingClientRect().top + start - 32);
+      if (reducedMotion) {
+        window.scrollTo({ top: end, behavior: "instant" });
+        return;
+      }
+      let started: number | undefined;
+      const glide = (time: number) => {
+        started ??= time;
+        const progress = Math.min((time - started) / 1150, 1);
+        const eased = progress < .5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2;
+        window.scrollTo({ top: start + (end - start) * eased, behavior: "instant" });
+        scrollFrame.current = progress < 1 ? requestAnimationFrame(glide) : null;
+      };
+      scrollFrame.current = requestAnimationFrame(glide);
+    });
+  }
 
   function openInvitation(event: FormEvent) {
     event.preventDefault();
@@ -76,11 +138,14 @@ export function RsvpDemo() {
     setPersistent(canPersist);
     setConfirmed(true);
     setResetNotice("");
-    focusHeading();
+    focusHeading(true);
   }
 
   function switchInvitation() {
+    if (scrollFrame.current !== null) cancelAnimationFrame(scrollFrame.current);
+    scrollFrame.current = null;
     setInvite(null); setCode(""); setCodeError(""); setResetting(false); setResetNotice("");
+    setAnswers([]); setNote(""); setConfirmed(false); setErrors({});
     requestAnimationFrame(() => codeInput.current?.focus());
     window.scrollTo({ top: 0, behavior: "instant" });
   }
@@ -93,21 +158,20 @@ export function RsvpDemo() {
     if (invite) { setAnswers(emptyResponses(invite)); setNote(""); setConfirmed(false); }
     setErrors({}); setResetting(false);
     setResetNotice(failed ? "The current form was reset, but saved browser responses could not be cleared." : "All sample responses in this browser have been cleared.");
-    focusHeading();
+    focusHeading(true);
   }
 
   const attending = answers.filter((answer) => answer.attendance === "yes").length;
 
-  return <div className={`${s.root} ${!invite ? s.entryRoot : ""}`}>
+  return <div className={s.root}>
     <a className={s.skip} href="#demo-main">Skip to invitation</a>
-    {invite && <div className={s.demoBar}>Wedding invitation demo<span className={s.demoBarDetail}>Fictional guests · No real RSVPs are sent</span></div>}
     <header className={s.header}>
-      <a href="/demo/rsvp" className={s.brand} aria-label="Luca and Victoria invitation demo"><Emblem className={s.brandMark} /><span><small>THE WEDDING OF</small><strong>VICTORIA & LUCA</strong></span></a>
-      {invite ? <nav aria-label="Invitation navigation"><a href="#rsvp">Your RSVP</a><a href="#details">The details</a><button type="button" onClick={switchInvitation}>Change invitation</button></nav> : <span className={s.demoBadge} aria-label="Demonstration only. No real RSVPs are sent.">DEMO</span>}
+      <a href="/demo/rsvp" className={s.brand} aria-label="Luca and Victoria invitation demo"><Emblem className={s.brandMark} /><span><strong>VICTORIA & LUCA</strong></span></a>
+      <span className={s.demoBadge} aria-label="Demonstration only. No real RSVPs are sent.">DEMO</span>
     </header>
 
     <main id="demo-main" className={s.main}>
-      {!invite ? <>
+      <div className={s.hero}>
         <div className={s.entry}>
           <section className={s.invitationArt} aria-label="Sample wedding invitation">
             <div className={s.paperContent}>
@@ -115,85 +179,120 @@ export function RsvpDemo() {
               <h1><span>Victoria Pacheco</span><i className={s.nameJoin}>&amp;</i><span>Luca Robert Cordiano</span></h1>
               <p className={s.paperMessage}><span>with full hearts,</span>joyfully invite you to their wedding</p>
               <p className={s.paperDate}>{wedding.date}</p>
-              <p className={s.paperLocation}>{wedding.location}</p>
             </div>
           </section>
           <div className={s.paintingPanel}>
-            <Image src="/images/demo/luca-victoria-watercolour-portrait.webp" alt="Victoria and Luca holding hands in a garden, with softly painted watercolour surroundings." fill loading="eager" unoptimized sizes="(max-width: 760px) 100vw, 600px" className={s.heroPainting} />
+            <Image src="/images/demo/luca-victoria-watercolour-portrait-v3.webp" alt="Victoria and Luca holding hands in a garden, with softly painted watercolour surroundings." fill loading="eager" fetchPriority="high" unoptimized sizes="(max-width: 760px) 100vw, 600px" className={s.heroPainting} />
           </div>
           <section id="invitation-entry" className={s.entryForm} aria-labelledby="entry-title">
+            {invite ? <div className={s.openedEntry}>
+              <h2 id="entry-title">Your invitation is open</h2>
+              <a href="#your-invitation" className={s.openedLink} onClick={(event) => { event.preventDefault(); focusHeading(); }}>View your invitation <span className={s.downArrow} aria-hidden="true"><Arrow /></span></a>
+              <button type="button" onClick={switchInvitation}>Change invitation</button>
+            </div> : <>
             <h2 id="entry-title"><label htmlFor="invitation-code">Enter your code</label></h2>
             <p id="code-help" className={s.codeExplanation}>You’ll find it on your invitation.</p>
             <form onSubmit={openInvitation}>
               <div className={`${s.codeBar} ${codeError ? s.codeBarError : ""}`}>
-                <input ref={codeInput} id="invitation-code" className={s.codeInput} value={code} onChange={(event) => { setCode(event.target.value); setCodeError(""); }} autoCapitalize="characters" autoCorrect="off" autoComplete="off" spellCheck={false} maxLength={24} placeholder="Enter code" aria-invalid={Boolean(codeError)} aria-describedby={codeError ? "code-help code-error" : "code-help"} required />
+                <input ref={codeInput} id="invitation-code" name="invitation-code" className={s.codeInput} value={code} onChange={(event) => { setCode(event.target.value); setCodeError(""); }} autoCapitalize="characters" autoCorrect="off" autoComplete="off" spellCheck={false} maxLength={24} placeholder="Enter code" aria-invalid={Boolean(codeError)} aria-describedby={codeError ? "code-help code-error" : "code-help"} required />
                 <button className={s.codeSubmit} type="submit" aria-label="Open my invitation"><Arrow /></button>
               </div>
               {codeError && <p id="code-error" className={s.error} role="alert">{codeError}</p>}
             </form>
+            </>}
           </section>
         </div>
-      </> : <>
-        <section className={s.welcome}>
-          <p className={s.eyebrow}>{confirmed ? "WITH LOVE & THANKS" : "AN INVITATION FOR"}</p>
-          <h1 ref={heading} tabIndex={-1}>{invite.household}</h1>
-          <p className={s.welcomeDate}>{wedding.date} <span aria-hidden="true">·</span> {wedding.location}</p>
-          <p>{invite.reception ? "We’d love to celebrate our ceremony and reception with you." : "We’d love for you to join us at our wedding ceremony."}</p>
+      </div>
+      {invite && <div className={s.unlocked}>
+        <section ref={welcome} id="your-invitation" className={s.welcome} aria-labelledby="household-title">
+          <p className={s.guestEyebrow}>{confirmed ? "WITH LOVE & THANKS" : "AN INVITATION FOR"}</p>
+          <h2 id="household-title" ref={heading} tabIndex={-1}>{invite.household}</h2>
+          <p className={s.welcomeDate}>{wedding.date} <span aria-hidden="true">·</span> {wedding.ceremony.time} <span aria-hidden="true">·</span> {wedding.location}</p>
           <span className={s.tag}>{invite.reception ? "CEREMONY & RECEPTION" : "CEREMONY INVITATION"} <span aria-hidden="true">·</span> {invite.guests.length} INVITED GUESTS</span>
         </section>
-        <div className={s.inviteGrid}>
-          <section id="rsvp" className={s.responsePanel} aria-labelledby="rsvp-title">
+        <section id="rsvp" className={s.inviteGrid} aria-labelledby="reply-title">
+          <div ref={instructions} className={s.rsvpInstructions}>
+            <h2 id="reply-title">Will you be joining us?</h2>
+            <ol className={s.replySteps}>
+              <li>Reply for each person named on your invitation.</li>
+              {invite.reception && <li>Choose a meal for each guest attending the reception.</li>}
+              <li>Share any dietary requirements, then save your response.</li>
+            </ol>
+            <p className={s.instructionNote}>You can return with your invitation code to make changes.</p>
+          </div>
+          <section className={s.responsePanel} aria-labelledby="rsvp-title">
             {confirmed ? <>
-              <div className={s.check} aria-hidden="true">✓</div>
-              <p className={s.eyebrow}>DEMO RESPONSE {persistent ? "SAVED" : "PREVIEW"}</p>
-              <h2 id="rsvp-title">{attending ? "A little closer to the big day." : "Thank you for letting us know."}</h2>
+              <div className={s.check} aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m6 12 4 4 8-8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
+              <h3 id="rsvp-title" ref={responseHeading} tabIndex={-1}>{attending ? "A little closer to the big day." : "Thank you for letting us know."}</h3>
+              <p className={s.savedStatus}>DEMO RESPONSE {persistent ? "SAVED" : "PREVIEW"}</p>
               <p className={s.muted}>{persistent ? "Your sample response is saved in this browser. Nothing has been sent to a couple." : "Your browser couldn’t save this response. It’s visible here until you leave the page; nothing has been sent."}</p>
               <div className={s.summary}>{invite.guests.map((guest) => {
                 const answer = answers.find((item) => item.guestId === guest.id)!;
                 return <div className={s.summaryGuest} key={guest.id}><strong>{guest.name}</strong><span>{answer.attendance === "yes" ? "Joyfully attending" : "Respectfully declining"}</span>{answer.attendance === "yes" && invite.reception && <small>{meals.find((meal) => meal.id === answer.meal)?.label}</small>}{answer.dietary && <small>Dietary requirements: {answer.dietary}</small>}</div>;
               })}</div>
               {note && <div className={s.noteSummary}><strong>Your note</strong><p>{note}</p></div>}
-              <button type="button" className={s.primary} onClick={() => { setConfirmed(false); focusHeading(); }}>Edit my response</button>
-              <p className={s.fieldHint}>In the live version, guests can update their reply until {wedding.deadline}.</p>
+              <button type="button" className={s.primary} onClick={() => { setConfirmed(false); focusHeading(true); }}>Edit my response</button>
+              <p className={s.fieldHint}>You can return with your code to update this demo response.</p>
             </> : <>
-              <p className={s.eyebrow}>KINDLY REPLY BY {wedding.deadline.toUpperCase()}</p>
-              <h2 id="rsvp-title">Will you be joining us?</h2>
-              <p className={s.muted}>Please reply for each person on your invitation.{invite.reception ? " Choose a meal for everyone attending." : " This invitation is for the ceremony."}</p>
+              <h3 id="rsvp-title" ref={responseHeading} tabIndex={-1}>Your response</h3>
               <form ref={form} onSubmit={submit} noValidate>
                 {invite.guests.map((guest) => {
                   const answer = answers.find((item) => item.guestId === guest.id)!;
-                  return <fieldset key={guest.id} className={s.guest} aria-describedby={errors[guest.id] ? `error-${guest.id}` : undefined}>
+                  return <div key={guest.id} className={s.guestBlock}><fieldset className={s.guest} aria-describedby={errors[guest.id] ? `error-${guest.id}` : undefined}>
                     <legend>{guest.name}{guest.child && <small>CHILD</small>}</legend>
-                    <div className={s.attendance}>{([{ value: "yes", label: "Joyfully attending" }, { value: "no", label: "Respectfully declining" }] as const).map((option) => <label key={option.value} className={answer.attendance === option.value ? s.chosen : ""}><input id={`attendance-${guest.id}-${option.value}`} type="radio" name={`attendance-${guest.id}`} value={option.value} checked={answer.attendance === option.value} onChange={() => updateGuest(guest.id, { attendance: option.value, ...(option.value === "no" ? { meal: "", dietary: "" } : {}) })} aria-invalid={Boolean(errors[guest.id])} aria-describedby={errors[guest.id] ? `error-${guest.id}` : undefined} />{option.label}</label>)}</div>
+                    <div className={`${s.attendance} ${errors[guest.id] && !answer.attendance ? s.attendanceError : ""}`}>{([{ value: "yes", label: "Joyfully attending" }, { value: "no", label: "Respectfully declining" }] as const).map((option) => <label key={option.value} className={answer.attendance === option.value ? s.chosen : ""}><input id={`attendance-${guest.id}-${option.value}`} type="radio" name={`attendance-${guest.id}`} value={option.value} checked={answer.attendance === option.value} onChange={() => updateGuest(guest.id, { attendance: option.value, ...(option.value === "no" ? { meal: "", dietary: "" } : {}) })} aria-describedby={errors[guest.id] ? `error-${guest.id}` : undefined} />{option.label}</label>)}</div>
                     {answer.attendance === "yes" && <div className={s.guestFields}>
-                      {invite.reception && <label className={s.field} htmlFor={`meal-${guest.id}`}>Meal for {guest.name.split(" ")[0]}<select id={`meal-${guest.id}`} value={answer.meal} onChange={(event) => updateGuest(guest.id, { meal: event.target.value as GuestResponse["meal"] })} aria-invalid={Boolean(errors[guest.id])} aria-describedby={errors[guest.id] ? `error-${guest.id}` : undefined}><option value="">Select a meal</option>{meals.filter((meal) => guest.child || meal.id !== "children").map((meal) => <option value={meal.id} key={meal.id}>{meal.label}</option>)}</select></label>}
-                      <label className={s.field} htmlFor={`dietary-${guest.id}`}>Dietary requirements for {guest.name.split(" ")[0]} <span className={s.optional}>(optional)</span><input id={`dietary-${guest.id}`} value={answer.dietary} onChange={(event) => updateGuest(guest.id, { dietary: event.target.value })} maxLength={300} placeholder="Allergies or anything we should know" /></label>
+                      {invite.reception && <label className={s.field} htmlFor={`meal-${guest.id}`}>Meal for {guest.name.split(" ")[0]}<select id={`meal-${guest.id}`} name={`meal-${guest.id}`} autoComplete="off" value={answer.meal} onChange={(event) => updateGuest(guest.id, { meal: event.target.value as GuestResponse["meal"] })} aria-invalid={Boolean(errors[guest.id])} aria-describedby={errors[guest.id] ? `error-${guest.id}` : undefined}><option value="">Select a meal</option>{meals.filter((meal) => guest.child || meal.id !== "children").map((meal) => <option value={meal.id} key={meal.id}>{meal.label}</option>)}</select></label>}
+                      <label className={s.field} htmlFor={`dietary-${guest.id}`}>Dietary requirements for {guest.name.split(" ")[0]} <span className={s.optional}>(optional)</span><input id={`dietary-${guest.id}`} name={`dietary-${guest.id}`} autoComplete="off" value={answer.dietary} onChange={(event) => updateGuest(guest.id, { dietary: event.target.value })} maxLength={300} placeholder="Allergies or anything we should know" /></label>
                     </div>}
                     {errors[guest.id] && <p id={`error-${guest.id}`} className={s.error} role="alert">{errors[guest.id]}</p>}
-                  </fieldset>;
+                  </fieldset></div>;
                 })}
-                <label className={s.field} htmlFor="guest-note">A note for the couple <span className={s.optional}>(optional)</span><textarea id="guest-note" rows={3} value={note} onChange={(event) => setNote(event.target.value)} maxLength={1000} placeholder="Leave a little love…" /></label>
+                <label className={s.field} htmlFor="guest-note">A note for the couple <span className={s.optional}>(optional)</span><textarea id="guest-note" name="guest-note" autoComplete="off" rows={3} value={note} onChange={(event) => setNote(event.target.value)} maxLength={1000} placeholder="Leave a little love…" /></label>
                 <button className={s.primary} type="submit">Save demo RSVP</button>
                 <p className={s.fieldHint}>Demo only. No email is sent and no real guest list is updated.</p>
               </form>
             </>}
           </section>
-          <aside id="details" className={s.details} aria-label="Wedding details">
-            <div className={s.detailsIntro}><Image src="/images/demo/luca-victoria-watercolour-portrait.webp" alt="A watercolour portrait of Victoria and Luca in the garden." width={1000} height={1252} unoptimized className={s.detailsPortrait} /><p className={s.eyebrow}>THE WEDDING OF</p><h2>Victoria <span>&</span> Luca</h2><p>{wedding.date}</p><div className={s.paperRule} aria-hidden="true" /></div>
-            <section className={s.detailBlock}><div><p className={s.eyebrow}>THE CEREMONY · {wedding.ceremony.time}</p><h3>{wedding.ceremony.name}</h3><p>{wedding.ceremony.address}</p><p className={s.fieldHint}>Please arrive 15 minutes before the ceremony.</p></div></section>
-            {invite.reception && <section className={s.detailBlock}><div><p className={s.eyebrow}>THE RECEPTION · {wedding.reception.time}</p><h3>{wedding.reception.name}</h3><p>{wedding.reception.address}</p><p className={s.fieldHint}>Dinner, dancing, and a few happy tears.</p></div></section>}
-            <section className={s.detailSection}><p className={s.eyebrow}>THE ORDER OF THE DAY</p><ol className={s.timeline}><li><time>1:45 PM</time><span>Arrive & settle in</span></li><li><time>2:00 PM</time><span>We say “I do”</span></li>{invite.reception && <><li><time>4:30 PM</time><span>Cocktails & conversation</span></li><li><time>6:00 PM</time><span>Dinner & toasts</span></li><li><time>8:00 PM</time><span>Meet us on the dance floor</span></li></>}</ol></section>
-            <section className={s.detailSection}><p className={s.eyebrow}>WHAT TO WEAR</p><h3>Garden formal</h3><p>Suits, dresses, and whatever makes you feel your best. The garden paths are happiest with comfortable shoes.</p></section>
-            <section className={s.detailSection}><p className={s.eyebrow}>A FEW LITTLE DETAILS</p><details><summary>Who is included on my invitation?</summary><p>Everyone listed in your RSVP form is invited. In a live invitation, plus-ones and children would be included here if invited.</p></details><details><summary>Can I change my response?</summary><p>Yes. Return with the same code and choose “Edit my response”. This demo remembers replies in the same browser. A live site would remember them across devices until the RSVP deadline.</p></details><details><summary>Are these real wedding locations?</summary><p>No. The names, addresses, menu, and itinerary are fictional examples for this demonstration.</p></details></section>
-          </aside>
-        </div>
+        </section>
+        <section id="details" className={s.detailBand} aria-labelledby="locations-title">
+          <div className={s.detailInner}>
+            <div className={s.sectionHeading}><h2 id="locations-title">Locations</h2></div>
+            <div className={s.locationsGrid}>
+              <section className={s.location}><h3>{wedding.ceremony.name}</h3><p className={s.locationTime}>Ceremony at {wedding.ceremony.time}</p><p>{wedding.ceremony.address}</p></section>
+              {invite.reception && <section className={s.location}><h3>{wedding.reception.name}</h3><p>{wedding.reception.note}</p></section>}
+            </div>
+          </div>
+        </section>
+        <section id="itinerary" className={s.detailBand} aria-labelledby="itinerary-title">
+          <div className={s.detailInner}>
+            <div className={s.sectionHeading}><h2 id="itinerary-title">Itinerary</h2></div>
+            <ol className={s.timeline}><li><time>{wedding.ceremony.time}</time><span>Wedding ceremony</span></li>{invite.reception && <li><time>To follow</time><span>Reception · details to come</span></li>}</ol>
+          </div>
+        </section>
+        <section id="dress-code" className={s.detailBand} aria-labelledby="dress-code-title">
+          <div className={s.detailInner}>
+            <div className={s.sectionHeading}><h2 id="dress-code-title">Dress code</h2></div>
+            <div className={s.detailCopy}><h3>Details to come</h3><p>We’ll share the dress code here once it’s confirmed.</p></div>
+          </div>
+        </section>
+        <section id="faq" className={s.detailBand} aria-labelledby="faq-title">
+          <div className={s.detailInner}>
+            <div className={s.sectionHeading}><h2 id="faq-title">FAQs</h2></div>
+            <div className={s.faq}>
+              <details><summary>Who is included on my invitation?</summary><p>Everyone listed in your RSVP form is invited. In a live invitation, plus-ones and children would be included here if invited.</p></details>
+              <details><summary>Can I change my response?</summary><p>Yes. Return with the same code and choose “Edit my response”. This demo remembers replies in the same browser. A live site would remember them across devices.</p></details>
+              <details><summary>Which details are confirmed?</summary><p>The wedding date and ceremony details match the invitation. Reception details and dress code are still to come. The guest list and meal choices are examples for this demo.</p></details>
+            </div>
+          </div>
+        </section>
         <section className={s.demoTools} aria-label="Demo controls">
           <div><strong>Make yourself at home in the demo.</strong><p>Try another invitation or clear the sample responses saved in this browser.</p></div>
           <div className={s.toolButtons}><button type="button" onClick={switchInvitation}>Try another code</button><button type="button" onClick={() => setResetting(true)}>Reset demo</button></div>
           {resetting && <div className={s.resetConfirm} role="group" aria-label="Confirm demo reset"><p>Clear all three sample invitations’ responses in this browser?</p><button type="button" onClick={resetDemo}>Yes, clear demo responses</button><button type="button" onClick={() => setResetting(false)}>Keep responses</button></div>}
           {resetNotice && <p role="status" className={s.resetNotice}>{resetNotice}</p>}
         </section>
-      </>}
+      </div>}
     </main>
     {invite && <footer className={s.footer}><span>WITH LOVE, VICTORIA & LUCA</span><span>A sample invitation, made for a real celebration.</span><span>DEMONSTRATION ONLY</span></footer>}
   </div>;

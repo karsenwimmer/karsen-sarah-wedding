@@ -1,15 +1,32 @@
 # Victoria & Luca invitation design
 
-Route: `/demo/rsvp`. The redesign is scoped to this route. The homepage and separate `/invitation` preview are preserved.
+Route: `/demo/rsvp` on https://thewimmers.ca. Changes are scoped to the invitation demo; the save-the-date homepage and separate `/invitation` route are preserved.
 
-The reference card guides the composition: warm ivory (#FAF8F1), olive-sage ink (#536542), a pale sage surround (#E9EDDF), an upright Cormorant Garamond serif with spaced uppercase full names, and Source Sans 3 for form controls. The generated sage V | L wildflower PNG replaces the gold monogram. The invitation uses “with full hearts, joyfully invite you to their wedding”.
+## Visual direction
 
-The desktop entrance is one shared paper panel with invitation text and code entry on the left and the approved watercolour portrait on the right. On mobile, the order is monogram, names, date, a softly faded portrait crop, and code entry. A larger complete portrait appears with the wedding details after code entry. Standard phone entrances fit one screen, with natural overflow retained for enlarged text or error messages.
+Warm ivory paper (#FAF8F1), sage ink (#536542), light sage header and form (#E9EDDF), Cormorant Garamond display type and Source Sans 3 controls. The hero uses uppercase full names, the approved transparent V | L wildflower PNG, and the approved portrait with photographic facial detail and painted garden surroundings. The date is August 28, 2027. No location details appear before code entry.
 
-Active assets:
-- `public/images/demo/luca-victoria-wildflower-monogram.png`: 512 × 512 transparent PNG, resized from the approved generated sage wildflower monogram.
-- `public/images/demo/luca-victoria-watercolour-portrait.webp`: 1000 × 1252 WebP with alpha, optimized from the approved hybrid portrait PNG. The real couple retains photographic detail, while the garden and pergola have a watercolour treatment. Original generated PNG and prompt remain in the project workspace.
+Desktop pairs invitation text and code entry with the portrait. Mobile stacks monogram, names, date, a softly faded portrait crop and code entry. The entrance fits standard phone screens, with natural overflow available for enlarged text and error messages.
 
-The previous gold monogram and courtyard painting remain historical assets and are not used by this route.
+## Invitation flow
 
-Invitation codes, fictional guest fixtures, meal selections, browser storage keys, RSVP validation, saved response editing and demo reset behavior are unchanged. The current demo date and fictional locations are retained pending confirmation of the reference card’s event details. No real RSVP backend or email integration is added.
+Entering a valid code keeps the hero visible and reveals the household invitation below it. An interruptible 1.15-second glide lands above the welcome section; reduced-motion users land immediately. The household eyebrow is retained above the names.
+
+The RSVP has vertically centered sticky instructions on the left and a light sage response form on the right. The instructions release at the end of the form. Mobile and short windows use normal stacked flow. Locations, Itinerary, Dress code and FAQs have centered headings and spacious, continuous ivory backgrounds, without repeated floral dividers.
+
+Guest names and attendance controls use consistent grouping. Supporting text, placeholders and field boundaries have readable contrast. Selection controls, focus, press feedback and native FAQ disclosure share the sage palette. Hover effects apply only to pointing devices. The portrait loads with high fetch priority.
+
+## Event details and demo behavior
+
+Ceremony: August 28, 2027 at 12:00 PM, Saints Peter and Paul Parish, 4070 Central Parkway East, Mississauga, Ontario. Reception is to follow; its venue and timing, dress code and RSVP deadline have not been supplied and are not invented.
+
+ROSE24 demonstrates a couple, OAK123 a family with children, and FERN26 a ceremony-only invitation. Guests and meal choices are fictional fixtures. Responses are saved only in the current browser; no real RSVP records or emails are created. Meal validation, saved-response editing, invite-specific reception visibility and demo-only storage reset are preserved. This remains a demonstration rather than a real RSVP backend.
+
+## Active assets
+
+- `public/images/demo/luca-victoria-wildflower-monogram.png`: 512 × 512 transparent PNG.
+- `public/images/demo/luca-victoria-watercolour-portrait-v3.webp`: 1000 × 1250 optimized WebP, using the approved close-up-referenced likeness.
+
+## Validation
+
+All 65 tests and the production build pass. Browser checks covered 320 × 568, 390 × 700, 1000 × 800 and 1440 × 900, invalid-code recovery, keyboard radio selection, meal validation and focus recovery, saved-response editing, keyboard FAQ disclosure and console errors. Measured name-to-control gaps are consistently 16px. Calculated contrast is 4.88:1 for supporting text on sage, 5.65:1 for input placeholders and 3.03:1 for field boundaries against sage.
