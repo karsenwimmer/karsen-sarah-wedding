@@ -67,7 +67,10 @@ describe("isolated wedding RSVP demo", () => {
     const observe = vi.fn();
     const disconnect = vi.fn();
     const cancel = vi.fn();
-    const animate = vi.fn(() => ({ finished: new Promise(() => {}), cancel }));
+    const animate = vi.fn((...args: Parameters<Element["animate"]>) => {
+      void args;
+      return { finished: new Promise(() => {}), cancel };
+    });
     const previousAnimate = Object.getOwnPropertyDescriptor(Element.prototype, "animate");
     Object.defineProperty(Element.prototype, "animate", { configurable: true, value: animate });
     vi.stubGlobal("matchMedia", vi.fn(() => ({
@@ -89,10 +92,21 @@ describe("isolated wedding RSVP demo", () => {
       act(() => callback([{ isIntersecting: true, target: title.parentElement!, boundingClientRect: rect, intersectionRatio: 1, intersectionRect: rect, rootBounds: null, time: 0 }], {} as IntersectionObserver));
       expect(animate).toHaveBeenCalledTimes(1);
       expect(title).toBeVisible();
+      const name = screen.getByRole("heading", { name: "Jordan & Taylor" });
+      const nameRect = name.getBoundingClientRect();
+      const nameEntry = { isIntersecting: true, target: name, boundingClientRect: nameRect, intersectionRatio: 1, intersectionRect: nameRect, rootBounds: null, time: 0 };
+      act(() => callback([nameEntry], {} as IntersectionObserver));
+      expect(animate).toHaveBeenCalledTimes(2);
+      const titleTiming = animate.mock.calls[0][1] as KeyframeAnimationOptions;
+      const nameTiming = animate.mock.calls[1][1] as KeyframeAnimationOptions;
+      expect(nameTiming.duration).toBeGreaterThan(titleTiming.duration as number);
+      act(() => callback([nameEntry], {} as IntersectionObserver));
+      expect(animate).toHaveBeenCalledTimes(2);
       act(() => { reduce = true; preferenceChanged(); });
-      expect(cancel).toHaveBeenCalledTimes(1);
+      expect(cancel).toHaveBeenCalledTimes(2);
       expect(disconnect).toHaveBeenCalled();
       expect(title).toBeVisible();
+      expect(name).toBeVisible();
       view.unmount();
     } finally {
       if (previousAnimate) Object.defineProperty(Element.prototype, "animate", previousAnimate);

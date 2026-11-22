@@ -20,7 +20,8 @@ export function RsvpDemo() {
   const [resetNotice, setResetNotice] = useState("");
   const welcome = useRef<HTMLElement>(null);
   const instructions = useRef<HTMLDivElement>(null);
-  const invitationDetails = useRef<HTMLDivElement>(null);
+  const revealRoot = useRef<HTMLDivElement>(null);
+  const revealed = useRef(new WeakSet<Element>());
   const scrollFrame = useRef<number | null>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const responseHeading = useRef<HTMLHeadingElement>(null);
@@ -76,7 +77,7 @@ export function RsvpDemo() {
   }, [invite]);
 
   useEffect(() => {
-    const region = invitationDetails.current;
+    const region = revealRoot.current;
     const preference = window.matchMedia?.("(prefers-reduced-motion: reduce)");
     if (!region || preference?.matches || typeof IntersectionObserver === "undefined") return;
     const animations = new Set<Animation>();
@@ -85,16 +86,32 @@ export function RsvpDemo() {
         if (preference?.matches) return;
         if (!entry.isIntersecting) continue;
         observer.unobserve(entry.target);
+        if (revealed.current.has(entry.target)) continue;
+        revealed.current.add(entry.target);
         if (typeof entry.target.animate !== "function") continue;
+        const kind = (entry.target as HTMLElement).dataset.inviteReveal;
+        const personal = kind === "name";
+        const title = kind === "heading" || kind === "hero";
         const animation = entry.target.animate(
-          [{ opacity: .55, transform: "translateY(6px)" }, { opacity: 1, transform: "translateY(0)" }],
-          { duration: 560, easing: "cubic-bezier(.16, 1, .3, 1)" }
+          personal ? [
+            { opacity: .12, transform: "translateY(14px)", filter: "blur(3px)" },
+            { opacity: .55, transform: "translateY(6px)", filter: "blur(0px)", offset: .5 },
+            { opacity: 1, transform: "translateY(0)", filter: "blur(0px)" }
+          ] : [
+            { opacity: title ? .3 : .45, transform: `translateY(${title ? 8 : 5}px)` },
+            { opacity: 1, transform: "translateY(0)" }
+          ],
+          { duration: personal ? 1600 : title ? 760 : 640,
+            delay: kind === "welcome-copy" ? 280 : title ? 0 : 100,
+            easing: personal ? "cubic-bezier(.4, 0, .2, 1)" : "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" }
         );
         animations.add(animation);
         animation.finished.then(() => animations.delete(animation), () => animations.delete(animation));
       }
     }, { threshold: .2, rootMargin: "0px 0px -32px 0px" });
-    region.querySelectorAll<HTMLElement>("[data-detail-heading]").forEach((element) => observer.observe(element));
+    region.querySelectorAll<HTMLElement>("[data-invite-reveal]").forEach((element) => {
+      if (!revealed.current.has(element)) observer.observe(element);
+    });
     const stop = () => {
       observer.disconnect();
       animations.forEach((animation) => animation.cancel());
@@ -215,7 +232,7 @@ export function RsvpDemo() {
 
   const attending = answers.filter((answer) => answer.attendance === "yes").length;
 
-  return <div className={s.root}>
+  return <div ref={revealRoot} className={s.root}>
     <a className={s.skip} href="#demo-main">Skip to invitation</a>
     <header className={s.header}>
       <a href="/demo/rsvp" className={s.brand} aria-label="Luca and Victoria invitation demo"><Emblem className={s.brandMark} /><span><strong>VICTORIA & LUCA</strong></span></a>
@@ -228,9 +245,9 @@ export function RsvpDemo() {
           <section className={s.invitationArt} aria-label="Sample wedding invitation">
             <div className={s.paperContent}>
               <Emblem className={s.heroEmblem} />
-              <h1><span>Victoria Pacheco</span><i className={s.nameJoin}>&amp;</i><span>Luca Robert Cordiano</span></h1>
-              <p className={s.paperMessage}><span>with full hearts,</span>joyfully invite you to their wedding</p>
-              <p className={s.paperDate}>{wedding.date}</p>
+              <h1 data-invite-reveal="hero"><span>Victoria Pacheco</span><i className={s.nameJoin}>&amp;</i><span>Luca Robert Cordiano</span></h1>
+              <p className={s.paperMessage} data-invite-reveal="copy"><span>with full hearts,</span>joyfully invite you to their wedding</p>
+              <p className={s.paperDate} data-invite-reveal="copy">{wedding.date}</p>
             </div>
           </section>
           <div className={s.paintingPanel}>
@@ -242,8 +259,8 @@ export function RsvpDemo() {
               <a href="#your-invitation" className={s.openedLink} onClick={(event) => { event.preventDefault(); focusHeading(); }}>View your invitation <span className={s.downArrow} aria-hidden="true"><Arrow /></span></a>
               <button type="button" onClick={switchInvitation}>Change invitation</button>
             </div> : <>
-            <h2 id="entry-title"><label htmlFor="invitation-code">Enter your code</label></h2>
-            <p id="code-help" className={s.codeExplanation}>You’ll find it on your invitation.</p>
+            <h2 id="entry-title" data-invite-reveal="heading"><label htmlFor="invitation-code">Enter your code</label></h2>
+            <p id="code-help" className={s.codeExplanation} data-invite-reveal="copy">You’ll find it on your invitation.</p>
             <form onSubmit={openInvitation}>
               <div className={`${s.codeBar} ${codeError ? s.codeBarError : ""}`}>
                 <input ref={codeInput} id="invitation-code" name="invitation-code" className={s.codeInput} value={code} onChange={(event) => { setCode(event.target.value); setCodeError(""); }} autoCapitalize="characters" autoCorrect="off" autoComplete="off" spellCheck={false} maxLength={24} placeholder="Enter code" aria-invalid={Boolean(codeError)} aria-describedby={codeError ? "code-help code-error" : "code-help"} required />
@@ -255,22 +272,22 @@ export function RsvpDemo() {
           </section>
         </div>
       </div>
-      {invite && <div ref={invitationDetails} className={s.unlocked}>
+      {invite && <div>
         <section ref={welcome} id="your-invitation" className={s.welcome} aria-labelledby="household-title">
-          <p className={s.guestEyebrow}>{confirmed ? "WITH LOVE & THANKS" : "AN INVITATION FOR"}</p>
-          <h2 id="household-title" ref={heading} tabIndex={-1}>{invite.household}</h2>
-          <p className={s.welcomeDate}>{wedding.date} <span aria-hidden="true">·</span> {wedding.ceremony.time} <span aria-hidden="true">·</span> {wedding.location}</p>
-          <span className={s.tag}>{invite.reception ? "CEREMONY & RECEPTION" : "CEREMONY INVITATION"} <span aria-hidden="true">·</span> {invite.guests.length} INVITED GUESTS</span>
+          <p className={s.guestEyebrow} data-invite-reveal="welcome-copy">{confirmed ? "WITH LOVE & THANKS" : "AN INVITATION FOR"}</p>
+          <h2 id="household-title" ref={heading} tabIndex={-1} data-invite-reveal="name">{invite.household}</h2>
+          <p className={s.welcomeDate} data-invite-reveal="welcome-copy">{wedding.date} <span aria-hidden="true">·</span> {wedding.ceremony.time} <span aria-hidden="true">·</span> {wedding.location}</p>
+          <span className={s.tag} data-invite-reveal="welcome-copy">{invite.reception ? "CEREMONY & RECEPTION" : "CEREMONY INVITATION"} <span aria-hidden="true">·</span> {invite.guests.length} INVITED GUESTS</span>
         </section>
         <section id="rsvp" className={s.inviteGrid} aria-labelledby="reply-title">
           <div ref={instructions} className={s.rsvpInstructions}>
-            <h2 id="reply-title">Will you be joining us?</h2>
-            <ol className={s.replySteps}>
+            <h2 id="reply-title" data-invite-reveal="heading">Will you be joining us?</h2>
+            <ol className={s.replySteps} data-invite-reveal="copy">
               <li>Reply for each person named on your invitation.</li>
               {invite.reception && <li>Choose a meal for each guest attending the reception.</li>}
               <li>Share any dietary requirements, then save your response.</li>
             </ol>
-            <p className={s.instructionNote}>You can return with your invitation code to make changes.</p>
+            <p className={s.instructionNote} data-invite-reveal="copy">You can return with your invitation code to make changes.</p>
           </div>
           <section className={s.responsePanel} aria-labelledby="rsvp-title">
             {confirmed ? <>
@@ -286,7 +303,7 @@ export function RsvpDemo() {
               <button type="button" className={s.primary} onClick={() => { setConfirmed(false); focusHeading(true); }}>Edit my response</button>
               <p className={s.fieldHint}>You can return with your code to update this demo response.</p>
             </> : <>
-              <h3 id="rsvp-title" ref={responseHeading} tabIndex={-1}>Your response</h3>
+              <h3 id="rsvp-title" ref={responseHeading} tabIndex={-1} data-invite-reveal="heading">Your response</h3>
               <form ref={form} onSubmit={submit} noValidate>
                 {invite.guests.map((guest) => {
                   const answer = answers.find((item) => item.guestId === guest.id)!;
@@ -309,29 +326,29 @@ export function RsvpDemo() {
         </section>
         <section id="details" className={s.detailBand} aria-labelledby="locations-title">
           <div className={s.detailInner}>
-            <div className={s.sectionHeading} data-detail-heading><h2 id="locations-title">Locations</h2></div>
+            <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="locations-title">Locations</h2></div>
             <div className={s.locationsGrid}>
-              <section className={s.location}><h3>{wedding.ceremony.name}</h3><p className={s.locationTime}>Ceremony at {wedding.ceremony.time}</p><p>{wedding.ceremony.address}</p></section>
-              {invite.reception && <section className={s.location}><h3>{wedding.reception.name}</h3><p>{wedding.reception.note}</p></section>}
+              <section className={s.location} data-invite-reveal="copy"><h3>{wedding.ceremony.name}</h3><p className={s.locationTime}>Ceremony at {wedding.ceremony.time}</p><p>{wedding.ceremony.address}</p></section>
+              {invite.reception && <section className={s.location} data-invite-reveal="copy"><h3>{wedding.reception.name}</h3><p>{wedding.reception.note}</p></section>}
             </div>
           </div>
         </section>
         <section id="itinerary" className={s.detailBand} aria-labelledby="itinerary-title">
           <div className={s.detailInner}>
-            <div className={s.sectionHeading} data-detail-heading><h2 id="itinerary-title">Itinerary</h2></div>
-            <ol className={s.timeline}><li><time>{wedding.ceremony.time}</time><span>Wedding ceremony</span></li>{invite.reception && <li><time>To follow</time><span>Reception · details to come</span></li>}</ol>
+            <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="itinerary-title">Itinerary</h2></div>
+            <ol className={s.timeline} data-invite-reveal="copy"><li><time>{wedding.ceremony.time}</time><span>Wedding ceremony</span></li>{invite.reception && <li><time>To follow</time><span>Reception · details to come</span></li>}</ol>
           </div>
         </section>
         <section id="dress-code" className={s.detailBand} aria-labelledby="dress-code-title">
           <div className={s.detailInner}>
-            <div className={s.sectionHeading} data-detail-heading><h2 id="dress-code-title">Dress code</h2></div>
-            <div className={s.detailCopy}><h3>Details to come</h3><p>We’ll share the dress code here once it’s confirmed.</p></div>
+            <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="dress-code-title">Dress code</h2></div>
+            <div className={s.detailCopy} data-invite-reveal="copy"><h3>Details to come</h3><p>We’ll share the dress code here once it’s confirmed.</p></div>
           </div>
         </section>
         <section id="faq" className={s.detailBand} aria-labelledby="faq-title">
           <div className={s.detailInner}>
-            <div className={s.sectionHeading} data-detail-heading><h2 id="faq-title">FAQs</h2></div>
-            <div className={s.faq}>
+            <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="faq-title">FAQs</h2></div>
+            <div className={s.faq} data-invite-reveal="copy">
               <details><summary>Who is included on my invitation?</summary><p>Everyone listed in your RSVP form is invited. In a live invitation, plus-ones and children would be included here if invited.</p></details>
               <details><summary>Can I change my response?</summary><p>Yes. Return with the same code and choose “Edit my response”. This demo remembers replies in the same browser. A live site would remember them across devices.</p></details>
               <details><summary>Which details are confirmed?</summary><p>The wedding date and ceremony details match the invitation. Reception details and dress code are still to come. The guest list and meal choices are examples for this demo.</p></details>

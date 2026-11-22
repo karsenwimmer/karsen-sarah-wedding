@@ -74,8 +74,6 @@
 .downArrow { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; }
 .downArrow .arrow { width: 16px; height: 12px; transform: rotate(90deg); }
 .openedEntry button { min-height: 44px; padding: 8px; border: 0; background: none; color: var(--muted); font-size: .875rem; text-decoration: underline; text-underline-offset: 4px; }
-.unlocked { animation: reveal 1.15s var(--ease-out) both; }
-@keyframes reveal { from { opacity: .2; } to { opacity: 1; } }
 .welcome { padding: 58px 24px 44px; text-align: center; }
 .guestEyebrow { margin-bottom: 14px !important; color: var(--muted); font-size: .8125rem; line-height: 1.6; letter-spacing: .16em; }
 .welcome h2 { max-width: 900px; margin: 0 auto 18px; font-size: clamp(2.2rem, 4vw, 3.7rem); font-weight: 500; line-height: 1.1; letter-spacing: .01em; text-wrap: balance; overflow-wrap: anywhere; }
