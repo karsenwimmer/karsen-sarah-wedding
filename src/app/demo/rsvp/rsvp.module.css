@@ -19,6 +19,7 @@
   line-height: 1.65;
 }
 .root * { box-sizing: border-box; }
+.root [data-reveal-pending] { opacity: 0; }
 .root h1, .root h2, .root h3, .root p { margin: 0; }
 .root h1, .root h2, .root h3 { font-family: var(--font-display), Georgia, serif; font-weight: 500; }
 .root p { text-wrap: pretty; }
@@ -269,6 +270,7 @@
 @keyframes reply-signed { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
 @media (hover: hover) and (pointer: fine) { .codeSubmit:hover .arrow { transform: translateX(2px); } }
 @media (prefers-reduced-motion: reduce) {
+  .root [data-reveal-pending] { opacity: 1; }
   .root .entry, .root .guestFields, .root .check svg path { animation: none; }
   .root .codePrompt .codeBar::after { animation: none; opacity: 0; }
   .root :is(input:not([type="radio"]), select, textarea), .root .codeSubmit .arrow { transition: none; }

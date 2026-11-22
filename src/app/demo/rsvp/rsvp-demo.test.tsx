@@ -84,13 +84,21 @@ describe("isolated wedding RSVP demo", () => {
       unobserve = vi.fn();
       disconnect = disconnect;
     });
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+      return this.hasAttribute("data-detail-heading") ? new DOMRect(0, 2000, 500, 60) : new DOMRect();
+    });
     try {
       const view = render(<RsvpDemo />); open();
       expect(observe.mock.calls.filter(([element]) => element.hasAttribute("data-detail-heading"))).toHaveLength(4);
       const title = screen.getByRole("heading", { name: "Locations" });
       const rect = title.parentElement!.getBoundingClientRect();
+      expect(title.parentElement).toHaveAttribute("data-reveal-pending");
+      act(() => callback([{ isIntersecting: true, target: title.parentElement!, boundingClientRect: rect, intersectionRatio: .1, intersectionRect: rect, rootBounds: null, time: 0 }], {} as IntersectionObserver));
+      expect(animate).not.toHaveBeenCalled();
+      expect(title.parentElement).toHaveAttribute("data-reveal-pending");
       act(() => callback([{ isIntersecting: true, target: title.parentElement!, boundingClientRect: rect, intersectionRatio: 1, intersectionRect: rect, rootBounds: null, time: 0 }], {} as IntersectionObserver));
       expect(animate).toHaveBeenCalledTimes(1);
+      expect(title.parentElement).not.toHaveAttribute("data-reveal-pending");
       expect(title).toBeVisible();
       const name = screen.getByRole("heading", { name: "Jordan & Taylor" });
       const nameRect = name.getBoundingClientRect();
@@ -102,9 +110,12 @@ describe("isolated wedding RSVP demo", () => {
       expect(nameTiming.duration).toBeGreaterThan(titleTiming.duration as number);
       act(() => callback([nameEntry], {} as IntersectionObserver));
       expect(animate).toHaveBeenCalledTimes(2);
+      const waiting = screen.getByRole("heading", { name: "Itinerary" }).parentElement;
+      expect(waiting).toHaveAttribute("data-reveal-pending");
       act(() => { reduce = true; preferenceChanged(); });
       expect(cancel).toHaveBeenCalledTimes(2);
       expect(disconnect).toHaveBeenCalled();
+      expect(waiting).not.toHaveAttribute("data-reveal-pending");
       expect(title).toBeVisible();
       expect(name).toBeVisible();
       view.unmount();

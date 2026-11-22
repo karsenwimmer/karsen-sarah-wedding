@@ -81,14 +81,18 @@ export function RsvpDemo() {
     const preference = window.matchMedia?.("(prefers-reduced-motion: reduce)");
     if (!region || preference?.matches || typeof IntersectionObserver === "undefined") return;
     const animations = new Set<Animation>();
+    const pending = new Set<HTMLElement>();
+    const inset = Math.min(180, Math.round(window.innerHeight * .18));
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (preference?.matches) return;
-        if (!entry.isIntersecting) continue;
+        if (!entry.isIntersecting || entry.intersectionRatio < .55) continue;
         observer.unobserve(entry.target);
         if (revealed.current.has(entry.target)) continue;
         revealed.current.add(entry.target);
         if (typeof entry.target.animate !== "function") continue;
+        (entry.target as HTMLElement).removeAttribute("data-reveal-pending");
+        pending.delete(entry.target as HTMLElement);
         const kind = (entry.target as HTMLElement).dataset.inviteReveal;
         const personal = kind === "name";
         const title = kind === "heading" || kind === "hero";
@@ -98,24 +102,33 @@ export function RsvpDemo() {
             { opacity: .55, transform: "translateY(6px)", filter: "blur(0px)", offset: .5 },
             { opacity: 1, transform: "translateY(0)", filter: "blur(0px)" }
           ] : [
-            { opacity: title ? .3 : .45, transform: `translateY(${title ? 8 : 5}px)` },
+            { opacity: title ? .18 : .3, transform: `translateY(${title ? 12 : 8}px)` },
             { opacity: 1, transform: "translateY(0)" }
           ],
-          { duration: personal ? 1600 : title ? 760 : 640,
+          { duration: personal ? 1600 : title ? 1100 : 900,
             delay: kind === "welcome-copy" ? 280 : title ? 0 : 100,
-            easing: personal ? "cubic-bezier(.4, 0, .2, 1)" : "cubic-bezier(.22, 1, .36, 1)", fill: "backwards" }
+            easing: personal ? "cubic-bezier(.4, 0, .2, 1)" : "cubic-bezier(.25, .1, .25, 1)", fill: "backwards" }
         );
         animations.add(animation);
         animation.finished.then(() => animations.delete(animation), () => animations.delete(animation));
       }
-    }, { threshold: .2, rootMargin: "0px 0px -32px 0px" });
+    }, { threshold: .55, rootMargin: `0px 0px -${inset}px 0px` });
     region.querySelectorAll<HTMLElement>("[data-invite-reveal]").forEach((element) => {
-      if (!revealed.current.has(element)) observer.observe(element);
+      if (revealed.current.has(element) || typeof element.animate !== "function") return;
+      const rect = element.getBoundingClientRect();
+      if (rect.height > window.innerHeight - inset) return;
+      if (rect.top >= window.innerHeight - inset) {
+        element.setAttribute("data-reveal-pending", "");
+        pending.add(element);
+      }
+      observer.observe(element);
     });
     const stop = () => {
       observer.disconnect();
       animations.forEach((animation) => animation.cancel());
       animations.clear();
+      pending.forEach((element) => element.removeAttribute("data-reveal-pending"));
+      pending.clear();
     };
     const updatePreference = () => { if (preference?.matches) stop(); };
     preference?.addEventListener?.("change", updatePreference);
