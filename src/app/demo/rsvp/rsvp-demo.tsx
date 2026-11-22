@@ -20,6 +20,7 @@ export function RsvpDemo() {
   const [resetNotice, setResetNotice] = useState("");
   const welcome = useRef<HTMLElement>(null);
   const instructions = useRef<HTMLDivElement>(null);
+  const invitationDetails = useRef<HTMLDivElement>(null);
   const scrollFrame = useRef<number | null>(null);
   const heading = useRef<HTMLHeadingElement>(null);
   const responseHeading = useRef<HTMLHeadingElement>(null);
@@ -54,6 +55,39 @@ export function RsvpDemo() {
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     return () => observer.disconnect();
+  }, [invite]);
+
+  useEffect(() => {
+    const region = invitationDetails.current;
+    const preference = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!region || preference?.matches || typeof IntersectionObserver === "undefined") return;
+    const animations = new Set<Animation>();
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (preference?.matches) return;
+        if (!entry.isIntersecting) continue;
+        observer.unobserve(entry.target);
+        if (typeof entry.target.animate !== "function") continue;
+        const animation = entry.target.animate(
+          [{ opacity: .55, transform: "translateY(6px)" }, { opacity: 1, transform: "translateY(0)" }],
+          { duration: 560, easing: "cubic-bezier(.16, 1, .3, 1)" }
+        );
+        animations.add(animation);
+        animation.finished.then(() => animations.delete(animation), () => animations.delete(animation));
+      }
+    }, { threshold: .2, rootMargin: "0px 0px -32px 0px" });
+    region.querySelectorAll<HTMLElement>("[data-detail-heading]").forEach((element) => observer.observe(element));
+    const stop = () => {
+      observer.disconnect();
+      animations.forEach((animation) => animation.cancel());
+      animations.clear();
+    };
+    const updatePreference = () => { if (preference?.matches) stop(); };
+    preference?.addEventListener?.("change", updatePreference);
+    return () => {
+      stop();
+      preference?.removeEventListener?.("change", updatePreference);
+    };
   }, [invite]);
 
   function focusHeading(response = false) {
@@ -184,7 +218,7 @@ export function RsvpDemo() {
           <div className={s.paintingPanel}>
             <Image src="/images/demo/luca-victoria-watercolour-portrait-v3.webp" alt="Victoria and Luca holding hands in a garden, with softly painted watercolour surroundings." fill loading="eager" fetchPriority="high" unoptimized sizes="(max-width: 760px) 100vw, 600px" className={s.heroPainting} />
           </div>
-          <section id="invitation-entry" className={s.entryForm} aria-labelledby="entry-title">
+          <section id="invitation-entry" className={`${s.entryForm} ${!invite ? s.codePrompt : ""}`} aria-labelledby="entry-title">
             {invite ? <div className={s.openedEntry}>
               <h2 id="entry-title">Your invitation is open</h2>
               <a href="#your-invitation" className={s.openedLink} onClick={(event) => { event.preventDefault(); focusHeading(); }}>View your invitation <span className={s.downArrow} aria-hidden="true"><Arrow /></span></a>
@@ -203,7 +237,7 @@ export function RsvpDemo() {
           </section>
         </div>
       </div>
-      {invite && <div className={s.unlocked}>
+      {invite && <div ref={invitationDetails} className={s.unlocked}>
         <section ref={welcome} id="your-invitation" className={s.welcome} aria-labelledby="household-title">
           <p className={s.guestEyebrow}>{confirmed ? "WITH LOVE & THANKS" : "AN INVITATION FOR"}</p>
           <h2 id="household-title" ref={heading} tabIndex={-1}>{invite.household}</h2>
@@ -257,7 +291,7 @@ export function RsvpDemo() {
         </section>
         <section id="details" className={s.detailBand} aria-labelledby="locations-title">
           <div className={s.detailInner}>
-            <div className={s.sectionHeading}><h2 id="locations-title">Locations</h2></div>
+            <div className={s.sectionHeading} data-detail-heading><h2 id="locations-title">Locations</h2></div>
             <div className={s.locationsGrid}>
               <section className={s.location}><h3>{wedding.ceremony.name}</h3><p className={s.locationTime}>Ceremony at {wedding.ceremony.time}</p><p>{wedding.ceremony.address}</p></section>
               {invite.reception && <section className={s.location}><h3>{wedding.reception.name}</h3><p>{wedding.reception.note}</p></section>}
@@ -266,19 +300,19 @@ export function RsvpDemo() {
         </section>
         <section id="itinerary" className={s.detailBand} aria-labelledby="itinerary-title">
           <div className={s.detailInner}>
-            <div className={s.sectionHeading}><h2 id="itinerary-title">Itinerary</h2></div>
+            <div className={s.sectionHeading} data-detail-heading><h2 id="itinerary-title">Itinerary</h2></div>
             <ol className={s.timeline}><li><time>{wedding.ceremony.time}</time><span>Wedding ceremony</span></li>{invite.reception && <li><time>To follow</time><span>Reception · details to come</span></li>}</ol>
           </div>
         </section>
         <section id="dress-code" className={s.detailBand} aria-labelledby="dress-code-title">
           <div className={s.detailInner}>
-            <div className={s.sectionHeading}><h2 id="dress-code-title">Dress code</h2></div>
+            <div className={s.sectionHeading} data-detail-heading><h2 id="dress-code-title">Dress code</h2></div>
             <div className={s.detailCopy}><h3>Details to come</h3><p>We’ll share the dress code here once it’s confirmed.</p></div>
           </div>
         </section>
         <section id="faq" className={s.detailBand} aria-labelledby="faq-title">
           <div className={s.detailInner}>
-            <div className={s.sectionHeading}><h2 id="faq-title">FAQs</h2></div>
+            <div className={s.sectionHeading} data-detail-heading><h2 id="faq-title">FAQs</h2></div>
             <div className={s.faq}>
               <details><summary>Who is included on my invitation?</summary><p>Everyone listed in your RSVP form is invited. In a live invitation, plus-ones and children would be included here if invited.</p></details>
               <details><summary>Can I change my response?</summary><p>Yes. Return with the same code and choose “Edit my response”. This demo remembers replies in the same browser. A live site would remember them across devices.</p></details>

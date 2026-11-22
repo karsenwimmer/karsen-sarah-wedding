@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { RsvpDemo } from "./rsvp-demo";
 import { demoInvitations, readResponse, storageKey } from "./demo-data";
 
@@ -9,7 +9,7 @@ function open(code = "ROSE24") {
 }
 
 beforeEach(() => { window.localStorage.clear(); vi.spyOn(window, "scrollTo").mockImplementation(() => {}); });
-afterEach(() => { cleanup(); vi.restoreAllMocks(); });
+afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe("isolated wedding RSVP demo", () => {
   it("shows the confirmed date without locations on entry and reveals the ceremony only after opening", () => {
@@ -58,6 +58,46 @@ describe("isolated wedding RSVP demo", () => {
     expect(frames).toHaveLength(0);
     view.unmount();
     vi.unstubAllGlobals();
+  });
+
+  it("keeps details visible and cancels their reveals when reduced motion is enabled", () => {
+    let callback: IntersectionObserverCallback = () => {};
+    let preferenceChanged = () => {};
+    let reduce = false;
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+    const cancel = vi.fn();
+    const animate = vi.fn(() => ({ finished: new Promise(() => {}), cancel }));
+    const previousAnimate = Object.getOwnPropertyDescriptor(Element.prototype, "animate");
+    Object.defineProperty(Element.prototype, "animate", { configurable: true, value: animate });
+    vi.stubGlobal("matchMedia", vi.fn(() => ({
+      get matches() { return reduce; },
+      addEventListener: (_event: string, listener: () => void) => { preferenceChanged = listener; },
+      removeEventListener: vi.fn()
+    })));
+    vi.stubGlobal("IntersectionObserver", class {
+      constructor(listener: IntersectionObserverCallback) { callback = listener; }
+      observe = observe;
+      unobserve = vi.fn();
+      disconnect = disconnect;
+    });
+    try {
+      const view = render(<RsvpDemo />); open();
+      expect(observe).toHaveBeenCalledTimes(4);
+      const title = screen.getByRole("heading", { name: "Locations" });
+      const rect = title.parentElement!.getBoundingClientRect();
+      act(() => callback([{ isIntersecting: true, target: title.parentElement!, boundingClientRect: rect, intersectionRatio: 1, intersectionRect: rect, rootBounds: null, time: 0 }], {} as IntersectionObserver));
+      expect(animate).toHaveBeenCalledTimes(1);
+      expect(title).toBeVisible();
+      act(() => { reduce = true; preferenceChanged(); });
+      expect(cancel).toHaveBeenCalledTimes(1);
+      expect(disconnect).toHaveBeenCalled();
+      expect(title).toBeVisible();
+      view.unmount();
+    } finally {
+      if (previousAnimate) Object.defineProperty(Element.prototype, "animate", previousAnimate);
+      else Reflect.deleteProperty(Element.prototype, "animate");
+    }
   });
 
   it("rejects unknown codes and opens only the selected household with a normalized code", () => {

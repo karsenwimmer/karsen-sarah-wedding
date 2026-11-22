@@ -30,3 +30,7 @@ ROSE24 demonstrates a couple, OAK123 a family with children, and FERN26 a ceremo
 ## Validation
 
 All 65 tests and the production build pass. Browser checks covered 320 × 568, 390 × 700, 1000 × 800 and 1440 × 900, invalid-code recovery, keyboard radio selection, meal validation and focus recovery, saved-response editing, keyboard FAQ disclosure and console errors. Measured name-to-control gaps are consistently 16px. Calculated contrast is 4.88:1 for supporting text on sage, 5.65:1 for input placeholders and 3.03:1 for field boundaries against sage.
+
+## Motion refinement
+
+The focal moment is light drawing attention to the invitation code: a soft static sage halo settles through one 2.2-second entrance, then stays still. Focusing the code stops that entrance, while an error dims the halo. The paper has one gentle arrival. Detail headings settle by 6px once when entering view, using progressive enhancement so content remains visible if observation or animation is unavailable. New meal fields appear over 220ms, the confirmation check draws once, and the arrow responds subtly to a precise pointer. No perpetual loops, parallax, new dependencies or changes to RSVP logic are introduced. Reduced motion retains the static code highlight and readable state changes, with movement disabled; switching to reduced motion cancels active heading reveals.
