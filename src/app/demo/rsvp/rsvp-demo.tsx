@@ -28,6 +28,24 @@ export function RsvpDemo() {
   const form = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
+    const element = codeInput.current?.parentElement;
+    if (!element) return;
+    let visible = typeof IntersectionObserver === "undefined";
+    const update = () => element.style.setProperty("--code-light-play", visible && !document.hidden ? "running" : "paused");
+    const observer = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      update();
+    });
+    observer?.observe(element);
+    document.addEventListener("visibilitychange", update);
+    update();
+    return () => {
+      observer?.disconnect();
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, [invite]);
+
+  useEffect(() => {
     const stop = () => {
       if (scrollFrame.current !== null) cancelAnimationFrame(scrollFrame.current);
       scrollFrame.current = null;

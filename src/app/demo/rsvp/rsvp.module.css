@@ -57,7 +57,7 @@
 .entryForm { position: relative; isolation: isolate; grid-column: 1; grid-row: 2; align-self: start; width: 100%; max-width: 300px; min-height: 123px; margin: 0 auto; padding: 0; text-align: center; }
 .entryForm h2 { font-family: var(--font-display), Georgia, serif; font-size: 1.35rem; font-style: italic; font-weight: 500; line-height: 1.3; letter-spacing: .015em; margin: 0 0 5px; }
 .codeExplanation { margin: 0 0 16px !important; color: var(--muted); font-size: .875rem; line-height: 1.5; }
-.codeBar { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 8px; padding: 0 0 9px; background: transparent; border: 0; border-bottom: 1px solid var(--control-line); border-radius: 0; transition: border-color 180ms ease, box-shadow 180ms ease; }
+.codeBar { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 8px; padding: 0 0 9px; background: transparent; border: 0; border-bottom: 1px solid var(--control-line); border-radius: 0; transition: border-color 180ms ease, box-shadow 180ms ease; }
 .codeBar::before { content: ""; grid-column: 1; grid-row: 1; }
 .codeBar:focus-within { border-bottom-color: var(--ink); box-shadow: 0 1px 0 var(--ink); }
 .root .codeBarError { border-bottom-color: var(--error); box-shadow: 0 1px 0 var(--error); }
@@ -257,22 +257,22 @@
 @media (forced-colors: active) { .attendance input { appearance: auto; } }
 @media (prefers-reduced-motion: reduce) { .root :is(.primary, .codeSubmit):active { transform: none; } .root .codeSubmit { transition: none; } }
 
-/* A brief light on the code area makes the invitation’s next step easy to find. */
-.codePrompt::before { content: ""; position: absolute; inset: -18px -12px -12px; z-index: -1; border-radius: 50%; pointer-events: none; background: radial-gradient(ellipse at center, rgb(151 177 119 / .27), rgb(164 187 136 / .11) 58%, transparent 78%); filter: blur(8px); opacity: .72; transition: opacity 220ms ease; animation: invitation-light 2200ms ease-out; }
-.codePrompt:focus-within::before { animation: none; opacity: 1; }
-.codePrompt:has(.codeBarError)::before { animation: none; opacity: .3; }
+/* A narrow glint travels only along the invitation-code underline. */
+.codePrompt .codeBar::after { content: ""; position: absolute; bottom: -1px; left: 0; width: 34%; height: 2px; border-radius: 999px; pointer-events: none; background: linear-gradient(90deg, transparent, #acb98f 24%, #f2dfaa 50%, #acb98f 76%, transparent); box-shadow: 0 0 5px rgb(173 185 143 / .45); animation: code-light 3200ms ease-in-out infinite alternate; animation-play-state: var(--code-light-play, paused); }
+.codePrompt .codeBar:focus-within::after { animation-play-state: paused; }
+.codePrompt .codeBarError::after { opacity: 0; animation-play-state: paused; }
 .guestFields { animation: fields-appear 220ms var(--ease-out) both; }
 .check svg path { stroke-dasharray: 24; stroke-dashoffset: 0; animation: reply-signed 420ms var(--ease-out) both; }
 .root :is(input:not([type="radio"]), select, textarea) { transition: border-color 180ms ease, background-color 180ms ease; }
 .codeSubmit .arrow { transition: transform 180ms var(--ease-out); }
 @keyframes paper-arrive { from { opacity: .7; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes invitation-light { 0% { opacity: .3; transform: scale(.98); } 42% { opacity: 1; transform: scale(1.02); } 100% { opacity: .72; transform: scale(1); } }
+@keyframes code-light { from { transform: translateX(0); } to { transform: translateX(194.117647%); } }
 @keyframes fields-appear { from { opacity: .45; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes reply-signed { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
 @media (hover: hover) and (pointer: fine) { .codeSubmit:hover .arrow { transform: translateX(2px); } }
 @media (prefers-reduced-motion: reduce) {
-  .root .entry, .root .codePrompt::before, .root .guestFields, .root .check svg path { animation: none; }
-  .root .codePrompt::before { opacity: .72; transition: none; }
+  .root .entry, .root .guestFields, .root .check svg path { animation: none; }
+  .root .codePrompt .codeBar::after { animation: none; opacity: 0; }
   .root :is(input:not([type="radio"]), select, textarea), .root .codeSubmit .arrow { transition: none; }
   .codeSubmit:hover .arrow { transform: none; }
 }

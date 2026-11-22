@@ -83,7 +83,7 @@ describe("isolated wedding RSVP demo", () => {
     });
     try {
       const view = render(<RsvpDemo />); open();
-      expect(observe).toHaveBeenCalledTimes(4);
+      expect(observe.mock.calls.filter(([element]) => element.hasAttribute("data-detail-heading"))).toHaveLength(4);
       const title = screen.getByRole("heading", { name: "Locations" });
       const rect = title.parentElement!.getBoundingClientRect();
       act(() => callback([{ isIntersecting: true, target: title.parentElement!, boundingClientRect: rect, intersectionRatio: 1, intersectionRect: rect, rootBounds: null, time: 0 }], {} as IntersectionObserver));
