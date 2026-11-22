@@ -3,10 +3,12 @@ import { weddingConfig } from "@/config/wedding";
 export type CalendarEvent = {
   title: string;
   startDate: string;
-  endDate: string;
+  endDate?: string;
   location: string;
   description: string;
   url: string;
+  uid?: string;
+  timezone?: string;
 };
 
 function addDays(date: string, days: number) {
@@ -16,8 +18,11 @@ function addDays(date: string, days: number) {
 }
 
 function compactDate(date: string) {
-  return date.replaceAll("-", "");
+  if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date.replaceAll("-", "");
+  return new Date(date).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
 }
+
+function isAllDay(event: CalendarEvent) { return /^\d{4}-\d{2}-\d{2}$/.test(event.startDate); }
 
 function encode(value: string) {
   return encodeURIComponent(value);
@@ -33,20 +38,18 @@ function escapeIcsText(value: string) {
 
 function foldIcsLine(line: string) {
   const maxLength = 73;
-
-  if (line.length <= maxLength) {
-    return line;
-  }
-
   const parts: string[] = [];
-  let remaining = line;
-
-  while (remaining.length > maxLength) {
-    parts.push(remaining.slice(0, maxLength));
-    remaining = remaining.slice(maxLength);
+  const encoder = new TextEncoder();
+  let current = "";
+  let bytes = 0;
+  for (const character of line) {
+    const size = encoder.encode(character).length;
+    if (bytes + size > maxLength) {
+      parts.push(current); current = ""; bytes = 0;
+    }
+    current += character; bytes += size;
   }
-
-  parts.push(remaining);
+  parts.push(current);
   return parts.join("\r\n ");
 }
 
@@ -63,10 +66,11 @@ export function createGoogleCalendarUrl(event = calendarEvent) {
   const params = [
     "action=TEMPLATE",
     `text=${encode(event.title)}`,
-    `dates=${compactDate(event.startDate)}/${compactDate(event.endDate)}`,
+    `dates=${compactDate(event.startDate)}/${compactDate(event.endDate ?? (isAllDay(event) ? addDays(event.startDate, 1) : event.startDate))}`,
     `details=${encode(event.description)}`,
     `location=${encode(event.location)}`
   ];
+  if (event.timezone) params.push(`ctz=${encode(event.timezone)}`);
 
   return `https://calendar.google.com/calendar/render?${params.join("&")}`;
 }
@@ -76,8 +80,8 @@ export function createOutlookCalendarUrl(event = calendarEvent) {
     "rru=addevent",
     `subject=${encode(event.title)}`,
     `startdt=${encode(event.startDate)}`,
-    `enddt=${encode(event.endDate)}`,
-    "allday=true",
+    ...(event.endDate ? [`enddt=${encode(event.endDate)}`] : []),
+    `allday=${isAllDay(event)}`,
     `body=${encode(event.description)}`,
     `location=${encode(event.location)}`
   ];
@@ -93,10 +97,10 @@ export function createIcsCalendarFile(event = calendarEvent, timestamp = "202608
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "BEGIN:VEVENT",
-    "UID:karsen-sarah-wedding-20270717@thewimmers.ca",
+    `UID:${event.uid ?? "karsen-sarah-wedding-20270717@thewimmers.ca"}`,
     `DTSTAMP:${timestamp}`,
-    `DTSTART;VALUE=DATE:${compactDate(event.startDate)}`,
-    `DTEND;VALUE=DATE:${compactDate(event.endDate)}`,
+    `DTSTART${isAllDay(event) ? ";VALUE=DATE" : ""}:${compactDate(event.startDate)}`,
+    ...(event.endDate ? [`DTEND${isAllDay(event) ? ";VALUE=DATE" : ""}:${compactDate(event.endDate)}`] : []),
     `SUMMARY:${escapeIcsText(event.title)}`,
     `DESCRIPTION:${escapeIcsText(event.description)}`,
     `LOCATION:${escapeIcsText(event.location)}`,

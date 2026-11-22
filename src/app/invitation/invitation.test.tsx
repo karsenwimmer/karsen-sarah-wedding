@@ -120,7 +120,14 @@ describe("Karsen and Sarah invitation", () => {
     expect(document.getElementById("your-rsvp")!.compareDocumentPosition(document.getElementById("the-day")!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getAllByRole("heading", { name: "The Boathouse" })).toHaveLength(1);
     expect(document.getElementById("dress-code")).toBeInTheDocument();
-    expect(document.getElementById("transportation")).toBeInTheDocument();
+    expect(document.getElementById("locations")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Itinerary" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Elevated Cocktail Attire" })).toBeVisible();
+    expect(screen.getAllByTitle(/Map showing/)).toHaveLength(2);
+    const googleLinks = screen.getAllByRole("link", { name: "Google Calendar", hidden: true });
+    expect(googleLinks.map(link => new URL(link.getAttribute("href")!).searchParams.get("dates"))).toEqual([
+      "20270717T170000Z/20270717T170000Z", "20270717T183000Z/20270717T183000Z", "20270717T220000Z/20270717T220000Z"
+    ]);
     expect(screen.queryByText("THE LITTLE THINGS")).not.toBeInTheDocument();
   });
   it("collapses the entire form after a valid mixed response and remembers it after a reload", async () => {
@@ -168,10 +175,12 @@ describe("Karsen and Sarah invitation", () => {
     expect(screen.queryByText("Ellie Parker")).not.toBeInTheDocument();
     expect(screen.getByRole("group", { name: /Avery Morgan/ })).toBeVisible();
   });
-  it("keeps ceremony-only invitations free of reception events and meal choices", async () => {
+  it("includes church lunch while hiding the evening reception and dinner meal choices", async () => {
     render(<Invitation />); await open("CHURCH");
     expect(screen.queryByText("The Boathouse")).not.toBeInTheDocument();
-    expect(screen.queryByText("Between the celebrations")).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Lunch Reception" })).toBeVisible();
+    expect(screen.queryByRole("heading", { name: "Dinner Reception" })).not.toBeInTheDocument();
+    expect(screen.getAllByTitle(/Map showing/)).toHaveLength(1);
     for (const radio of screen.getAllByRole("radio", { name: "Joyfully accepts" })) fireEvent.click(radio);
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Save preview reply/ }));
