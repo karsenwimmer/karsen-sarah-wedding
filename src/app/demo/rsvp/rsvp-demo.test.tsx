@@ -17,7 +17,7 @@ describe("isolated wedding RSVP demo", () => {
     const hero = screen.getByRole("heading", { level: 1 });
     const portrait = screen.getByRole("img", { name: /Victoria and Luca holding hands/ });
     expect(screen.getByText("August 28, 2027")).toBeVisible();
-    expect(screen.queryByText(/Mississauga|Central Parkway|Saints Peter and Paul/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Mississauga|Central Parkway|Saints Peter and Paul|Venetian|Romina|5:30/)).not.toBeInTheDocument();
     open();
     expect(screen.getByRole("heading", { level: 1 })).toBe(hero);
     expect(screen.getByRole("img", { name: /Victoria and Luca holding hands/ })).toBe(portrait);
@@ -34,11 +34,15 @@ describe("isolated wedding RSVP demo", () => {
     expect(screen.queryByText(/We’d love to celebrate|We can’t wait to share|Explore the wedding details|Please reply for each person/)).not.toBeInTheDocument();
     expect(response.compareDocumentPosition(details) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Saints Peter and Paul Parish" })).toBeVisible();
-    expect(screen.getByText("4070 Central Parkway East, Mississauga, Ontario")).toBeVisible();
+    expect(screen.getByText("4070 Central Parkway East, Mississauga, Ontario L4Z 1T6")).toBeVisible();
     expect(screen.getByText("Ceremony at 12:00 PM")).toBeVisible();
+    expect(screen.getByRole("heading", { name: "The Venetian Banquet Hall" })).toBeVisible();
+    expect(screen.getByText("219 Romina Drive, Concord, Ontario L4K 4V3")).toBeVisible();
+    expect(screen.getByText("Reception at 5:30 PM")).toBeVisible();
+    expect(screen.getByText("Reception & antipasto bar")).toBeVisible();
     expect(screen.queryByText(/Oakville|Willow House|May 12, 2026|June 12, 2026/)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Change invitation" }));
-    expect(screen.queryByText(/Mississauga|Central Parkway|Saints Peter and Paul/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Mississauga|Central Parkway|Saints Peter and Paul|Venetian|Romina|5:30/)).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Your response" })).not.toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "Enter your code" })).toHaveValue("");
     expect(screen.getByRole("heading", { level: 1 })).toBe(hero);
@@ -134,7 +138,7 @@ describe("isolated wedding RSVP demo", () => {
     expect(screen.queryByText("Sam Bennett")).not.toBeInTheDocument();
   });
 
-  it("validates each guest and meal, saves a mixed response, reloads it and supports editing", () => {
+  it("validates attendance, saves optional dietary notes, reloads them and supports editing", () => {
     const view = render(<RsvpDemo />);
     open();
     fireEvent.click(screen.getByRole("button", { name: /Save demo RSVP/ }));
@@ -143,41 +147,53 @@ describe("isolated wedding RSVP demo", () => {
     const taylor = screen.getByRole("group", { name: /Taylor Morgan/ });
     fireEvent.click(within(jordan).getByLabelText("Joyfully attending"));
     fireEvent.click(within(taylor).getByLabelText("Respectfully declining"));
-    fireEvent.click(screen.getByRole("button", { name: /Save demo RSVP/ }));
-    expect(screen.getByRole("alert")).toHaveTextContent("choose a meal");
-    expect(screen.getByLabelText("Meal for Jordan")).toHaveAttribute("aria-invalid", "true");
-    fireEvent.change(screen.getByLabelText("Meal for Jordan"), { target: { value: "salmon" } });
-    fireEvent.change(screen.getByLabelText(/Dietary requirements for Jordan/), { target: { value: "No nuts" } });
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(/Dietary requirements or allergies for Jordan/), { target: { value: "  No nuts  " } });
     fireEvent.click(screen.getByRole("button", { name: /Save demo RSVP/ }));
     expect(screen.getByText("DEMO RESPONSE SAVED")).toBeVisible();
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Victoria Pacheco");
-    expect(screen.getByText("Lemon & dill salmon")).toBeVisible();
     expect(screen.getByText("Dietary requirements: No nuts")).toBeVisible();
     expect(window.localStorage.getItem(storageKey(demoInvitations[0]))).toContain('"attendance":"no"');
     view.unmount();
     render(<RsvpDemo />); open();
-    expect(screen.getByRole("button", { name: /Edit my response/ })).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: /Edit my response/ }));
-    expect(screen.getByLabelText("Meal for Jordan")).toHaveValue("salmon");
+    expect(screen.getByLabelText(/Dietary requirements or allergies for Jordan/)).toHaveValue("No nuts");
     fireEvent.click(within(screen.getByRole("group", { name: /Jordan Morgan/ })).getByLabelText("Respectfully declining"));
     fireEvent.click(screen.getByRole("button", { name: /Save demo RSVP/ }));
     expect(screen.getByText("Thank you for letting us know.")).toBeVisible();
     const saved = JSON.parse(window.localStorage.getItem(storageKey(demoInvitations[0]))!);
-    expect(saved.guests[0]).toMatchObject({ meal: "", dietary: "", attendance: "no" });
+    expect(saved.guests[0]).toMatchObject({ dietary: "", attendance: "no" });
+    expect(saved.guests[0]).not.toHaveProperty("meal");
   });
 
-  it("offers children’s meals for the family and keeps ceremony-only invitations free of reception details", () => {
+  it("assumes the standard menu for blank dietary fields and keeps ceremony-only invitations free of reception details", () => {
     render(<RsvpDemo />); open("OAK123");
-    fireEvent.click(within(screen.getByRole("group", { name: /Avery Bennett/ })).getByLabelText("Joyfully attending"));
-    expect(within(screen.getByLabelText("Meal for Avery")).getByRole("option", { name: "Children’s meal" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Try another code/ }));
-    open("FERN26");
-    expect(screen.queryByRole("heading", { name: "Reception to follow" })).not.toBeInTheDocument();
-    expect(screen.queryByText("Reception · details to come")).not.toBeInTheDocument();
     for (const radio of screen.getAllByRole("radio", { name: "Joyfully attending" })) fireEvent.click(radio);
+    expect(screen.getByLabelText(/Dietary requirements or allergies for Avery/)).toHaveValue("");
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Save demo RSVP/ }));
+    expect(screen.getAllByText("Standard menu · No dietary requirements provided")).toHaveLength(4);
+    fireEvent.click(screen.getByRole("button", { name: /Try another code/ }));
+    open("FERN26");
+    expect(screen.queryByRole("heading", { name: "The Venetian Banquet Hall" })).not.toBeInTheDocument();
+    expect(screen.queryByText(/antipasto|Romina|5:30|chicken and beef/)).not.toBeInTheDocument();
+    for (const radio of screen.getAllByRole("radio", { name: "Joyfully attending" })) fireEvent.click(radio);
+    expect(screen.queryByLabelText(/Dietary requirements or allergies/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Save demo RSVP/ }));
     expect(screen.getByText("DEMO RESPONSE SAVED")).toBeVisible();
+    expect(screen.queryByText(/Standard menu/)).not.toBeInTheDocument();
+  });
+
+  it("keeps alternative requests from earlier saved demo responses", () => {
+    const raw = JSON.stringify({ guests: [
+      { guestId: "jordan", attendance: "yes", meal: "vegetarian", dietary: "" },
+      { guestId: "taylor", attendance: "yes", meal: "salmon", dietary: "" }
+    ], note: "See you there", savedAt: new Date().toISOString() });
+    const saved = readResponse(demoInvitations[0], raw);
+    expect(saved?.guests.map((guest) => guest.dietary)).toEqual([
+      "Vegetarian meal requested previously", "Fish meal requested previously"
+    ]);
+    expect(saved?.guests[0]).not.toHaveProperty("meal");
   });
 
   it("resets only demo records and retains unrelated storage", () => {

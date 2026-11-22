@@ -9,6 +9,8 @@
   --line: #cdd3bf;
   --paper: #faf8f1;
   --sage-pale: #e9eddf;
+  --gold: #92713b;
+  --gold-line: #c7b486;
   --paper-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.84' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23716a51' opacity='.025' filter='url(%23g)' d='M0 0h180v180H0z'/%3E%3C/svg%3E");
   min-height: 100svh;
   background-color: var(--paper);
@@ -43,7 +45,7 @@
 .demoBadge { font-size: .75rem; letter-spacing: .13em; color: var(--muted); }
 .main { width: 100%; }
 .hero { min-height: calc(100svh - 76px); display: flex; align-items: center; justify-content: center; }
-.entry { display: grid; grid-template-columns: minmax(0, .96fr) minmax(0, 1.06fr); grid-template-rows: auto auto; align-content: center; gap: 36px 28px; width: min(1240px, calc(100% - 88px)); min-height: min(680px, calc(100svh - 144px)); margin: 32px auto; padding: 32px 38px; border: 1px solid #cdd3bf; background-color: var(--paper); background-image: var(--paper-grain); box-shadow: 0 18px 50px -30px #4a593f45; animation: paper-arrive 720ms var(--ease-out) both; }
+.entry { display: grid; grid-template-columns: minmax(0, .96fr) minmax(0, 1.06fr); grid-template-rows: auto auto; align-content: center; gap: 36px 28px; width: min(1240px, calc(100% - 88px)); min-height: min(680px, calc(100svh - 144px)); margin: 32px auto; padding: 32px 38px; border: 1px solid var(--gold-line); background-color: var(--paper); background-image: var(--paper-grain); box-shadow: 0 18px 50px -30px #4a593f45; animation: paper-arrive 720ms var(--ease-out) both; }
 .invitationArt { grid-column: 1; grid-row: 1; align-self: end; min-width: 0; text-align: center; }
 .paperContent { display: flex; flex-direction: column; align-items: center; width: 100%; }
 .heroEmblem { width: 120px; height: 120px; margin: 0 auto 13px; }
@@ -79,7 +81,7 @@
 .guestEyebrow { margin-bottom: 14px !important; color: var(--muted); font-size: .8125rem; line-height: 1.6; letter-spacing: .16em; }
 .welcome h2 { max-width: 900px; margin: 0 auto 18px; font-size: clamp(2.2rem, 4vw, 3.7rem); font-weight: 500; line-height: 1.1; letter-spacing: .01em; text-wrap: balance; overflow-wrap: anywhere; }
 .welcome .welcomeDate { font-family: var(--font-display), Georgia, serif; font-size: 1.25rem; font-weight: 500; }
-.welcomeDate span { padding-inline: 8px; color: #879675; }
+.welcomeDate span { padding-inline: 8px; color: var(--gold); }
 .tag { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin-top: 20px; color: var(--muted); font-size: .75rem; letter-spacing: .07em; }
 .inviteGrid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); align-items: start; gap: clamp(40px, 7vw, 100px); width: min(1120px, calc(100% - 88px)); margin: auto; padding: 64px 0 80px; }
 .rsvpInstructions { position: sticky; top: max(32px, calc((100svh - var(--instructions-height, 400px)) / 2)); padding: 0; }
@@ -119,6 +121,7 @@
 .detailBand { padding: 56px 0 72px; }
 .detailInner { width: min(1120px, calc(100% - 88px)); margin: auto; }
 .sectionHeading { text-align: center; margin-bottom: 40px; }
+.sectionHeading::after { content: ""; display: block; width: 44px; height: 1px; margin: 18px auto 0; background: var(--gold-line); }
 .sectionHeading h2 { font-size: clamp(2.4rem, 4vw, 3rem); line-height: 1.15; }
 .locationsGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px; width: min(100%, 1000px); margin: 0 auto; }
 .location { text-align: center; }
@@ -130,6 +133,8 @@
 .timeline li:last-child { border-bottom: 1px solid #c5ceba; }
 .timeline time { font-variant-numeric: tabular-nums; white-space: nowrap; font-size: .875rem; line-height: 1.9; color: var(--ink); }
 .timeline span { color: var(--muted); }
+.itineraryNote { margin-top: 24px !important; text-align: center; color: var(--muted); font-size: .9375rem; }
+.menuNote { margin-bottom: 28px !important; color: var(--muted); font-size: 1rem; line-height: 1.65; }
 .detailCopy { max-width: 680px; margin: auto; text-align: center; }
 .detailCopy h3 { margin-top: 0; }
 .faq { width: min(100%, 760px); margin: auto; }
@@ -257,7 +262,7 @@
 @media (prefers-reduced-motion: reduce) { .root :is(.primary, .codeSubmit):active { transform: none; } .root .codeSubmit { transition: none; } }
 
 /* A narrow glint travels only along the invitation-code underline. */
-.codePrompt .codeBar::after { content: ""; position: absolute; bottom: -1px; left: 0; width: 34%; height: 2px; border-radius: 999px; pointer-events: none; background: linear-gradient(90deg, transparent, #acb98f 24%, #f2dfaa 50%, #acb98f 76%, transparent); box-shadow: 0 0 5px rgb(173 185 143 / .45); animation: code-light 3200ms ease-in-out infinite alternate; animation-play-state: var(--code-light-play, paused); }
+.codePrompt .codeBar::after { content: ""; position: absolute; bottom: -1px; left: 0; width: 34%; height: 2px; border-radius: 999px; pointer-events: none; background: linear-gradient(90deg, transparent, var(--gold-line) 24%, #f5e1ad 50%, var(--gold-line) 76%, transparent); box-shadow: 0 0 5px rgb(199 180 134 / .4); animation: code-light 3200ms ease-in-out infinite alternate; animation-play-state: var(--code-light-play, paused); }
 .codePrompt .codeBar:focus-within::after { animation-play-state: paused; }
 .codePrompt .codeBarError::after { opacity: 0; animation-play-state: paused; }
 .guestFields { animation: fields-appear 220ms var(--ease-out) both; }

@@ -3,7 +3,7 @@ import { RsvpDemo } from "./rsvp-demo";
 
 export const metadata: Metadata = {
   title: "Luca & Victoria | Invitation demo",
-  description: "Try a sample wedding invitation, RSVP and meal selection.",
+  description: "Try a sample wedding invitation, RSVP and dietary requirements.",
   alternates: { canonical: "/demo/rsvp" },
   robots: { index: false, follow: false, nocache: true },
   openGraph: {

@@ -4,8 +4,8 @@ export const demoWedding = {
   names: "Luca & Victoria",
   date: "August 28, 2027",
   location: "Mississauga, Ontario",
-  ceremony: { name: "Saints Peter and Paul Parish", address: "4070 Central Parkway East, Mississauga, Ontario", time: "12:00 PM" },
-  reception: { name: "Reception to follow", note: "Venue and timing details will be shared here." }
+  ceremony: { name: "Saints Peter and Paul Parish", address: "4070 Central Parkway East, Mississauga, Ontario L4Z 1T6", time: "12:00 PM" },
+  reception: { name: "The Venetian Banquet Hall", address: "219 Romina Drive, Concord, Ontario L4K 4V3", time: "5:30 PM" }
 };
 
 export type DemoGuest = { id: string; name: string; child?: boolean };
@@ -27,15 +27,7 @@ export const demoInvitations: DemoInvitation[] = [
     guests: [{ id: "casey", name: "Casey Ellis" }, { id: "drew", name: "Drew Ellis" }] }
 ];
 
-export const meals = [
-  { id: "chicken", label: "Herb-roasted chicken" },
-  { id: "salmon", label: "Lemon & dill salmon" },
-  { id: "vegetarian", label: "Wild mushroom risotto (vegetarian)" },
-  { id: "children", label: "Children’s meal" }
-] as const;
-
-export type Meal = "" | (typeof meals)[number]["id"];
-export type GuestResponse = { guestId: string; attendance: "" | "yes" | "no"; meal: Meal; dietary: string };
+export type GuestResponse = { guestId: string; attendance: "" | "yes" | "no"; dietary: string };
 export type DemoResponse = { guests: GuestResponse[]; note: string; savedAt: string };
 
 export function findInvitation(code: string) {
@@ -48,7 +40,7 @@ export function storageKey(invite: DemoInvitation) {
 }
 
 export function emptyResponses(invite: DemoInvitation): GuestResponse[] {
-  return invite.guests.map((guest) => ({ guestId: guest.id, attendance: "", meal: "", dietary: "" }));
+  return invite.guests.map((guest) => ({ guestId: guest.id, attendance: "", dietary: "" }));
 }
 
 export function responseErrors(invite: DemoInvitation, responses: GuestResponse[]) {
@@ -57,9 +49,6 @@ export function responseErrors(invite: DemoInvitation, responses: GuestResponse[
     const answer = responses.find((response) => response.guestId === guest.id);
     if (!answer || !["yes", "no"].includes(answer.attendance)) {
       errors[guest.id] = "Please choose attending or declining.";
-    } else if (invite.reception && answer.attendance === "yes" &&
-      !meals.some((meal) => meal.id === answer.meal && (guest.child || meal.id !== "children"))) {
-      errors[guest.id] = "Please choose a meal.";
     }
   }
   return errors;
@@ -68,15 +57,20 @@ export function responseErrors(invite: DemoInvitation, responses: GuestResponse[
 export function readResponse(invite: DemoInvitation, raw: string | null): DemoResponse | null {
   if (!raw) return null;
   try {
-    const data = JSON.parse(raw) as DemoResponse;
+    const data = JSON.parse(raw) as Omit<DemoResponse, "guests"> & { guests: (GuestResponse & { meal?: unknown })[] };
     if (!Array.isArray(data.guests) || typeof data.note !== "string" || data.note.length > 1000 ||
       typeof data.savedAt !== "string" || !Number.isFinite(Date.parse(data.savedAt))) return null;
     const guests = invite.guests.map((guest) => {
       const answer = data.guests.find((item) => item?.guestId === guest.id);
       if (!answer || typeof answer.dietary !== "string" || answer.dietary.length > 300) throw new Error("Invalid response");
-      return { guestId: guest.id, attendance: answer.attendance,
-        meal: invite.reception && answer.attendance === "yes" ? answer.meal : "" as Meal,
-        dietary: answer.attendance === "yes" ? answer.dietary : "" };
+      let dietary = invite.reception && answer.attendance === "yes" ? answer.dietary.trim() : "";
+      // Preserve an alternative requested in an earlier demo when no dietary note was entered.
+      if (!dietary && invite.reception && answer.attendance === "yes") {
+        if (answer.meal === "vegetarian") dietary = "Vegetarian meal requested previously";
+        if (answer.meal === "salmon") dietary = "Fish meal requested previously";
+        if (answer.meal === "children") dietary = "Children’s meal requested previously";
+      }
+      return { guestId: guest.id, attendance: answer.attendance, dietary };
     });
     if (Object.keys(responseErrors(invite, guests)).length) return null;
     return { guests, note: data.note, savedAt: data.savedAt };

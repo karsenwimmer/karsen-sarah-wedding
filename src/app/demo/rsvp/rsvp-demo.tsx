@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
 import { Emblem } from "./emblem";
-import { demoInvitations, demoWedding as wedding, emptyResponses, findInvitation, meals,
+import { demoInvitations, demoWedding as wedding, emptyResponses, findInvitation,
   readResponse, responseErrors, storageKey, type DemoInvitation, type GuestResponse } from "./demo-data";
 import s from "./rsvp.module.css";
 
@@ -204,14 +204,12 @@ export function RsvpDemo() {
     if (Object.keys(nextErrors).length) {
       requestAnimationFrame(() => {
         const id = Object.keys(nextErrors)[0];
-        const answer = answers.find((item) => item.guestId === id);
-        form.current?.querySelector<HTMLElement>(answer?.attendance === "yes" ? `#meal-${id}` : `#attendance-${id}-yes`)?.focus();
+        form.current?.querySelector<HTMLElement>(`#attendance-${id}-yes`)?.focus();
       });
       return;
     }
-    const cleaned = answers.map((answer) => ({ ...answer,
-      meal: invite.reception && answer.attendance === "yes" ? answer.meal : "" as const,
-      dietary: answer.attendance === "yes" ? answer.dietary.trim() : "" }));
+    const cleaned = answers.map((answer) => ({ guestId: answer.guestId, attendance: answer.attendance,
+      dietary: invite.reception && answer.attendance === "yes" ? answer.dietary.trim() : "" }));
     let canPersist = true;
     try {
       window.localStorage.setItem(storageKey(invite), JSON.stringify({ guests: cleaned, note: note.trim(), savedAt: new Date().toISOString() }));
@@ -297,8 +295,8 @@ export function RsvpDemo() {
             <h2 id="reply-title" data-invite-reveal="heading">Will you be joining us?</h2>
             <ol className={s.replySteps} data-invite-reveal="copy">
               <li>Reply for each person named on your invitation.</li>
-              {invite.reception && <li>Choose a meal for each guest attending the reception.</li>}
-              <li>Share any dietary requirements, then save your response.</li>
+              {invite.reception && <li>Add any dietary requirements or allergies for each guest attending.</li>}
+              <li>Save your response.</li>
             </ol>
             <p className={s.instructionNote} data-invite-reveal="copy">You can return with your invitation code to make changes.</p>
           </div>
@@ -310,7 +308,7 @@ export function RsvpDemo() {
               <p className={s.muted}>{persistent ? "Your sample response is saved in this browser. Nothing has been sent to a couple." : "Your browser couldn’t save this response. It’s visible here until you leave the page; nothing has been sent."}</p>
               <div className={s.summary}>{invite.guests.map((guest) => {
                 const answer = answers.find((item) => item.guestId === guest.id)!;
-                return <div className={s.summaryGuest} key={guest.id}><strong>{guest.name}</strong><span>{answer.attendance === "yes" ? "Joyfully attending" : "Respectfully declining"}</span>{answer.attendance === "yes" && invite.reception && <small>{meals.find((meal) => meal.id === answer.meal)?.label}</small>}{answer.dietary && <small>Dietary requirements: {answer.dietary}</small>}</div>;
+                return <div className={s.summaryGuest} key={guest.id}><strong>{guest.name}</strong><span>{answer.attendance === "yes" ? "Joyfully attending" : "Respectfully declining"}</span>{answer.attendance === "yes" && invite.reception && <small>{answer.dietary ? `Dietary requirements: ${answer.dietary}` : "Standard menu · No dietary requirements provided"}</small>}</div>;
               })}</div>
               {note && <div className={s.noteSummary}><strong>Your note</strong><p>{note}</p></div>}
               <button type="button" className={s.primary} onClick={() => { setConfirmed(false); focusHeading(true); }}>Edit my response</button>
@@ -318,14 +316,14 @@ export function RsvpDemo() {
             </> : <>
               <h3 id="rsvp-title" ref={responseHeading} tabIndex={-1} data-invite-reveal="heading">Your response</h3>
               <form ref={form} onSubmit={submit} noValidate>
+                {invite.reception && <p className={s.menuNote}>The standard menu includes chicken and beef. Please let us know if you require an alternative.</p>}
                 {invite.guests.map((guest) => {
                   const answer = answers.find((item) => item.guestId === guest.id)!;
                   return <div key={guest.id} className={s.guestBlock}><fieldset className={s.guest} aria-describedby={errors[guest.id] ? `error-${guest.id}` : undefined}>
                     <legend>{guest.name}{guest.child && <small>CHILD</small>}</legend>
-                    <div className={`${s.attendance} ${errors[guest.id] && !answer.attendance ? s.attendanceError : ""}`}>{([{ value: "yes", label: "Joyfully attending" }, { value: "no", label: "Respectfully declining" }] as const).map((option) => <label key={option.value} className={answer.attendance === option.value ? s.chosen : ""}><input id={`attendance-${guest.id}-${option.value}`} type="radio" name={`attendance-${guest.id}`} value={option.value} checked={answer.attendance === option.value} onChange={() => updateGuest(guest.id, { attendance: option.value, ...(option.value === "no" ? { meal: "", dietary: "" } : {}) })} aria-describedby={errors[guest.id] ? `error-${guest.id}` : undefined} />{option.label}</label>)}</div>
-                    {answer.attendance === "yes" && <div className={s.guestFields}>
-                      {invite.reception && <label className={s.field} htmlFor={`meal-${guest.id}`}>Meal for {guest.name.split(" ")[0]}<select id={`meal-${guest.id}`} name={`meal-${guest.id}`} autoComplete="off" value={answer.meal} onChange={(event) => updateGuest(guest.id, { meal: event.target.value as GuestResponse["meal"] })} aria-invalid={Boolean(errors[guest.id])} aria-describedby={errors[guest.id] ? `error-${guest.id}` : undefined}><option value="">Select a meal</option>{meals.filter((meal) => guest.child || meal.id !== "children").map((meal) => <option value={meal.id} key={meal.id}>{meal.label}</option>)}</select></label>}
-                      <label className={s.field} htmlFor={`dietary-${guest.id}`}>Dietary requirements for {guest.name.split(" ")[0]} <span className={s.optional}>(optional)</span><input id={`dietary-${guest.id}`} name={`dietary-${guest.id}`} autoComplete="off" value={answer.dietary} onChange={(event) => updateGuest(guest.id, { dietary: event.target.value })} maxLength={300} placeholder="Allergies or anything we should know" /></label>
+                    <div className={`${s.attendance} ${errors[guest.id] && !answer.attendance ? s.attendanceError : ""}`}>{([{ value: "yes", label: "Joyfully attending" }, { value: "no", label: "Respectfully declining" }] as const).map((option) => <label key={option.value} className={answer.attendance === option.value ? s.chosen : ""}><input id={`attendance-${guest.id}-${option.value}`} type="radio" name={`attendance-${guest.id}`} value={option.value} checked={answer.attendance === option.value} onChange={() => updateGuest(guest.id, { attendance: option.value, ...(option.value === "no" ? { dietary: "" } : {}) })} aria-describedby={errors[guest.id] ? `error-${guest.id}` : undefined} />{option.label}</label>)}</div>
+                    {answer.attendance === "yes" && invite.reception && <div className={s.guestFields}>
+                      <label className={s.field} htmlFor={`dietary-${guest.id}`}>Dietary requirements or allergies for {guest.name.split(" ")[0]} <span className={s.optional}>(optional)</span><textarea id={`dietary-${guest.id}`} name={`dietary-${guest.id}`} autoComplete="off" rows={2} value={answer.dietary} onChange={(event) => updateGuest(guest.id, { dietary: event.target.value })} maxLength={300} placeholder="e.g. vegetarian, pescatarian, gluten-free, or food allergies" /></label>
                     </div>}
                     {errors[guest.id] && <p id={`error-${guest.id}`} className={s.error} role="alert">{errors[guest.id]}</p>}
                   </fieldset></div>;
@@ -342,14 +340,15 @@ export function RsvpDemo() {
             <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="locations-title">Locations</h2></div>
             <div className={s.locationsGrid}>
               <section className={s.location} data-invite-reveal="copy"><h3>{wedding.ceremony.name}</h3><p className={s.locationTime}>Ceremony at {wedding.ceremony.time}</p><p>{wedding.ceremony.address}</p></section>
-              {invite.reception && <section className={s.location} data-invite-reveal="copy"><h3>{wedding.reception.name}</h3><p>{wedding.reception.note}</p></section>}
+              {invite.reception && <section className={s.location} data-invite-reveal="copy"><h3>{wedding.reception.name}</h3><p className={s.locationTime}>Reception at {wedding.reception.time}</p><p>{wedding.reception.address}</p></section>}
             </div>
           </div>
         </section>
         <section id="itinerary" className={s.detailBand} aria-labelledby="itinerary-title">
           <div className={s.detailInner}>
             <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="itinerary-title">Itinerary</h2></div>
-            <ol className={s.timeline} data-invite-reveal="copy"><li><time>{wedding.ceremony.time}</time><span>Wedding ceremony</span></li>{invite.reception && <li><time>To follow</time><span>Reception · details to come</span></li>}</ol>
+            <ol className={s.timeline} data-invite-reveal="copy"><li><time>{wedding.ceremony.time}</time><span>Wedding ceremony</span></li>{invite.reception && <><li><time>{wedding.reception.time}</time><span>Reception &amp; antipasto bar</span></li><li><time>To follow</time><span>Dinner</span></li></>}</ol>
+            <p className={s.itineraryNote}>Further itinerary details to come.</p>
           </div>
         </section>
         <section id="dress-code" className={s.detailBand} aria-labelledby="dress-code-title">
@@ -364,7 +363,7 @@ export function RsvpDemo() {
             <div className={s.faq} data-invite-reveal="copy">
               <details><summary>Who is included on my invitation?</summary><p>Everyone listed in your RSVP form is invited. In a live invitation, plus-ones and children would be included here if invited.</p></details>
               <details><summary>Can I change my response?</summary><p>Yes. Return with the same code and choose “Edit my response”. This demo remembers replies in the same browser. A live site would remember them across devices.</p></details>
-              <details><summary>Which details are confirmed?</summary><p>The wedding date and ceremony details match the invitation. Reception details and dress code are still to come. The guest list and meal choices are examples for this demo.</p></details>
+              <details><summary>Which details are confirmed?</summary><p>The wedding date and ceremony details are confirmed.{invite.reception && " The reception begins at 5:30 PM at The Venetian Banquet Hall, with an antipasto bar and dinner to follow."} Further itinerary details and dress code are still to come. Guest names are examples for this demo.</p></details>
             </div>
           </div>
         </section>
