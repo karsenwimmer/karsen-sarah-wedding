@@ -70,14 +70,47 @@ describe("isolated wedding RSVP demo", () => {
     vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: true })));
     const view = render(<RsvpDemo />);
     open();
+    vi.spyOn(screen.getByRole("banner"), "getBoundingClientRect").mockReturnValue(new DOMRect(0, 0, 1440, 76));
     const region = screen.getByRole("region", { name: "Jordan & Taylor" });
     vi.spyOn(region, "getBoundingClientRect").mockReturnValue({ top: 900 } as DOMRect);
     frames.shift()!(0);
-    expect(window.scrollTo).toHaveBeenLastCalledWith({ top: 868, behavior: "instant" });
+    expect(window.scrollTo).toHaveBeenLastCalledWith({ top: 800, behavior: "instant" });
     expect(screen.getByRole("heading", { name: "Jordan & Taylor" })).toHaveFocus();
     expect(frames).toHaveLength(0);
     view.unmount();
     vi.unstubAllGlobals();
+  });
+
+  it("unlocks header navigation, closes the menu and respects reduced motion when jumping to sections", () => {
+    const frames: FrameRequestCallback[] = [];
+    let reduce = true;
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => { frames.push(callback); return frames.length; });
+    vi.stubGlobal("matchMedia", vi.fn(() => ({ get matches() { return reduce; } })));
+    render(<RsvpDemo />);
+    expect(screen.queryByRole("navigation", { name: "Wedding sections" })).not.toBeInTheDocument();
+    open(); frames.shift()!(0);
+    const nav = screen.getByRole("navigation", { name: "Wedding sections" });
+    expect(within(nav).getAllByRole("link")).toHaveLength(5);
+    const toggle = screen.getByRole("button", { name: "Wedding sections" });
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    const locations = screen.getByRole("heading", { name: "Locations" });
+    const scroll = vi.fn();
+    Object.defineProperty(locations, "scrollIntoView", { configurable: true, value: scroll });
+    reduce = false;
+    fireEvent.click(within(nav).getByRole("link", { name: "Locations" }));
+    frames.shift()!(0);
+    expect(scroll).toHaveBeenLastCalledWith({ block: "start", behavior: "smooth" });
+    expect(locations).toHaveFocus();
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    reduce = true;
+    fireEvent.click(within(nav).getByRole("link", { name: "Locations" }));
+    frames.shift()!(0);
+    expect(scroll).toHaveBeenLastCalledWith({ block: "start", behavior: "auto" });
+    fireEvent.click(toggle);
+    fireEvent.keyDown(toggle, { key: "Escape" });
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(toggle).toHaveFocus();
   });
 
   it("keeps details visible and cancels their reveals when reduced motion is enabled", () => {
@@ -105,10 +138,13 @@ describe("isolated wedding RSVP demo", () => {
       disconnect = disconnect;
     });
     vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+      if (this.id === "code-help") return new DOMRect(0, 700, 300, 21);
       return this.hasAttribute("data-detail-heading") ? new DOMRect(0, 2000, 500, 60) : new DOMRect();
     });
     try {
-      const view = render(<RsvpDemo />); open();
+      const view = render(<RsvpDemo />);
+      expect(screen.getByText("You’ll find the 4-digit code on your invitation.")).not.toHaveAttribute("data-reveal-pending");
+      open();
       expect(observe.mock.calls.filter(([element]) => element.hasAttribute("data-detail-heading"))).toHaveLength(4);
       const title = screen.getByRole("heading", { name: "Locations" });
       const rect = title.parentElement!.getBoundingClientRect();

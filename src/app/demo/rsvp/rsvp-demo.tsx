@@ -7,6 +7,12 @@ import { demoInvitations, demoWedding as wedding, emptyResponses, findInvitation
   readResponse, responseErrors, storageKey, type DemoInvitation, type GuestResponse } from "./demo-data";
 import s from "./rsvp.module.css";
 
+const sectionLinks = [
+  { id: "rsvp", label: "RSVP" }, { id: "details", label: "Locations" },
+  { id: "itinerary", label: "Itinerary" }, { id: "dress-code", label: "Dress code" },
+  { id: "faq", label: "FAQs" }
+];
+
 export function RsvpDemo() {
   const [code, setCode] = useState("");
   const [codePosition, setCodePosition] = useState(0);
@@ -19,6 +25,9 @@ export function RsvpDemo() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [resetting, setResetting] = useState(false);
   const [resetNotice, setResetNotice] = useState("");
+  const [sectionMenuOpen, setSectionMenuOpen] = useState(false);
+  const siteHeader = useRef<HTMLElement>(null);
+  const sectionToggle = useRef<HTMLButtonElement>(null);
   const welcome = useRef<HTMLElement>(null);
   const instructions = useRef<HTMLDivElement>(null);
   const revealRoot = useRef<HTMLDivElement>(null);
@@ -84,11 +93,12 @@ export function RsvpDemo() {
     const animations = new Set<Animation>();
     const pending = new Set<HTMLElement>();
     const inset = Math.min(180, Math.round(window.innerHeight * .18));
-    const observer = new IntersectionObserver((entries) => {
+    const reveal: IntersectionObserverCallback = (entries) => {
       for (const entry of entries) {
         if (preference?.matches) return;
         if (!entry.isIntersecting || entry.intersectionRatio < .55) continue;
         observer.unobserve(entry.target);
+        entranceObserver.unobserve(entry.target);
         if (revealed.current.has(entry.target)) continue;
         revealed.current.add(entry.target);
         if (typeof entry.target.animate !== "function") continue;
@@ -113,19 +123,23 @@ export function RsvpDemo() {
         animations.add(animation);
         animation.finished.then(() => animations.delete(animation), () => animations.delete(animation));
       }
-    }, { threshold: .55, rootMargin: `0px 0px -${inset}px 0px` });
+    };
+    const observer = new IntersectionObserver(reveal, { threshold: .55, rootMargin: `0px 0px -${inset}px 0px` });
+    const entranceObserver = new IntersectionObserver(reveal, { threshold: .55 });
     region.querySelectorAll<HTMLElement>("[data-invite-reveal]").forEach((element) => {
       if (revealed.current.has(element) || typeof element.animate !== "function") return;
       const rect = element.getBoundingClientRect();
-      if (rect.height > window.innerHeight - inset) return;
-      if (rect.top >= window.innerHeight - inset) {
+      const entrance = Boolean(element.closest("[data-invitation-hero]"));
+      if (!entrance && rect.height > window.innerHeight - inset) return;
+      if (!entrance && rect.top >= window.innerHeight - inset) {
         element.setAttribute("data-reveal-pending", "");
         pending.add(element);
       }
-      observer.observe(element);
+      (entrance ? entranceObserver : observer).observe(element);
     });
     const stop = () => {
       observer.disconnect();
+      entranceObserver.disconnect();
       animations.forEach((animation) => animation.cancel());
       animations.clear();
       pending.forEach((element) => element.removeAttribute("data-reveal-pending"));
@@ -138,6 +152,20 @@ export function RsvpDemo() {
       preference?.removeEventListener?.("change", updatePreference);
     };
   }, [invite]);
+
+  function scrollToSection(id: string) {
+    if (scrollFrame.current !== null) cancelAnimationFrame(scrollFrame.current);
+    scrollFrame.current = null;
+    setSectionMenuOpen(false);
+    requestAnimationFrame(() => {
+      const section = document.getElementById(id);
+      const target = section?.querySelector<HTMLElement>("h1, h2") ?? section;
+      target?.focus({ preventScroll: true });
+      const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      const destination = id === "demo-main" ? section : target;
+      destination?.scrollIntoView?.({ block: "start", behavior: reducedMotion ? "auto" : "smooth" });
+    });
+  }
 
   function focusHeading(response = false) {
     if (scrollFrame.current !== null) cancelAnimationFrame(scrollFrame.current);
@@ -152,7 +180,8 @@ export function RsvpDemo() {
       }
       if (!welcome.current) return;
       const start = window.scrollY;
-      const end = Math.max(0, welcome.current.getBoundingClientRect().top + start - 32);
+      const headerHeight = siteHeader.current?.getBoundingClientRect().height ?? 0;
+      const end = Math.max(0, welcome.current.getBoundingClientRect().top + start - headerHeight - 24);
       if (reducedMotion) {
         window.scrollTo({ top: end, behavior: "instant" });
         return;
@@ -232,6 +261,7 @@ export function RsvpDemo() {
     scrollFrame.current = null;
     setInvite(null); setCode(""); setCodePosition(0); setCodeError(""); setResetting(false); setResetNotice("");
     setAnswers([]); setNote(""); setConfirmed(false); setErrors({});
+    setSectionMenuOpen(false);
     requestAnimationFrame(() => codeInput.current?.focus());
     window.scrollTo({ top: 0, behavior: "instant" });
   }
@@ -251,18 +281,22 @@ export function RsvpDemo() {
 
   return <div ref={revealRoot} className={s.root}>
     <a className={s.skip} href="#demo-main">Skip to invitation</a>
-    <header className={s.header}>
-      <a href="/demo/rsvp" className={s.brand} aria-label="Luca and Victoria invitation demo"><Emblem className={s.brandMark} /><span><strong>VICTORIA & LUCA</strong></span></a>
+    <header ref={siteHeader} className={s.header} onKeyDown={(event) => { if (event.key === "Escape" && sectionMenuOpen) { setSectionMenuOpen(false); sectionToggle.current?.focus(); } }}>
+      <a href="#demo-main" className={s.brand} aria-label="Luca and Victoria invitation demo" onClick={(event) => { event.preventDefault(); scrollToSection("demo-main"); }}><Emblem className={s.brandMark} /><span><strong>VICTORIA & LUCA</strong></span></a>
+      {invite && <>
+        <nav id="wedding-sections" className={s.sectionNav} data-open={sectionMenuOpen} aria-label="Wedding sections">{sectionLinks.map((section) => <a key={section.id} href={`#${section.id}`} onClick={(event) => { event.preventDefault(); scrollToSection(section.id); }}>{section.label}</a>)}</nav>
+        <button ref={sectionToggle} type="button" className={s.sectionToggle} aria-label="Wedding sections" aria-controls="wedding-sections" aria-expanded={sectionMenuOpen} onClick={() => setSectionMenuOpen((open) => !open)}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d={sectionMenuOpen ? "M6 6l12 12M6 18 18 6" : "M4 6h16M4 12h16M4 18h16"} stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg></button>
+      </>}
       <span className={s.demoBadge} aria-label="Demonstration only. No real RSVPs are sent.">DEMO</span>
     </header>
 
-    <main id="demo-main" className={s.main}>
-      <div className={s.hero}>
+    <main id="demo-main" className={s.main} tabIndex={-1}>
+      <div className={s.hero} data-invitation-hero>
         <div className={s.entry}>
           <section className={s.invitationArt} aria-label="Sample wedding invitation">
             <div className={s.paperContent}>
               <Emblem className={s.heroEmblem} />
-              <h1 data-invite-reveal="hero"><span>Victoria Pacheco</span><i className={s.nameJoin}>&amp;</i><span>Luca Robert Cordiano</span></h1>
+              <h1 data-invite-reveal="hero" tabIndex={-1}><span>Victoria Pacheco</span><i className={s.nameJoin}>&amp;</i><span>Luca Robert Cordiano</span></h1>
               <p className={s.paperMessage} data-invite-reveal="copy"><span>with full hearts,</span>joyfully invite you to their wedding</p>
               <p className={s.paperDate} data-invite-reveal="copy">{wedding.date}</p>
             </div>
@@ -304,7 +338,7 @@ export function RsvpDemo() {
         </section>
         <section id="rsvp" className={s.inviteGrid} aria-labelledby="reply-title">
           <div ref={instructions} className={s.rsvpInstructions}>
-            <h2 id="reply-title" data-invite-reveal="heading">Will you be joining us?</h2>
+            <h2 id="reply-title" tabIndex={-1} data-invite-reveal="heading">Will you be joining us?</h2>
             <ol className={s.replySteps} data-invite-reveal="copy">
               <li>Reply for each person named on your invitation.</li>
               {invite.reception && <li>Add any dietary requirements or allergies for each guest attending.</li>}
@@ -349,7 +383,7 @@ export function RsvpDemo() {
         </section>
         <section id="details" className={s.detailBand} aria-labelledby="locations-title">
           <div className={s.detailInner}>
-            <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="locations-title">Locations</h2></div>
+            <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="locations-title" tabIndex={-1}>Locations</h2></div>
             <div className={s.locationsGrid}>
               <section className={s.location} data-invite-reveal="copy"><h3>{wedding.ceremony.name}</h3><p className={s.locationTime}>Ceremony at {wedding.ceremony.time}</p><p>{wedding.ceremony.address}</p></section>
               {invite.reception && <section className={s.location} data-invite-reveal="copy"><h3>{wedding.reception.name}</h3><p className={s.locationTime}>Reception at {wedding.reception.time}</p><p>{wedding.reception.address}</p></section>}
@@ -358,20 +392,20 @@ export function RsvpDemo() {
         </section>
         <section id="itinerary" className={s.detailBand} aria-labelledby="itinerary-title">
           <div className={s.detailInner}>
-            <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="itinerary-title">Itinerary</h2></div>
+            <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="itinerary-title" tabIndex={-1}>Itinerary</h2></div>
             <ol className={s.timeline} data-invite-reveal="copy"><li><time>{wedding.ceremony.time}</time><span>Wedding ceremony</span></li>{invite.reception && <><li><time>{wedding.reception.time}</time><span>Reception &amp; antipasto bar</span></li><li><time>To follow</time><span>Dinner</span></li></>}</ol>
             <p className={s.itineraryNote}>Further itinerary details to come.</p>
           </div>
         </section>
         <section id="dress-code" className={s.detailBand} aria-labelledby="dress-code-title">
           <div className={s.detailInner}>
-            <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="dress-code-title">Dress code</h2></div>
+            <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="dress-code-title" tabIndex={-1}>Dress code</h2></div>
             <div className={s.detailCopy} data-invite-reveal="copy"><h3>Details to come</h3><p>We’ll share the dress code here once it’s confirmed.</p></div>
           </div>
         </section>
         <section id="faq" className={s.detailBand} aria-labelledby="faq-title">
           <div className={s.detailInner}>
-            <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="faq-title">FAQs</h2></div>
+            <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="faq-title" tabIndex={-1}>FAQs</h2></div>
             <div className={s.faq} data-invite-reveal="copy">
               <details><summary>Who is included on my invitation?</summary><p>Everyone listed in your RSVP form is invited. In a live invitation, plus-ones and children would be included here if invited.</p></details>
               <details><summary>Can I change my response?</summary><p>Yes. Return with the same code and choose “Edit my response”. This demo remembers replies in the same browser. A live site would remember them across devices.</p></details>
