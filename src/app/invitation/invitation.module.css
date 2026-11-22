@@ -397,7 +397,7 @@
 /* An engraved keepsake opens, holds, then dissolves into the invitation. */
 .root { --ink: #20201e; font-size: 18px; }
 .root h1, .root h2, .root h3 { color: var(--ink); }
-.root #rsvp-heading:focus, .collapsedReply h3:focus { outline: none; }
+.root .rsvpIntro h2:focus, .collapsedReply h3:focus { outline: none; }
 .entranceOverlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: radial-gradient(ellipse at center, #fffaf2ed, #f3eee5e0 65%, #d9d6cecf); backdrop-filter: blur(6px); animation: veilArrives .65s ease both; }
 .ceremonialLock { width: clamp(200px, 22vw, 280px); max-height: 70svh; height: auto; overflow: visible; filter: drop-shadow(0 14px 18px #60472226) drop-shadow(0 2px 2px #6047221a); animation: lockArrives 3.4s cubic-bezier(.2,.65,.3,1) both; }
 .ornateShackle { transform-box: view-box; transform-origin: 166px 128px; animation: ceremonialUnlock 1.35s 1.1s cubic-bezier(.4,0,.2,1) both; }
