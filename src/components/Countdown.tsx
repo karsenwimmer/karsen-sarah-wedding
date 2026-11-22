@@ -13,19 +13,19 @@ const emptyCountdown: CountdownParts = {
   seconds: 0
 };
 
-export function Countdown() {
+export function Countdown({ target = weddingConfig.date.iso }: { target?: string } = {}) {
   const [parts, setParts] = useState<CountdownParts | null>(null);
 
   useEffect(() => {
     function updateCountdown() {
-      setParts(getCountdownParts(weddingConfig.date.iso));
+      setParts(getCountdownParts(target));
     }
 
     updateCountdown();
     const timer = window.setInterval(updateCountdown, 1000);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [target]);
 
   const displayParts = parts ?? emptyCountdown;
   const items = [

@@ -10,7 +10,7 @@ Use case: precise-object-edit. Asset type: watercolor background for Karsen and 
 
 The invitation palette uses a warm beige RSVP section, near-black headings matching the hero, muted blue buttons, antique gold details, and ivory paper. The centered household greeting sits above a form capped at 960px. Regular body text is 16–18px, field labels are 16px, and supporting text is generally 14px. Small decorative uppercase labels remain 12px. All styles remain scoped to the invitation route.
 
-Centered, full-width opening → personalized RSVP section or compact saved-reply strip → combined schedule and venues → Dress Code → Transportation → FAQs → photos and activity placeholders.
+Centered opening → personalized RSVP or saved reply → Itinerary → Locations → Dress Code → FAQ. Navigation uses the same order. The original #the-day anchor is retained for the itinerary. Transportation is covered by venue directions and the FAQ; future photo/activity features remain planned rather than displayed as placeholders.
 
 The centered RSVP introduction greets the household by name and explains that choices are made for each guest. The displayed change deadline is May 1, 2027. Successful saves collapse the form into a compact response card beneath the greeting; editing restores its answers. Canceling an edit restores the last saved response. Failed saves leave the form open and never claim success. Change invitation is available beneath the form and in the footer.
 
@@ -22,7 +22,7 @@ Real invitations use server actions and the existing Supabase database. Only ena
 
 Real response persistence is implemented and covered by service and UI tests. No real invitation code has been issued or used for a live submission in this task. Real menu selections remain closed until the menu is finalized; attendance and dietary information can be saved for an enabled invitation. Preview menus stay within public fixtures. Confirmation email and admin response reporting remain future work.
 
-Before sending formal invitations: finalize ceremony, addresses, schedule, dress code, transportation, RSVP deadline and meals; issue random individual household codes (8–32 uppercase letters/digits); enable appropriate households; add final deadline enforcement, confirmation emails and reporting. Keep the save-the-date homepage until the couple is ready to switch.
+Before sending formal invitations: confirm approved parking boundaries, event end times and transportation, RSVP deadline and meals; issue random individual household codes (8–32 uppercase letters/digits); enable appropriate households; add final deadline enforcement, confirmation emails and reporting. Keep the save-the-date homepage until the couple is ready to switch.
 
 ## Simple code entrance
 
@@ -32,3 +32,14 @@ Before entry, wheel, touch, keyboard and inner-scroll attempts add a temporary g
 
 
 The invitation uses black reading text, with the script date in antique gold. The code field has a gold border; Unlock and the hero reply link use gold outlines and gold text on ivory, with a pale warm hover tint. The small lock inherits the button's gold. Existing blue field selections and form submit buttons retain their contrast. The save-the-date homepage is unchanged. The RSVP reveal has three distinct beats. Household names fade in during the scroll and are fully visible at 1.8 seconds after the section mounts. They sit alone for 1.4 seconds, then the welcome line fades in over 1.2 seconds. At 4.8 seconds, the sprig, instructions, deadline, reply card, and supporting links all fade in together over 1.6 seconds. The reveal finishes 6.4 seconds after the section mounts, about 9.8 seconds after a valid code starts the lock animation. Persistent wrappers prevent the reply card from replaying its entrance when guests edit or save. Keyboard focus immediately reveals a fading card or link group; reduced-motion guests see all groups immediately.
+
+
+## Itinerary and locations
+
+The user supplied July 17, 2027 starts of 1:00 PM for the ceremony at St. Mary’s Parish, 2:30 PM for lunch in its parish hall, and 6:00 PM for dinner at The Boathouse. The design uses plain section titles, black text, gold hairlines and outline controls, with no extra eyebrows or decorative numbering. Dress Code reads “Elevated Cocktail Attire,” followed by the approved description of suits with a shirt and tie, or elegant cocktail, midi, or long dresses. Jumpsuits are not suggested.
+
+Venue data is isolated in celebration.ts. Current primary sources: https://stmaryshamilton.com/ lists 23 Sheaffe Street, Hamilton, ON L8R 2N7; https://bronteboathouse.ca/events/ and https://bronteboathouse.ca/restaurant/ list 2340 Ontario Street, Oakville, ON L6L 6P7. The couple confirmed the 23 Sheaffe Street address. An older parish bulletin lists 146 Park Street North, which is not used for guest directions. Maps embed the venue pin and include a full-address Google Maps link. The couple explicitly deferred parking outlines until later. Each location currently says parking information will follow; no unapproved parking polygon is drawn.
+
+Calendar menus offer Google, Outlook, and Apple/iCal per event. Timed events use explicit Toronto summer offsets, unique ICS UIDs, and UTC ICS timestamps; UTF-8 line folding preserves text. The couple confirmed that end times are not yet decided, so ICS entries omit DTEND, Outlook omits enddt, and Google uses a point-in-time entry. The existing save-the-date all-day defaults are unchanged. The invitation countdown now targets the confirmed 1:00 PM ceremony via an optional Countdown target; the homepage keeps its existing default target.
+
+The couple confirmed that all guests are invited to the ceremony and church lunch, while dinner remains invitation-specific. Church-only codes show those first two events and the church location; reception codes show all three events and both venues. Dinner meal choices remain available only for reception invitations. No real invitation codes or RSVP records were used or changed.

@@ -5,7 +5,8 @@ import Image from "next/image";
 import { Countdown } from "@/components/Countdown";
 import { SealMark } from "@/components/SealMark";
 import { weddingConfig as wedding } from "@/config/wedding";
-import { createGoogleCalendarUrl, createIcsCalendarFile, createOutlookCalendarUrl, type CalendarEvent } from "@/lib/calendar";
+import { WeddingDetails } from "./wedding-details";
+import { celebrationEvents } from "./celebration";
 import { blankAnswers, cleanAnswers, findInvite, invitations, mealOptions, readReply, replyKey, validateAnswers, type Answer, type Invite, type Reply } from "./preview-data";
 import { lookupInvitation, saveInvitationReply } from "./actions";
 import { OrnateLock } from "./ornate-lock";
@@ -20,9 +21,7 @@ function Lock() {
 function Sprig() {
   return <svg width="95" height="40" viewBox="0 0 95 40" fill="none" aria-hidden="true"><path d="M4 30Q48 37 91 7M27 31L21 15M46 27L43 9M62 21L65 5M75 15L86 18" stroke="currentColor" strokeWidth=".8"/><path d="M23 24C9 21 13 10 13 10C24 10 27 18 23 24ZM44 19C32 14 37 4 37 4C48 7 49 14 44 19ZM63 15C56 6 66 1 66 1C72 8 68 13 63 15ZM78 15C87 9 93 17 93 17C84 24 78 20 78 15ZM47 27C38 34 29 30 29 30C34 23 41 23 47 27ZM65 22C57 31 49 29 49 29C52 21 58 19 65 22Z" fill="currentColor" opacity=".5"/></svg>;
 }
-function SectionHeading({ label, title }: { label: string; title: string }) {
-  return <div className={s.sectionHeading}><p className={s.eyebrow}>{label}</p><h2>{title}</h2></div>;
-}
+
 
 export function Invitation() {
   const [code, setCode] = useState("");
@@ -195,15 +194,6 @@ export function Invitation() {
     setAnswers(reply.answers); setNote(reply.note); setSavedReply(reply); setConfirmed(true);
     window.requestAnimationFrame(() => responseHeading.current?.focus());
   }
-  const calendar: CalendarEvent = {
-    title: "Karsen & Sarah’s Wedding", startDate: "2027-07-17", endDate: "2027-07-18",
-    location: invite?.reception ? "Bronte Harbour, Oakville, Ontario" : "Oakville, Ontario",
-    description: "Celebrate with Karsen & Sarah. Please check your invitation for the final schedule.", url: "https://thewimmers.ca/invitation"
-  };
-  function downloadCalendar() {
-    const url = URL.createObjectURL(new Blob([createIcsCalendarFile(calendar)], { type: "text/calendar;charset=utf-8" }));
-    const link = document.createElement("a"); link.href = url; link.download = "karsen-and-sarah.ics"; link.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
   const attending = answers.filter(answer => answer.attending === "yes").length;
   return <div className={`${s.root} ${!invite ? s.lockedRoot : ""}`}>
     {entrancePhase !== "idle" && <div className={s.entranceOverlay} data-phase={entrancePhase} role="status" aria-label="Opening your invitation"><OrnateLock /><span className={s.entranceStatus}>Opening your invitation.</span></div>}
@@ -212,7 +202,7 @@ export function Invitation() {
     <header className={s.header} inert={entrancePhase === "unlocking"}>
       <a className={s.brand} href="#invitation-main" aria-label="Karsen and Sarah invitation"><Seal />{invite && <span>KARSEN <i>&</i> SARAH</span>}</a>
       {invite ? <><button className={s.menuToggle} type="button" aria-expanded={menuOpen} aria-controls="invitation-nav" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? "Close" : "Menu"}<span aria-hidden="true">{menuOpen ? "−" : "+"}</span></button>
-        <nav id="invitation-nav" className={`${s.nav} ${menuOpen ? s.navOpen : ""}`} aria-label="Wedding navigation" onClick={() => setMenuOpen(false)}><a className={s.navRsvp} href="#your-rsvp">Your RSVP <span aria-hidden="true">↗</span></a><a href="#the-day">The day</a><a href="#dress-code">Dress code</a><a href="#transportation">Transportation</a><a href="#questions">Questions</a></nav></> : <p className={s.headerDate}>JULY 17, 2027 <span>·</span> OAKVILLE</p>}
+        <nav id="invitation-nav" className={`${s.nav} ${menuOpen ? s.navOpen : ""}`} aria-label="Wedding navigation" onClick={() => setMenuOpen(false)}><a className={s.navRsvp} href="#your-rsvp">Your RSVP <span aria-hidden="true">↗</span></a><a href="#the-day">Itinerary</a><a href="#locations">Locations</a><a href="#dress-code">Dress code</a><a href="#questions">FAQ</a></nav></> : <p className={s.headerDate}>JULY 17, 2027 <span>·</span> HAMILTON &amp; OAKVILLE</p>}
     </header>
     <main id="invitation-main" inert={entrancePhase === "unlocking"}>
       <section ref={hero} className={s.hero} aria-labelledby="wedding-title">
@@ -226,7 +216,7 @@ export function Invitation() {
             <p className="save-date-mark__date">{wedding.date.shortLabel}</p>
           </div>
           <div className={s.readabilityCloud}>
-          <Countdown />
+          <Countdown target={celebrationEvents[0].start} />
           {!invite ? <div className={s.entryGate}>
             <form onSubmit={openInvitation} className={s.codeForm} aria-busy={gateBusy} data-highlighted={codeHighlighted || undefined}>
               <label htmlFor="invitation-code">Enter the Code</label>
@@ -235,7 +225,7 @@ export function Invitation() {
               {codeError && <p className={s.error} id="code-error" role="alert">{codeError}</p>}
             </form>
             <details className={s.previewCodes}><summary>Explore the preview</summary><p>Try a fictional invitation.</p><div>{invitations.map(sample => <button type="button" key={sample.code} onClick={() => { setCode(sample.code); setCodeError(""); setCodeHighlighted(false); codeInput.current?.focus(); }} disabled={gateBusy}><span>{sample.code}</span><small>{sample.code === "HARBOUR" ? "A couple" : sample.code === "FAMILY" ? "A family" : "Church celebration"}</small></button>)}</div></details>
-          </div> : <><p className={s.invitedEvents}>{invite.reception ? "Ceremony & reception · Bronte Harbour" : "Church celebration · Oakville"}</p><a className={s.primary} href={confirmed ? "#the-day" : "#your-rsvp"}>{confirmed ? "Explore the day" : "Kindly reply"}<span aria-hidden="true">↓</span></a></>}
+          </div> : <><p className={s.invitedEvents}>{invite.reception ? "Ceremony & receptions · Hamilton & Oakville" : "Ceremony & lunch · Hamilton"}</p><a className={s.primary} href={confirmed ? "#the-day" : "#your-rsvp"}>{confirmed ? "View itinerary" : "Kindly reply"}<span aria-hidden="true">↓</span></a></>}
           </div>
         </div>
       </section>
@@ -250,7 +240,7 @@ export function Invitation() {
           <div className={s.rsvpResponse}>{confirmed ? <div className={s.collapsedReply} role="region" aria-label="Saved RSVP"><span className={s.savedCheck} aria-hidden="true">✓</span><div><h3 ref={responseHeading} tabIndex={-1}>{preview ? "Your preview RSVP is saved." : "Your RSVP is saved."}</h3><p>{attending ? "We can’t wait to celebrate with you." : "Thank you for letting us know."} <span>{attending} attending · {answers.length - attending} declining</span></p><small>{preview ? "Saved in this browser · No real RSVP or email sent" : "Saved to your invitation · Available when you return with your code"}</small></div><div className={s.editPrompt}><p>Need to make a change? Feel free.</p><button type="button" className={s.textButton} onClick={editReply}>Edit your RSVP <span aria-hidden="true">↗</span></button></div></div> :
           <div className={s.responsePaper}><div className={s.paperTop}><span>K & S</span><span>17 JULY 2027</span></div>
 <form ref={form} onSubmit={submit} noValidate aria-busy={busy}><fieldset disabled={busy} className={s.formFields}>
-              <h3 ref={responseHeading} tabIndex={-1}>Will you be joining us?</h3><p className={s.formIntro}>{invite.reception ? "Your invitation includes our ceremony and reception." : "Your invitation includes our church celebration."}</p>
+              <h3 ref={responseHeading} tabIndex={-1}>Will you be joining us?</h3><p className={s.formIntro}>{invite.reception ? "Your invitation includes our ceremony, lunch and dinner receptions." : "Your invitation includes our ceremony and lunch reception."}</p>
               {invite.guests.map((guest, index) => { const answer = answers.find(item => item.id === guest.id)!; const error = errors[guest.id]; return <fieldset key={guest.id} className={s.guest} aria-describedby={error ? `error-${guest.id}` : undefined}><legend><span>0{index + 1}</span>{guest.name}{guest.child && <small>CHILD</small>}</legend><div className={s.attendance}>{[{ value: "yes", label: "Joyfully accepts" }, { value: "no", label: "Regretfully declines" }].map(option => <label key={option.value} className={answer.attending === option.value ? s.selected : ""}><input id={`attendance-${guest.id}-${option.value}`} type="radio" name={`attendance-${guest.id}`} value={option.value} checked={answer.attending === option.value} onChange={() => updateAnswer(guest.id, { attending: option.value as "yes" | "no" })} aria-invalid={Boolean(error)} /><span>{option.label}</span></label>)}</div>
                 {answer.attending === "yes" && <div className={s.guestDetails}>{invite.reception && invite.mealsOpen !== false && <div><label htmlFor={`meal-${guest.id}`}>Meal for {guest.name.split(" ")[0]} {preview && <small>SAMPLE MENU</small>}</label><select id={`meal-${guest.id}`} value={answer.meal} onChange={event => updateAnswer(guest.id, { meal: event.target.value })} aria-invalid={Boolean(error)} aria-describedby={error ? `error-${guest.id}` : undefined}><option value="">Choose a meal</option>{mealOptions.filter(meal => guest.child || meal.value !== "children").map(meal => <option key={meal.value} value={meal.value}>{meal.label}</option>)}</select></div>}<div><label htmlFor={`dietary-${guest.id}`}>Dietary requirements for {guest.name.split(" ")[0]} <small>OPTIONAL</small></label><input id={`dietary-${guest.id}`} value={answer.dietary} maxLength={300} onChange={event => updateAnswer(guest.id, { dietary: event.target.value })} placeholder="Allergies or anything we should know" /></div></div>}
                 {error && <p className={s.error} id={`error-${guest.id}`} role="alert">{error}</p>}
@@ -262,22 +252,9 @@ export function Invitation() {
           }</div>
           <div className={s.rsvpLinks}><a href={`mailto:${wedding.contact.email}`} className={s.textLink}>A question for us? <span aria-hidden="true">↗</span></a><button type="button" className={s.textButton} onClick={changeInvitation}>Change invitation <span aria-hidden="true">↗</span></button></div>
         </section>
-        <section className={s.daySection} id="the-day"><div className={s.sectionIntro}><SectionHeading label="THE DAY" title="Every moment, together." /><p>Saturday, July 17, 2027<br />The places to be, and the moments we’ll share.</p></div><ol className={s.eventList}>
-          <li><div className={s.eventTime}><span>I.</span><p>TIME TO FOLLOW</p></div><div className={s.eventCopy}><p className={s.eyebrow}>THE CEREMONY</p><h3>Our vows, witnessed by you.</h3><p>Join us as we exchange our vows. We’ll share the confirmed church, address, and arrival time here before invitations are sent.</p></div></li>
-          {invite.reception && <li><div className={s.eventTime}><span>II.</span><p>TIME TO FOLLOW</p></div><div className={s.eventCopy}><p className={s.eyebrow}>RECEPTION, DINNER & CELEBRATION</p><h3>The Boathouse</h3><p>Restaurant & Event Venue<br />Bronte Harbour · Oakville, Ontario</p><p>Dinner, toasts, and time with our favourite people. The exact address, directions, and evening itinerary will be added once confirmed.</p></div></li>}
-        </ol><div className={s.calendar}><span>KEEP THE DAY FOR US</span><div><a href={createGoogleCalendarUrl(calendar)} target="_blank" rel="noreferrer">Google <span aria-hidden="true">↗</span></a><a href={createOutlookCalendarUrl(calendar)} target="_blank" rel="noreferrer">Outlook <span aria-hidden="true">↗</span></a><button type="button" onClick={downloadCalendar}>Apple / iCal <span aria-hidden="true">↓</span></button></div></div></section>
-        <section className={s.dressSection} id="dress-code"><Sprig /><SectionHeading label="DRESS CODE" title="Dressed for the occasion." /><p>Dress code and any colour guidance will be shared here when finalized.</p><span className={s.detailNote}>A LITTLE MORE TO COME</span></section>
-        <section className={s.transportSection} id="transportation"><div><SectionHeading label="TRANSPORTATION" title="Your way to the celebration." /><p>We’ll help make the journey a little easier.</p></div><div className={s.transportRows}><article><h3>Getting here & parking</h3><p>Venue directions and parking information will be shared here once confirmed.</p></article>{invite.reception && <article><h3>Between the celebrations</h3><p>Any arrangements for travel between the ceremony and reception will be listed here.</p></article>}<article><h3>Staying nearby</h3><p>Nearby accommodation information will follow as plans are finalized.</p></article></div></section>
-        <section className={s.faqSection} id="questions"><div><SectionHeading label="A FEW ANSWERS" title="Wondering about something?" /><p>If you can’t find what you need, we’re only an email away.</p><a className={s.textLink} href={`mailto:${wedding.contact.email}`}>{wedding.contact.email} <span aria-hidden="true">↗</span></a></div><div className={s.faqList}>{[
-          ["Who is included on my invitation?", "The names shown in your RSVP are the people included on your invitation. Please contact us if anything looks incorrect."],
-          ["Can I change my response?", preview ? "Yes. Your saved preview reply stays collapsed when you return in this browser. Choose ‘Edit your RSVP’ to reopen it with your answers filled in. Preview codes do not synchronize between devices." : "Yes. Your choices can be changed up until May 1, 2027. Enter your invitation code on any device to reopen your saved response, then choose ‘Edit your RSVP’."],
-          ["When will the full schedule be available?", "We’re still confirming the details. Ceremony information, arrival times, and the final itinerary will be added before formal invitations are sent."],
-          ...(invite.reception ? [["What if I have an allergy or dietary requirement?", "Please use the dietary requirements field beside your name. The final menu will be added when it is confirmed."]] : []),
-          ...(preview ? [["Is this my official RSVP?", "Not yet. This is a preview using fictional households. No real RSVP is recorded and no confirmation email is sent."]] : [])
-        ].map(([question, answer]) => <details key={question}><summary>{question}<span aria-hidden="true">+</span></summary><p>{answer}</p></details>)}</div></section>
-        <section className={s.memories}><Sprig /><p className={s.eyebrow}>A LITTLE MORE TO COME</p><h2>The moments in between.</h2><p>{invite.reception ? "A place for your photos and a little wedding-day fun. We’ll share our guest photo album and activity links here when they’re ready." : "We’ll share a guest photo album here so we can remember the day through your eyes."}</p><div><span>GUEST PHOTO ALBUM · COMING SOON</span>{invite.reception && <span>WEDDING QUIZ · COMING SOON</span>}</div></section>
+        <WeddingDetails reception={invite.reception} preview={preview} />
       </div>}
     </main>
-    {invite && <footer className={s.footer}><div><span className={s.footerNames}>Karsen & Sarah</span><p>July 17, 2027 · Oakville, Ontario</p></div><span>WITH LOVE, ALWAYS.</span>{invite && <button className={s.textButton} type="button" onClick={changeInvitation}>Change invitation <span aria-hidden="true">↗</span></button>}</footer>}
+    {invite && <footer className={s.footer}><div><span className={s.footerNames}>Karsen & Sarah</span><p>July 17, 2027 · {invite.reception ? "Hamilton & Oakville" : "Hamilton"}, Ontario</p></div><span>WITH LOVE, ALWAYS.</span>{invite && <button className={s.textButton} type="button" onClick={changeInvitation}>Change invitation <span aria-hidden="true">↗</span></button>}</footer>}
   </div>;
 }
