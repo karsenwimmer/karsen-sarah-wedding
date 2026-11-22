@@ -20,7 +20,7 @@ Guest names and attendance controls use consistent grouping. Supporting text, pl
 
 Ceremony: August 28, 2027 at 12:00 PM, Saints Peter and Paul Parish, 4070 Central Parkway East, Mississauga, Ontario L4Z 1T6. Reception and antipasto bar begin at 5:30 PM at The Venetian Banquet Hall, 219 Romina Drive, Concord, Ontario L4K 4V3; dinner follows without an invented exact time. Further itinerary details, dress code and RSVP deadline are still to come.
 
-ROSE24 demonstrates a couple, OAK123 a family with children, and FERN26 a ceremony-only invitation. Guest names are fictional fixtures. The standard menu includes chicken and beef. Attending reception guests can provide optional dietary requirements or allergies in a personal write-in field; no meal dropdown or unconfirmed children’s menu is offered. A blank field records the standard menu with no dietary requirements provided. Earlier saved alternative choices are preserved as dietary notes when no explicit note existed. Responses are saved only in the current browser; no real RSVP records or emails are created. Attendance validation, saved-response editing, invite-specific reception visibility and demo-only storage reset are preserved. This remains a demonstration rather than a real RSVP backend.
+1234 demonstrates a couple, 5678 a family with children, and 9012 a ceremony-only invitation. The hero uses four outlined digit boxes backed by one accessible numeric text field, with phone keypad, paste and keyboard editing support. Original storage identifiers are retained so saved demo replies survive the code-format change. Guest names are fictional fixtures. The standard menu includes chicken and beef. Attending reception guests can provide optional dietary requirements or allergies in a personal write-in field; no meal dropdown or unconfirmed children’s menu is offered. A blank field records the standard menu with no dietary requirements provided. Earlier saved alternative choices are preserved as dietary notes when no explicit note existed. Responses are saved only in the current browser; no real RSVP records or emails are created. Attendance validation, saved-response editing, invite-specific reception visibility and demo-only storage reset are preserved. This remains a demonstration rather than a real RSVP backend.
 
 ## Active assets
 
@@ -29,7 +29,7 @@ ROSE24 demonstrates a couple, OAK123 a family with children, and FERN26 a ceremo
 
 ## Validation
 
-All 67 tests and the production build pass. Browser checks covered 320 × 568, 390 × 700, 1000 × 800 and 1440 × 900, invalid-code recovery, keyboard radio selection, dietary-note persistence and attendance focus recovery, saved-response editing, keyboard FAQ disclosure and console errors. Measured name-to-control gaps are consistently 16px. Calculated contrast is 4.88:1 for supporting text on sage, 5.65:1 for input placeholders and 3.03:1 for field boundaries against sage.
+All 68 tests and the production build pass. Browser checks covered 320 × 568, 390 × 700, 1000 × 800 and 1440 × 900, invalid-code recovery, keyboard radio selection, dietary-note persistence and attendance focus recovery, saved-response editing, keyboard FAQ disclosure and console errors. Measured name-to-control gaps are consistently 16px. Calculated contrast is 4.88:1 for supporting text on sage, 5.65:1 for input placeholders and 3.03:1 for field boundaries against sage.
 
 ## Motion refinement
 

@@ -3,7 +3,7 @@ import { act, cleanup, fireEvent, render, screen, within } from "@testing-librar
 import { RsvpDemo } from "./rsvp-demo";
 import { demoInvitations, readResponse, storageKey } from "./demo-data";
 
-function open(code = "ROSE24") {
+function open(code = "1234") {
   fireEvent.change(screen.getByRole("textbox", { name: "Enter your code" }), { target: { value: code } });
   fireEvent.click(screen.getByRole("button", { name: /Open my invitation/ }));
 }
@@ -12,6 +12,22 @@ beforeEach(() => { window.localStorage.clear(); vi.spyOn(window, "scrollTo").moc
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe("isolated wedding RSVP demo", () => {
+  it("requires four digits and accepts a pasted code with spaces", () => {
+    render(<RsvpDemo />);
+    const input = screen.getByRole("textbox", { name: "Enter your code" });
+    expect(input).toHaveAttribute("inputmode", "numeric");
+    expect(input).toHaveAttribute("maxlength", "4");
+    expect(input).not.toHaveAttribute("placeholder");
+    fireEvent.change(input, { target: { value: "12" } });
+    fireEvent.click(screen.getByRole("button", { name: "Open my invitation" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("4-digit code");
+    expect(input).toHaveFocus();
+    fireEvent.paste(input, { clipboardData: { getData: () => "12 34" } });
+    expect(input).toHaveValue("1234");
+    fireEvent.click(screen.getByRole("button", { name: "Open my invitation" }));
+    expect(screen.getByRole("heading", { name: "Jordan & Taylor" })).toBeVisible();
+  });
+
   it("shows the confirmed date without locations on entry and reveals the ceremony only after opening", () => {
     render(<RsvpDemo />);
     const hero = screen.getByRole("heading", { level: 1 });
@@ -131,9 +147,9 @@ describe("isolated wedding RSVP demo", () => {
 
   it("rejects unknown codes and opens only the selected household with a normalized code", () => {
     render(<RsvpDemo />);
-    open("INVALID");
+    open("9999");
     expect(screen.getByRole("alert")).toHaveTextContent("couldn’t find");
-    open(" rose-24 ");
+    open(" 12-34 ");
     expect(screen.getByText("Jordan Morgan")).toBeVisible();
     expect(screen.queryByText("Sam Bennett")).not.toBeInTheDocument();
   });
@@ -167,14 +183,14 @@ describe("isolated wedding RSVP demo", () => {
   });
 
   it("assumes the standard menu for blank dietary fields and keeps ceremony-only invitations free of reception details", () => {
-    render(<RsvpDemo />); open("OAK123");
+    render(<RsvpDemo />); open("5678");
     for (const radio of screen.getAllByRole("radio", { name: "Joyfully attending" })) fireEvent.click(radio);
     expect(screen.getByLabelText(/Dietary requirements or allergies for Avery/)).toHaveValue("");
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Save demo RSVP/ }));
     expect(screen.getAllByText("Standard menu · No dietary requirements provided")).toHaveLength(4);
     fireEvent.click(screen.getByRole("button", { name: /Try another code/ }));
-    open("FERN26");
+    open("9012");
     expect(screen.queryByRole("heading", { name: "The Venetian Banquet Hall" })).not.toBeInTheDocument();
     expect(screen.queryByText(/antipasto|Romina|5:30|chicken and beef/)).not.toBeInTheDocument();
     for (const radio of screen.getAllByRole("radio", { name: "Joyfully attending" })) fireEvent.click(radio);
@@ -185,6 +201,7 @@ describe("isolated wedding RSVP demo", () => {
   });
 
   it("keeps alternative requests from earlier saved demo responses", () => {
+    expect(storageKey(demoInvitations[0])).toBe("wedding-rsvp-demo:v1:ROSE24");
     const raw = JSON.stringify({ guests: [
       { guestId: "jordan", attendance: "yes", meal: "vegetarian", dietary: "" },
       { guestId: "taylor", attendance: "yes", meal: "salmon", dietary: "" }

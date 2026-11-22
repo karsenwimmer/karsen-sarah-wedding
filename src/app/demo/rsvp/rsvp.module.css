@@ -64,10 +64,14 @@
 .codeBar::before { content: ""; grid-column: 1; grid-row: 1; }
 .codeBar:focus-within { border-bottom-color: var(--ink); box-shadow: 0 1px 0 var(--ink); }
 .root .codeBarError { border-bottom-color: var(--error); box-shadow: 0 1px 0 var(--error); }
-.root .codeBar input { grid-column: 2; grid-row: 1; text-align: center; width: 100%; min-width: 0; min-height: 44px; margin: 0; padding: 8px 12px; border: 0; background: transparent; border-radius: 0; box-shadow: none; color: var(--ink); font-size: 1rem; text-transform: uppercase; letter-spacing: .13em; }
+.root .codeBar .codeInput { grid-column: 2; grid-row: 1; z-index: 1; text-align: center; width: 100%; min-width: 0; height: 44px; min-height: 44px; margin: 0; padding: 0; border: 0; background: transparent; border-radius: 0; box-shadow: none; color: transparent; -webkit-text-fill-color: transparent; caret-color: transparent; font-size: 1.25rem; }
 .root .codeBar input:focus { outline: none; box-shadow: none; }
-.root .codeBar input::placeholder { font-family: var(--font-display), Georgia, serif; font-size: 1.25rem; font-style: italic; letter-spacing: .02em; text-transform: none; color: var(--muted); opacity: 1; }
-.codeInput { caret-color: var(--ink); }
+.codeDigits { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; pointer-events: none; }
+.root .codeInput::selection { background: transparent; color: transparent; }
+.codeDigits > span { display: grid; place-items: center; height: 44px; border: 1px solid var(--control-line); border-radius: 2px; color: var(--ink); background: #fdfcf7; font-family: var(--font-display), Georgia, serif; font-size: 1.5rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.codeBar:focus-within .codeDigits > span[data-active="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); background: var(--sage-pale); }
+.codeBarError .codeDigits > span { border-color: var(--error); }
+.codeBarError:focus-within .codeDigits > span[data-active="true"] { box-shadow: 0 0 0 1px var(--error); }
 .codeSubmit { grid-column: 3; grid-row: 1; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #85956f; border-radius: 50%; background: transparent; color: var(--ink); transition: background 160ms ease, border-color 160ms ease, transform 160ms var(--ease-out); }
 .codeSubmit:focus-visible { border-color: var(--ink); background: #e4ead8; }
 .arrow { width: 24px; height: 18px; }

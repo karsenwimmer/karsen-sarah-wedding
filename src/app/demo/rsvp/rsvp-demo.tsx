@@ -9,6 +9,7 @@ import s from "./rsvp.module.css";
 
 export function RsvpDemo() {
   const [code, setCode] = useState("");
+  const [codePosition, setCodePosition] = useState(0);
   const [invite, setInvite] = useState<DemoInvitation | null>(null);
   const [answers, setAnswers] = useState<GuestResponse[]>([]);
   const [note, setNote] = useState("");
@@ -170,6 +171,11 @@ export function RsvpDemo() {
 
   function openInvitation(event: FormEvent) {
     event.preventDefault();
+    if (!/^\d{4}$/.test(code)) {
+      setCodeError("Please enter the 4-digit code from your invitation.");
+      codeInput.current?.focus();
+      return;
+    }
     const found = findInvitation(code);
     if (!found) {
       setCodeError("We couldn’t find that invitation. Please check the code on your invite and try again.");
@@ -224,7 +230,7 @@ export function RsvpDemo() {
   function switchInvitation() {
     if (scrollFrame.current !== null) cancelAnimationFrame(scrollFrame.current);
     scrollFrame.current = null;
-    setInvite(null); setCode(""); setCodeError(""); setResetting(false); setResetNotice("");
+    setInvite(null); setCode(""); setCodePosition(0); setCodeError(""); setResetting(false); setResetNotice("");
     setAnswers([]); setNote(""); setConfirmed(false); setErrors({});
     requestAnimationFrame(() => codeInput.current?.focus());
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -271,10 +277,16 @@ export function RsvpDemo() {
               <button type="button" onClick={switchInvitation}>Change invitation</button>
             </div> : <>
             <h2 id="entry-title" data-invite-reveal="heading"><label htmlFor="invitation-code">Enter your code</label></h2>
-            <p id="code-help" className={s.codeExplanation} data-invite-reveal="copy">You’ll find it on your invitation.</p>
-            <form onSubmit={openInvitation}>
+            <p id="code-help" className={s.codeExplanation} data-invite-reveal="copy">You’ll find the 4-digit code on your invitation.</p>
+            <form onSubmit={openInvitation} noValidate>
               <div className={`${s.codeBar} ${codeError ? s.codeBarError : ""}`}>
-                <input ref={codeInput} id="invitation-code" name="invitation-code" className={s.codeInput} value={code} onChange={(event) => { setCode(event.target.value); setCodeError(""); }} autoCapitalize="characters" autoCorrect="off" autoComplete="off" spellCheck={false} maxLength={24} placeholder="Enter code" aria-invalid={Boolean(codeError)} aria-describedby={codeError ? "code-help code-error" : "code-help"} required />
+                <span className={s.codeDigits} aria-hidden="true">{Array.from({ length: 4 }, (_, index) => <span key={index} data-active={index === codePosition}>{code[index] ?? ""}</span>)}</span>
+                <input ref={codeInput} id="invitation-code" name="invitation-code" className={s.codeInput} value={code}
+                  onChange={(event) => { const next = event.currentTarget.value.replace(/\D/g, "").slice(0, 4); setCode(next); setCodePosition(Math.min(event.currentTarget.selectionStart ?? next.length, 3)); setCodeError(""); }}
+                  onSelect={(event) => setCodePosition(Math.min(event.currentTarget.selectionStart ?? code.length, 3))}
+                  onClick={(event) => { const input = event.currentTarget; const rect = input.getBoundingClientRect(); const index = Math.min(Math.max(Math.floor((event.clientX - rect.left) / rect.width * 4), 0), code.length, 3); input.setSelectionRange(index, Math.min(index + 1, code.length)); setCodePosition(index); }}
+                  onPaste={(event) => { event.preventDefault(); const next = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 4); setCode(next); setCodeError(""); setCodePosition(Math.min(next.length, 3)); requestAnimationFrame(() => codeInput.current?.setSelectionRange(next.length, next.length)); }}
+                  inputMode="numeric" pattern="[0-9]{4}" autoCorrect="off" autoComplete="off" spellCheck={false} maxLength={4} aria-invalid={Boolean(codeError)} aria-describedby={codeError ? "code-help code-error" : "code-help"} required />
                 <button className={s.codeSubmit} type="submit" aria-label="Open my invitation"><Arrow /></button>
               </div>
               {codeError && <p id="code-error" className={s.error} role="alert">{codeError}</p>}

@@ -11,6 +11,7 @@ export const demoWedding = {
 export type DemoGuest = { id: string; name: string; child?: boolean };
 export type DemoInvitation = {
   code: string;
+  storageId: string;
   label: string;
   household: string;
   reception: boolean;
@@ -18,12 +19,12 @@ export type DemoInvitation = {
 };
 
 export const demoInvitations: DemoInvitation[] = [
-  { code: "ROSE24", label: "A couple", household: "Jordan & Taylor", reception: true,
+  { code: "1234", storageId: "ROSE24", label: "A couple", household: "Jordan & Taylor", reception: true,
     guests: [{ id: "jordan", name: "Jordan Morgan" }, { id: "taylor", name: "Taylor Morgan" }] },
-  { code: "OAK123", label: "A family", household: "The Bennett Family", reception: true,
+  { code: "5678", storageId: "OAK123", label: "A family", household: "The Bennett Family", reception: true,
     guests: [{ id: "sam", name: "Sam Bennett" }, { id: "riley", name: "Riley Bennett" },
       { id: "avery", name: "Avery Bennett", child: true }, { id: "charlie", name: "Charlie Bennett", child: true }] },
-  { code: "FERN26", label: "Ceremony only", household: "Casey & Drew", reception: false,
+  { code: "9012", storageId: "FERN26", label: "Ceremony only", household: "Casey & Drew", reception: false,
     guests: [{ id: "casey", name: "Casey Ellis" }, { id: "drew", name: "Drew Ellis" }] }
 ];
 
@@ -36,7 +37,7 @@ export function findInvitation(code: string) {
 }
 
 export function storageKey(invite: DemoInvitation) {
-  return `wedding-rsvp-demo:v1:${invite.code}`;
+  return `wedding-rsvp-demo:v1:${invite.storageId}`;
 }
 
 export function emptyResponses(invite: DemoInvitation): GuestResponse[] {
