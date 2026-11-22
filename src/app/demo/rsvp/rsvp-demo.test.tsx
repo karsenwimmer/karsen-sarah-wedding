@@ -81,13 +81,14 @@ describe("isolated wedding RSVP demo", () => {
     vi.unstubAllGlobals();
   });
 
-  it("unlocks header navigation, closes the menu and respects reduced motion when jumping to sections", () => {
+  it("shows header navigation, closes the menu and respects reduced motion when jumping to sections", () => {
     const frames: FrameRequestCallback[] = [];
     let reduce = true;
     vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => { frames.push(callback); return frames.length; });
     vi.stubGlobal("matchMedia", vi.fn(() => ({ get matches() { return reduce; } })));
     render(<RsvpDemo />);
-    expect(screen.queryByRole("navigation", { name: "Wedding sections" })).not.toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "Wedding sections" })).toBeInTheDocument();
+    expect(screen.queryByText("DEMO", { exact: true })).not.toBeInTheDocument();
     open(); frames.shift()!(0);
     const nav = screen.getByRole("navigation", { name: "Wedding sections" });
     expect(within(nav).getAllByRole("link")).toHaveLength(5);
@@ -107,10 +108,37 @@ describe("isolated wedding RSVP demo", () => {
     fireEvent.click(within(nav).getByRole("link", { name: "Locations" }));
     frames.shift()!(0);
     expect(scroll).toHaveBeenLastCalledWith({ block: "start", behavior: "auto" });
+    const rsvp = screen.getByRole("region", { name: "Will you be joining us?" });
+    const scrollForm = vi.fn();
+    Object.defineProperty(rsvp, "scrollIntoView", { configurable: true, value: scrollForm });
+    fireEvent.click(within(nav).getByRole("link", { name: "RSVP" }));
+    frames.shift()!(0);
+    expect(scrollForm).toHaveBeenCalledWith({ block: "start", behavior: "auto" });
     fireEvent.click(toggle);
     fireEvent.keyDown(toggle, { key: "Escape" });
     expect(toggle).toHaveAttribute("aria-expanded", "false");
     expect(toggle).toHaveFocus();
+  });
+
+  it("offers the menu before code entry and opens the selected section only after a valid code", () => {
+    const frames: FrameRequestCallback[] = [];
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => { frames.push(callback); return frames.length; });
+    render(<RsvpDemo />);
+    fireEvent.click(screen.getByRole("button", { name: "Wedding sections" }));
+    fireEvent.click(screen.getByRole("link", { name: "Locations" }));
+    frames.shift()!(0);
+    expect(screen.getByRole("textbox", { name: "Enter your code" })).toHaveFocus();
+    expect(screen.getByText("Enter your code to view Locations.")).toBeVisible();
+    expect(screen.queryByRole("heading", { name: "Locations" })).not.toBeInTheDocument();
+    expect(screen.queryByText(/Romina|Central Parkway/)).not.toBeInTheDocument();
+    open();
+    const title = screen.getByRole("heading", { name: "Locations" });
+    const scroll = vi.fn();
+    Object.defineProperty(title, "scrollIntoView", { configurable: true, value: scroll });
+    frames.shift()!(0);
+    expect(title).toHaveFocus();
+    expect(scroll).toHaveBeenCalledWith({ block: "start", behavior: "smooth" });
+    expect(screen.getByRole("button", { name: "Wedding sections" })).toHaveAttribute("aria-expanded", "false");
   });
 
   it("keeps details visible and cancels their reveals when reduced motion is enabled", () => {

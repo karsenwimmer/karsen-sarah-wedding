@@ -26,6 +26,7 @@ export function RsvpDemo() {
   const [resetting, setResetting] = useState(false);
   const [resetNotice, setResetNotice] = useState("");
   const [sectionMenuOpen, setSectionMenuOpen] = useState(false);
+  const [pendingSection, setPendingSection] = useState<string | null>(null);
   const siteHeader = useRef<HTMLElement>(null);
   const sectionToggle = useRef<HTMLButtonElement>(null);
   const welcome = useRef<HTMLElement>(null);
@@ -153,16 +154,26 @@ export function RsvpDemo() {
     };
   }, [invite]);
 
-  function scrollToSection(id: string) {
+  function scrollToSection(id: string, unlocked = Boolean(invite)) {
     if (scrollFrame.current !== null) cancelAnimationFrame(scrollFrame.current);
     scrollFrame.current = null;
     setSectionMenuOpen(false);
+    if (!unlocked && id !== "demo-main") {
+      setPendingSection(id);
+      setCodeError("");
+      requestAnimationFrame(() => {
+        codeInput.current?.focus({ preventScroll: true });
+        const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+        codeInput.current?.scrollIntoView?.({ block: "center", behavior: reducedMotion ? "auto" : "smooth" });
+      });
+      return;
+    }
     requestAnimationFrame(() => {
       const section = document.getElementById(id);
       const target = section?.querySelector<HTMLElement>("h1, h2") ?? section;
       target?.focus({ preventScroll: true });
       const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-      const destination = id === "demo-main" ? section : target;
+      const destination = id === "demo-main" || id === "rsvp" ? section : target;
       destination?.scrollIntoView?.({ block: "start", behavior: reducedMotion ? "auto" : "smooth" });
     });
   }
@@ -223,7 +234,9 @@ export function RsvpDemo() {
     setCodeError("");
     setErrors({});
     setResetNotice("");
-    focusHeading();
+    if (pendingSection) scrollToSection(pendingSection, true);
+    else focusHeading();
+    setPendingSection(null);
   }
 
   function updateGuest(id: string, patch: Partial<GuestResponse>) {
@@ -262,6 +275,7 @@ export function RsvpDemo() {
     setInvite(null); setCode(""); setCodePosition(0); setCodeError(""); setResetting(false); setResetNotice("");
     setAnswers([]); setNote(""); setConfirmed(false); setErrors({});
     setSectionMenuOpen(false);
+    setPendingSection(null);
     requestAnimationFrame(() => codeInput.current?.focus());
     window.scrollTo({ top: 0, behavior: "instant" });
   }
@@ -283,11 +297,10 @@ export function RsvpDemo() {
     <a className={s.skip} href="#demo-main">Skip to invitation</a>
     <header ref={siteHeader} className={s.header} onKeyDown={(event) => { if (event.key === "Escape" && sectionMenuOpen) { setSectionMenuOpen(false); sectionToggle.current?.focus(); } }}>
       <a href="#demo-main" className={s.brand} aria-label="Luca and Victoria invitation demo" onClick={(event) => { event.preventDefault(); scrollToSection("demo-main"); }}><Emblem className={s.brandMark} /><span><strong>VICTORIA & LUCA</strong></span></a>
-      {invite && <>
+      <>
         <nav id="wedding-sections" className={s.sectionNav} data-open={sectionMenuOpen} aria-label="Wedding sections">{sectionLinks.map((section) => <a key={section.id} href={`#${section.id}`} onClick={(event) => { event.preventDefault(); scrollToSection(section.id); }}>{section.label}</a>)}</nav>
         <button ref={sectionToggle} type="button" className={s.sectionToggle} aria-label="Wedding sections" aria-controls="wedding-sections" aria-expanded={sectionMenuOpen} onClick={() => setSectionMenuOpen((open) => !open)}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d={sectionMenuOpen ? "M6 6l12 12M6 18 18 6" : "M4 6h16M4 12h16M4 18h16"} stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg></button>
-      </>}
-      <span className={s.demoBadge} aria-label="Demonstration only. No real RSVPs are sent.">DEMO</span>
+      </>
     </header>
 
     <main id="demo-main" className={s.main} tabIndex={-1}>
@@ -311,7 +324,7 @@ export function RsvpDemo() {
               <button type="button" onClick={switchInvitation}>Change invitation</button>
             </div> : <>
             <h2 id="entry-title" data-invite-reveal="heading"><label htmlFor="invitation-code">Enter your code</label></h2>
-            <p id="code-help" className={s.codeExplanation} data-invite-reveal="copy">You’ll find the 4-digit code on your invitation.</p>
+            <p id="code-help" className={s.codeExplanation} data-invite-reveal="copy">{pendingSection ? `Enter your code to view ${sectionLinks.find((section) => section.id === pendingSection)?.label}.` : "You’ll find the 4-digit code on your invitation."}</p>
             <form onSubmit={openInvitation} noValidate>
               <div className={`${s.codeBar} ${codeError ? s.codeBarError : ""}`}>
                 <span className={s.codeDigits} aria-hidden="true">{Array.from({ length: 4 }, (_, index) => <span key={index} data-active={index === codePosition}>{code[index] ?? ""}</span>)}</span>

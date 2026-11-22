@@ -46,7 +46,6 @@
 .brandMark { width: 44px; height: 44px; flex-shrink: 0; }
 .brand > span { display: grid; gap: 2px; }
 .brand strong { font-size: .875rem; font-weight: 400; letter-spacing: .13em; }
-.demoBadge { font-size: .75rem; letter-spacing: .13em; color: var(--muted); }
 .main { width: 100%; }
 .hero { min-height: calc(100svh - var(--header-height)); display: flex; align-items: center; justify-content: center; }
 .entry { display: grid; grid-template-columns: minmax(0, .96fr) minmax(0, 1.06fr); grid-template-rows: auto auto; align-content: center; gap: 36px 28px; width: min(1240px, calc(100% - 88px)); min-height: min(680px, calc(100svh - 144px)); margin: 32px auto; padding: 32px 38px; border: 1px solid var(--gold-line); background-color: var(--paper); background-image: var(--paper-grain); box-shadow: 0 18px 50px -30px #4a593f45; animation: paper-arrive 720ms var(--ease-out) both; }
@@ -70,8 +69,8 @@
 .root .codeBar input:focus { outline: none; box-shadow: none; }
 .codeDigits { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; pointer-events: none; }
 .root .codeInput::selection { background: transparent; color: transparent; }
-.codeDigits > span { position: relative; display: grid; place-items: center; height: 44px; border: 1px solid var(--control-line); border-radius: 2px; color: var(--ink); background: #fdfcf7; font-family: var(--font-display), Georgia, serif; font-size: 1.5rem; line-height: 1; font-variant-numeric: tabular-nums; }
-.codeBar:focus-within .codeDigits > span[data-active="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); background: var(--sage-pale); }
+.codeDigits > span { position: relative; display: grid; place-items: center; height: 44px; border: 1px solid var(--gold); border-radius: 2px; color: var(--ink); background: #fdfcf7; font-family: var(--font-display), Georgia, serif; font-size: 1.5rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.codeBar:focus-within .codeDigits > span[data-active="true"] { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); background: var(--sage-pale); }
 .codeBarError .codeDigits > span { border-color: var(--error); }
 .codeBarError:focus-within .codeDigits > span[data-active="true"] { box-shadow: 0 0 0 1px var(--error); }
 .codeSubmit { grid-column: 3; grid-row: 1; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #85956f; border-radius: 50%; background: transparent; color: var(--ink); transition: background 160ms ease, border-color 160ms ease, transform 160ms var(--ease-out); }
@@ -274,22 +273,15 @@
 @media (forced-colors: active) { .attendance input { appearance: auto; } }
 @media (prefers-reduced-motion: reduce) { .root :is(.primary, .codeSubmit):active { transform: none; } .root .codeSubmit { transition: none; } }
 
-/* A quiet gold light moves across the four borders and returns. */
-.codePrompt .codeDigits > span::after { content: ""; position: absolute; inset: -1px; border: 1px solid var(--gold); border-radius: inherit; box-shadow: 0 0 7px rgb(199 180 134 / .6); opacity: 0; pointer-events: none; animation-duration: 6400ms; animation-timing-function: ease-in-out; animation-iteration-count: infinite; animation-play-state: var(--code-light-play, paused); }
-.codeDigits > span:nth-child(1)::after { animation-name: code-light-first; }
-.codeDigits > span:nth-child(2)::after { animation-name: code-light-second; }
-.codeDigits > span:nth-child(3)::after { animation-name: code-light-third; }
-.codeDigits > span:nth-child(4)::after { animation-name: code-light-fourth; }
+/* All four gold borders breathe together, with no travelling highlight. */
+.codePrompt .codeDigits > span::after { content: ""; position: absolute; inset: -1px; border: 1px solid var(--gold); border-radius: inherit; box-shadow: 0 0 7px rgb(199 180 134 / .6); opacity: 0; pointer-events: none; animation: code-border-pulse 3600ms ease-in-out infinite; animation-play-state: var(--code-light-play, paused); }
 .codePrompt .codeBar:focus-within .codeDigits > span::after, .codePrompt .codeBarError .codeDigits > span::after { animation: none; opacity: 0; }
 .guestFields { animation: fields-appear 220ms var(--ease-out) both; }
 .check svg path { stroke-dasharray: 24; stroke-dashoffset: 0; animation: reply-signed 420ms var(--ease-out) both; }
 .root :is(input:not([type="radio"]), select, textarea) { transition: border-color 180ms ease, background-color 180ms ease; }
 .codeSubmit .arrow { transition: transform 180ms var(--ease-out); }
 @keyframes paper-arrive { from { opacity: .7; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes code-light-first { 0%, 100% { opacity: .85; } 16.6667%, 83.3333% { opacity: 0; } }
-@keyframes code-light-second { 0%, 33.3333%, 66.6667%, 100% { opacity: 0; } 16.6667%, 83.3333% { opacity: .85; } }
-@keyframes code-light-third { 0%, 16.6667%, 50%, 83.3333%, 100% { opacity: 0; } 33.3333%, 66.6667% { opacity: .85; } }
-@keyframes code-light-fourth { 0%, 33.3333%, 66.6667%, 100% { opacity: 0; } 50% { opacity: .85; } }
+@keyframes code-border-pulse { 0%, 100% { opacity: .12; } 50% { opacity: .65; } }
 @keyframes fields-appear { from { opacity: .45; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes reply-signed { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
 @media (hover: hover) and (pointer: fine) { .codeSubmit:hover .arrow { transform: translateX(2px); } }
