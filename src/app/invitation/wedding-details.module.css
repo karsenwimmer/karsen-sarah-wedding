@@ -20,7 +20,13 @@
 .calendarOptions a:hover, .calendarOptions button:hover { background: #f5eddb; }
 .locations { padding-top: 1rem; }
 .venueGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.75rem; }
-.venueGrid[data-single=true] { grid-template-columns: minmax(0, 1fr); max-width: 42rem; }
+.venueGrid[data-single=true] { grid-template-columns: minmax(0, 1fr); }
+.singleVenue { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); grid-template-rows: auto auto 1fr; grid-template-areas: "info map" "parking map" "directions map"; gap: 1rem 3rem; }
+.singleVenue .venueHeader { grid-area: info; min-height: 0; }
+.singleVenue .mapFrame { grid-area: map; }
+.singleVenue .parkingNote { grid-area: parking; margin: 0; }
+.singleVenue .outlineButton { grid-area: directions; justify-self: start; align-self: start; }
+.details .venueUse { font-size: 1rem; margin: .8rem 0 1rem; }
 .venueHeader { display: flex; align-items: flex-start; gap: .9rem; min-height: 8.25rem; }
 .venueHeader > svg { flex: 0 0 auto; color: #8d703f; margin-top: .25rem; }
 .details .venueHeader h3 { font-size: 2rem; margin-bottom: .65rem; }
@@ -50,6 +56,8 @@
   .details .eventCopy h3 { font-size: 2rem; }
   .eventCopy .eventDescription, .details .dressCode p { font-size: 1rem; }
   .venueGrid { grid-template-columns: 1fr; gap: 3rem; }
+  .singleVenue { display: block; }
+  .singleVenue .parkingNote { margin: 1rem 0; }
   .venueHeader { min-height: 0; margin-bottom: 1.5rem; }
   .details .venueHeader h3 { font-size: 1.85rem; }
   .mapFrame { aspect-ratio: 1.3; }

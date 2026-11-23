@@ -35,7 +35,7 @@ export const celebrationEvents: CelebrationEvent[] = [
 export function eventsForInvitation(reception: boolean) {
   return celebrationEvents.filter(event => reception || !event.eveningOnly).map(event =>
     !reception && event.id === "lunch"
-      ? { ...event, description: "Join us for a light lunch and a glass of wine as we celebrate together." }
+      ? { ...event, description: "After the ceremony, join us in the parish hall for lunch, a glass of wine, and time to celebrate together." }
       : event
   );
 }
