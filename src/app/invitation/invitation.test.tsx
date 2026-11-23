@@ -181,6 +181,12 @@ describe("Karsen and Sarah invitation", () => {
     expect(screen.getByRole("heading", { name: "Lunch Reception" })).toBeVisible();
     expect(screen.queryByRole("heading", { name: "Dinner Reception" })).not.toBeInTheDocument();
     expect(screen.getAllByTitle(/Map showing/)).toHaveLength(1);
+    expect(screen.getByRole("heading", { name: "Location" })).toBeVisible();
+    expect(screen.getByRole("link", { name: "Location" })).toHaveAttribute("href", "#locations");
+    expect(screen.getByText("After the ceremony, join us in the parish hall for lunch, a glass of wine, and time to celebrate together.")).toBeVisible();
+    expect(screen.queryByText(/before the evening celebrations/)).not.toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "Google Calendar", hidden: true })).toHaveLength(2);
+    expect(document.getElementById("locations")).not.toHaveTextContent(/Boathouse|Oakville/);
     for (const radio of screen.getAllByRole("radio", { name: "Joyfully accepts" })) fireEvent.click(radio);
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /Save preview reply/ }));

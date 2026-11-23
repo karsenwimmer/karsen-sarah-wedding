@@ -202,7 +202,7 @@ export function Invitation() {
     <header className={s.header} inert={entrancePhase === "unlocking"}>
       <a className={s.brand} href="#invitation-main" aria-label="Karsen and Sarah invitation"><Seal />{invite && <span>KARSEN <i>&</i> SARAH</span>}</a>
       {invite ? <><button className={s.menuToggle} type="button" aria-expanded={menuOpen} aria-controls="invitation-nav" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? "Close" : "Menu"}<span aria-hidden="true">{menuOpen ? "−" : "+"}</span></button>
-        <nav id="invitation-nav" className={`${s.nav} ${menuOpen ? s.navOpen : ""}`} aria-label="Wedding navigation" onClick={() => setMenuOpen(false)}><a className={s.navRsvp} href="#your-rsvp">Your RSVP <span aria-hidden="true">↗</span></a><a href="#the-day">Itinerary</a><a href="#locations">Locations</a><a href="#dress-code">Dress code</a><a href="#questions">FAQ</a></nav></> : <p className={s.headerDate}>JULY 17, 2027 <span>·</span> HAMILTON &amp; OAKVILLE</p>}
+        <nav id="invitation-nav" className={`${s.nav} ${menuOpen ? s.navOpen : ""}`} aria-label="Wedding navigation" onClick={() => setMenuOpen(false)}><a className={s.navRsvp} href="#your-rsvp">Your RSVP <span aria-hidden="true">↗</span></a><a href="#the-day">Itinerary</a><a href="#locations">{invite.reception ? "Locations" : "Location"}</a><a href="#dress-code">Dress code</a><a href="#questions">FAQ</a></nav></> : <p className={s.headerDate}>JULY 17, 2027 <span>·</span> HAMILTON &amp; OAKVILLE</p>}
     </header>
     <main id="invitation-main" inert={entrancePhase === "unlocking"}>
       <section ref={hero} className={s.hero} aria-labelledby="wedding-title">
@@ -224,7 +224,7 @@ export function Invitation() {
               <p id="code-help" className={s.hint} aria-live="polite">{unlocking ? "Your invitation is unlocked." : codeHighlighted ? "Enter your code to explore the rest of the page." : "You’ll find this on your printed invitation."}</p>
               {codeError && <p className={s.error} id="code-error" role="alert">{codeError}</p>}
             </form>
-            <details className={s.previewCodes}><summary>Explore the preview</summary><p>Try a fictional invitation.</p><div>{invitations.map(sample => <button type="button" key={sample.code} onClick={() => { setCode(sample.code); setCodeError(""); setCodeHighlighted(false); codeInput.current?.focus(); }} disabled={gateBusy}><span>{sample.code}</span><small>{sample.code === "HARBOUR" ? "A couple" : sample.code === "FAMILY" ? "A family" : "Church celebration"}</small></button>)}</div></details>
+            <details className={s.previewCodes}><summary>Explore the preview</summary><p>Try a fictional invitation.</p><div>{invitations.map(sample => <button type="button" key={sample.code} onClick={() => { setCode(sample.code); setCodeError(""); setCodeHighlighted(false); codeInput.current?.focus(); }} disabled={gateBusy}><span>{sample.code}</span><small>{sample.code === "HARBOUR" ? "A couple" : sample.code === "FAMILY" ? "A family" : "Ceremony & lunch"}</small></button>)}</div></details>
           </div> : <><p className={s.invitedEvents}>{invite.reception ? "Ceremony & receptions · Hamilton & Oakville" : "Ceremony & lunch · Hamilton"}</p><a className={s.primary} href={confirmed ? "#the-day" : "#your-rsvp"}>{confirmed ? "View itinerary" : "Kindly reply"}<span aria-hidden="true">↓</span></a></>}
           </div>
         </div>

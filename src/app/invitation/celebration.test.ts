@@ -13,7 +13,12 @@ describe("invitation schedule", () => {
     expect(entries[2].location).toContain("2340 Ontario Street");
   });
   it("includes church lunch for everyone while keeping dinner invitation-specific", () => {
-    expect(eventsForInvitation(false).map(event => event.id)).toEqual(["ceremony", "lunch"]);
+    const events = eventsForInvitation(false);
+    expect(events.map(event => event.id)).toEqual(["ceremony", "lunch"]);
+    const lunch = eventCalendar(events[1]);
+    expect(lunch.description).toContain("join us in the parish hall for lunch");
+    expect(lunch.description).not.toMatch(/evening|dinner|Boathouse|Oakville/i);
+    expect(eventsForInvitation(true)[1].description).toContain("before the evening celebrations");
   });
   it("links directions to each full venue address", () => {
     for (const venue of venues) {
