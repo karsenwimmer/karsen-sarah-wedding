@@ -46,3 +46,8 @@ The couple confirmed that all guests are invited to the ceremony and church lunc
 
 
 The ceremony-and-lunch version is previewed with CHURCH and selected automatically for real invitations without evening-reception access. Its itinerary contains only the 1:00 PM ceremony and 2:30 PM lunch. Lunch copy presents a complete afternoon celebration, with no reference to later dinner or evening events; calendar descriptions use that same tailored copy. Navigation and the venue section use singular “Location.” A combined church/parish-hall card at 23 Sheaffe Street replaces the two-venue grid, with one map and directions link. The FAQ explains that lunch is in the parish hall at the same address. The full-evening version retains its existing three-event itinerary, two locations, and lunch wording. Parking outlines remain deferred.
+
+
+## Sarah’s hero initial
+
+The invitation hero uses a custom vector capital S with an open, recognisable silhouette and contrasting thick/thin strokes. Its coordinates use Imperial Script’s 1000-unit em and baseline; the SVG scales with the hero type and is checked at phone size. Karsen, the ampersand, “arah,” and the date retain their original fonts. The hero heading has the complete accessible name “Karsen & Sarah”; the decorative SVG is hidden from screen readers. This lettering change is scoped to the invitation hero. The original save-the-date, monogram, and footer lettering remain unchanged.

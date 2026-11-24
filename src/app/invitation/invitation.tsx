@@ -10,6 +10,7 @@ import { celebrationEvents } from "./celebration";
 import { blankAnswers, cleanAnswers, findInvite, invitations, mealOptions, readReply, replyKey, validateAnswers, type Answer, type Invite, type Reply } from "./preview-data";
 import { lookupInvitation, saveInvitationReply } from "./actions";
 import { OrnateLock } from "./ornate-lock";
+import { SarahInitial } from "./sarah-initial";
 import s from "./invitation.module.css";
 
 function Seal({ large = false }: { large?: boolean }) {
@@ -212,7 +213,7 @@ export function Invitation() {
           <div className={`${s.invitationMark} save-date-mark hero__mark`}>
             <SealMark className="save-date-mark__seal" priority size={160} />
             <p className="save-date-mark__kicker">RSVP</p>
-            <h1 className="save-date-mark__names" id="wedding-title" tabIndex={-1}><span>Karsen</span><span className="save-date-mark__amp">&amp;</span><span>Sarah</span></h1>
+            <h1 className="save-date-mark__names" id="wedding-title" tabIndex={-1} aria-label="Karsen & Sarah"><span>Karsen</span><span className="save-date-mark__amp">&amp;</span><span><SarahInitial />arah</span></h1>
             <p className="save-date-mark__date">{wedding.date.shortLabel}</p>
           </div>
           <div className={s.readabilityCloud}>

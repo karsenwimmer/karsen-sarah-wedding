@@ -331,6 +331,7 @@
 .root .invitationMark :global(.save-date-mark__kicker) { margin: 0 0 .55rem; color: var(--ink); font-family: var(--font-display), Georgia, serif; font-size: .92rem; font-weight: 600; letter-spacing: .12em; line-height: 1.1; text-transform: uppercase; }
 .root .invitationMark :global(.save-date-mark__names) { display: flex; align-items: baseline; justify-content: center; gap: clamp(.1em, 1.1vw, .22em); margin: 0; color: var(--ink); font-family: var(--font-script), "Snell Roundhand", "Apple Chancery", cursive; font-size: clamp(5.4rem, 10.8vw, 10.6rem); font-weight: 400; letter-spacing: 0; line-height: .78; white-space: nowrap; }
 .root .invitationMark :global(.save-date-mark__names) > span { display: inline; margin: 0; }
+.root .invitationMark .sarahInitial { display: inline-block; width: .5em; height: .8em; margin: 0 .01em 0 0; vertical-align: -.15em; overflow: visible; }
 .root .invitationMark :global(.save-date-mark__names) > :global(.save-date-mark__amp) { margin-inline: .12em .24em; }
 .root .invitationMark :global(.save-date-mark__date) { margin: clamp(1rem, 2.3vw, 1.45rem) 0 0; color: #b18b49; font-family: var(--font-script), "Snell Roundhand", "Apple Chancery", cursive; font-size: clamp(2rem, 4vw, 3.6rem); font-weight: 400; line-height: .95; }
 .heroContent :global(.countdown) { color: var(--ink); }
