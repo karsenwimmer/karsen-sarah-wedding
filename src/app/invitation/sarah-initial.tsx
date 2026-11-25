@@ -1,12 +1,8 @@
 import s from "./invitation.module.css";
 
-/** A flourished, open capital S on Imperial Script's 1000-unit baseline. */
+/** The approved third lettering study, aligned to Imperial Script's baseline. */
 export function SarahInitial() {
-  return <svg className={s.sarahInitial} viewBox="0 -650 620 800" aria-hidden="true" focusable="false">
-    <g transform="scale(1 -1)" fill="currentColor">
-      <path d="M595 508C623 571 580 636 489 636C381 636 262 575 218 492C171 402 213 347 299 296L359 260C433 215 466 169 434 99C395 15 273-41 167-24C72-9 20 43 34 107C46 167 109 204 166 190C202 181 212 153 197 133C184 114 162 118 156 133C151 148 161 164 177 164C150 192 81 175 56 123C29 66 73 15 154 1C246-15 342 28 376 99C407 163 377 200 303 244L245 279C159 332 124 400 161 492C204 594 355 658 487 652C591 647 640 580 607 509C601 497 592 496 595 508Z" />
-      <path d="M343 606C278 610 217 644 160 644C102 644 64 615 66 579C68 549 100 535 127 546C145 554 150 573 140 581C131 588 120 580 123 569C126 559 113 548 101 552C73 558 73 587 93 605C128 635 179 625 224 611C263 599 301 593 343 606Z" />
-      <path d="M167-24C249-40 346-12 424 27C501 65 556 97 607 94C641 92 650 71 634 56C627 49 617 49 614 55C610 62 616 68 623 67C638 73 630 85 609 86C564 89 504 51 430 15C347-26 251-55 167-31Z" />
-    </g>
+  return <svg className={s.sarahInitial} viewBox="100 95 1080 1000" aria-hidden="true" focusable="false">
+    <image href="/images/lettering/sarah-s-approved.png" width="1300" height="1209" />
   </svg>;
 }
