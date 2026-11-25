@@ -51,3 +51,7 @@ The ceremony-and-lunch version is previewed with CHURCH and selected automatical
 ## Sarah’s hero initial
 
 The invitation hero uses the couple’s approved third capital-S study, with sweeping open terminal flourishes inspired by the existing K. The approved illustration was prepared with true transparency and saved as public/images/lettering/sarah-s-approved.png. An inline SVG viewport frames the original-resolution artwork and scales it with the surrounding Imperial Script type; its baseline and spacing are tuned for the following a. Karsen, the ampersand, “arah,” and the date retain their original fonts. The hero heading has the complete accessible name “Karsen & Sarah”; the decorative SVG is hidden from screen readers. This lettering change is scoped to the invitation hero. The original save-the-date, monogram, and footer lettering remain unchanged.
+
+## Dress-code illustrations
+
+Watercolor outfit examples flank the existing dress-code wording: a navy suit, white shirt, champagne tie and brown shoes on the left; a dusty-blue midi dress with champagne sandals on the right. The transparent artwork coordinates with the invitation’s blue, gold and ivory palette. On phones, the wording comes first with both outfits together below, keeping the text readable. The same section appears for both invitation types.

@@ -37,6 +37,9 @@
 .outlineButton { display: inline-flex; align-items: center; min-height: 46px; padding: .6rem 1.1rem; border: 1px solid #b18b49; background: #fffdf780; color: #8d703f; font-size: .9375rem; }
 .outlineButton:hover { background: #f5eddb; }
 .dressCode { padding: clamp(3.5rem, 6vw, 5rem) 1.5rem; background: #f5f0e6; border-block: 1px solid #ded4c0; text-align: center; }
+.dressCodeLayout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.3fr) minmax(0, 1fr); align-items: center; gap: clamp(1rem, 3vw, 3rem); width: min(100%, 1100px); margin: 0 auto; }
+.dressCodeCopy { min-width: 0; }
+.outfit { display: block; width: 100%; height: clamp(17rem, 30vw, 23rem); object-fit: contain; }
 .details .dressCode h3 { margin: 1.6rem 0 1rem; font-size: clamp(1.8rem, 3vw, 2.4rem); }
 .details .dressCode p { max-width: 40rem; margin: 0 auto; font-size: 1.0625rem; }
 .faq { display: grid; grid-template-columns: .65fr 1fr; gap: 5rem; }
@@ -55,6 +58,11 @@
   .eventTime { font-size: 1.65rem; }
   .details .eventCopy h3 { font-size: 2rem; }
   .eventCopy .eventDescription, .details .dressCode p { font-size: 1rem; }
+  .dressCodeLayout { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2rem 1.5rem; }
+  .dressCodeCopy { grid-column: 1 / -1; grid-row: 1; }
+  .outfit { height: clamp(14rem, 60vw, 19rem); }
+  .suitOutfit { grid-column: 1; grid-row: 2; }
+  .dressOutfit { grid-column: 2; grid-row: 2; }
   .venueGrid { grid-template-columns: 1fr; gap: 3rem; }
   .singleVenue { display: block; }
   .singleVenue .parkingNote { margin: 1rem 0; }
