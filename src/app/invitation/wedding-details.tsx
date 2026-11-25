@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { createGoogleCalendarUrl, createIcsCalendarFile, createOutlookCalendarUrl } from "@/lib/calendar";
 import { weddingConfig } from "@/config/wedding";
 import { eventCalendar, eventsForInvitation, mapEmbedUrl, mapsUrl, venues, type CelebrationEvent } from "./celebration";
@@ -66,9 +67,15 @@ export function WeddingDetails({ reception, preview }: { reception: boolean; pre
     </section>
 
     <section className={s.dressCode} id="dress-code" aria-labelledby="dress-title">
-      <h2 className={s.sectionTitle} id="dress-title">Dress Code</h2>
-      <h3>Elevated Cocktail Attire</h3>
-      <p>Think suits with a dress shirt and tie, or elegant cocktail, midi, or long dresses. We’d love to see you dressed up for the occasion.</p>
+      <div className={s.dressCodeLayout}>
+        <Image className={`${s.outfit} ${s.suitOutfit}`} src="/images/attire/watercolour-suit.webp" width={809} height={1942} sizes="(max-width: 700px) 42vw, 200px" alt="Outfit example: a navy suit with a white dress shirt, champagne tie, and brown dress shoes." />
+        <div className={s.dressCodeCopy}>
+          <h2 className={s.sectionTitle} id="dress-title">Dress Code</h2>
+          <h3>Elevated Cocktail Attire</h3>
+          <p>Think suits with a dress shirt and tie, or elegant cocktail, midi, or long dresses. We’d love to see you dressed up for the occasion.</p>
+        </div>
+        <Image className={`${s.outfit} ${s.dressOutfit}`} src="/images/attire/watercolour-dress.webp" width={1024} height={1536} sizes="(max-width: 700px) 42vw, 240px" alt="Outfit example: an elegant dusty-blue midi dress with champagne-gold sandals." />
+      </div>
     </section>
 
     <section className={s.faq} id="questions" aria-labelledby="faq-title">
