@@ -12,6 +12,33 @@ beforeEach(() => { window.localStorage.clear(); vi.spyOn(window, "scrollTo").moc
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
 describe("isolated wedding RSVP demo", () => {
+  it("gates planning tools and keeps ceremony-only maps and calendars free of reception details", () => {
+    render(<RsvpDemo />);
+    expect(screen.queryByTitle(/Map showing/)).not.toBeInTheDocument();
+    expect(screen.queryByText("Add to calendar")).not.toBeInTheDocument();
+    open("9012");
+    expect(screen.getByTitle("Map showing Saints Peter and Paul Parish")).toHaveAttribute("src", "/maps/luca-victoria-route.html?ceremony=1");
+    expect(screen.getAllByText("Add to calendar")).toHaveLength(1);
+    expect(screen.queryByText(/Concord|antipasto|Romina|between the venues/)).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Google Calendar" })).toHaveAttribute("href", expect.stringContaining("20270828T160000Z"));
+    expect(screen.getByText("We’ll share the reply deadline here once it’s confirmed.", { exact: true })).toBeVisible();
+    expect(screen.queryByRole("img", { name: /Outfit/ })).not.toBeInTheDocument();
+  });
+
+  it("offers directions and both event calendars for reception guests and updates RSVP progress", () => {
+    render(<RsvpDemo />); open();
+    expect(screen.getByTitle(/illustrative driving route/)).toHaveAttribute("src", "/maps/luca-victoria-route.html");
+    expect(screen.getAllByText("Add to calendar")).toHaveLength(2);
+    expect(screen.getByRole("link", { name: "Ceremony-to-reception directions" }).getAttribute("href")).toContain("origin=Saints");
+    expect(screen.getByText("0 of 2 guests answered")).toBeVisible();
+    fireEvent.click(within(screen.getByRole("group", { name: /Jordan Morgan/ })).getByLabelText("Joyfully attending"));
+    expect(screen.getByText("1 of 2 guests answered")).toBeVisible();
+    fireEvent.click(within(screen.getByRole("group", { name: /Taylor Morgan/ })).getByLabelText("Respectfully declining"));
+    expect(screen.getByText("Everyone is accounted for. Ready when you are.")).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Save demo RSVP" }));
+    expect(screen.getByText(/1 attending/)).toHaveTextContent("1 declining");
+    expect(screen.getByRole("link", { name: "See the plans for our day" })).toBeVisible();
+  });
   it("requires four digits and accepts a pasted code with spaces", () => {
     render(<RsvpDemo />);
     const input = screen.getByRole("textbox", { name: "Enter your code" });
@@ -47,7 +74,7 @@ describe("isolated wedding RSVP demo", () => {
     for (const name of ["Locations", "Itinerary", "Dress code", "FAQs"]) {
       expect(screen.getByRole("region", { name })).toBeVisible();
     }
-    expect(screen.queryByText(/We’d love to celebrate|We can’t wait to share|Explore the wedding details|Please reply for each person/)).not.toBeInTheDocument();
+    expect(within(screen.getByRole("region", { name: "Will you be joining us?" })).queryByText(/We’d love to celebrate|We can’t wait to share|Explore the wedding details|Please reply for each person/)).not.toBeInTheDocument();
     expect(response.compareDocumentPosition(details) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Saints Peter and Paul Parish" })).toBeVisible();
     expect(screen.getByText("4070 Central Parkway East, Mississauga, Ontario L4Z 1T6")).toBeVisible();

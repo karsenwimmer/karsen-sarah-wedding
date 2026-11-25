@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Image from "next/image";
 import { Emblem } from "./emblem";
+import { betweenVenues, calendarLinks, directionsTo, weddingEvents, type WeddingEvent } from "./event-tools";
 import { demoInvitations, demoWedding as wedding, emptyResponses, findInvitation,
   readResponse, responseErrors, storageKey, type DemoInvitation, type GuestResponse } from "./demo-data";
 import s from "./rsvp.module.css";
@@ -292,6 +293,7 @@ export function RsvpDemo() {
   }
 
   const attending = answers.filter((answer) => answer.attendance === "yes").length;
+  const replied = answers.filter((answer) => answer.attendance).length;
 
   return <div ref={revealRoot} className={s.root}>
     <a className={s.skip} href="#demo-main">Skip to invitation</a>
@@ -319,8 +321,8 @@ export function RsvpDemo() {
           </div>
           <section id="invitation-entry" className={`${s.entryForm} ${!invite ? s.codePrompt : ""}`} aria-labelledby="entry-title">
             {invite ? <div className={s.openedEntry}>
-              <h2 id="entry-title">Your invitation is open</h2>
-              <a href="#your-invitation" className={s.openedLink} onClick={(event) => { event.preventDefault(); focusHeading(); }}>View your invitation <span className={s.downArrow} aria-hidden="true"><Arrow /></span></a>
+              <h2 id="entry-title"><span className={s.openedSeal} aria-hidden="true"><svg viewBox="0 0 20 20" fill="none"><path d="m5 10 3 3 7-7" stroke="currentColor" strokeWidth="1.3" /></svg></span>Your invitation is open</h2>
+              <a href="#your-invitation" className={s.openedLink} onClick={(event) => { event.preventDefault(); focusHeading(); }}>View your invitation</a>
               <button type="button" onClick={switchInvitation}>Change invitation</button>
             </div> : <>
             <h2 id="entry-title" data-invite-reveal="heading"><label htmlFor="invitation-code">Enter your code</label></h2>
@@ -358,12 +360,17 @@ export function RsvpDemo() {
               <li>Save your response.</li>
             </ol>
             <p className={s.instructionNote} data-invite-reveal="copy">You can return with your invitation code to make changes.</p>
+            <div className={s.replyHelp}>
+              <p>We’ll share the reply deadline here once it’s confirmed.</p>
+              <a href="#faq" onClick={(event) => { event.preventDefault(); scrollToSection("faq"); }}>Questions about your invitation?</a>
+            </div>
           </div>
           <section className={s.responsePanel} aria-labelledby="rsvp-title">
             {confirmed ? <>
               <div className={s.check} aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m6 12 4 4 8-8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
               <h3 id="rsvp-title" ref={responseHeading} tabIndex={-1}>{attending ? "A little closer to the big day." : "Thank you for letting us know."}</h3>
               <p className={s.savedStatus}>DEMO RESPONSE {persistent ? "SAVED" : "PREVIEW"}</p>
+              <p className={s.responseCount}>{attending} attending <span aria-hidden="true">·</span> {invite.guests.length - attending} declining</p>
               <p className={s.muted}>{persistent ? "Your sample response is saved in this browser. Nothing has been sent to a couple." : "Your browser couldn’t save this response. It’s visible here until you leave the page; nothing has been sent."}</p>
               <div className={s.summary}>{invite.guests.map((guest) => {
                 const answer = answers.find((item) => item.guestId === guest.id)!;
@@ -371,16 +378,18 @@ export function RsvpDemo() {
               })}</div>
               {note && <div className={s.noteSummary}><strong>Your note</strong><p>{note}</p></div>}
               <button type="button" className={s.primary} onClick={() => { setConfirmed(false); focusHeading(true); }}>Edit my response</button>
+              <a className={s.savedNext} href="#itinerary" onClick={(event) => { event.preventDefault(); scrollToSection("itinerary"); }}>See the plans for our day</a>
               <p className={s.fieldHint}>You can return with your code to update this demo response.</p>
             </> : <>
               <h3 id="rsvp-title" ref={responseHeading} tabIndex={-1} data-invite-reveal="heading">Your response</h3>
               <form ref={form} onSubmit={submit} noValidate>
+                <p className={s.responseProgress} role="status" aria-live="polite">{replied === invite.guests.length ? "Everyone is accounted for. Ready when you are." : `${replied} of ${invite.guests.length} guests answered`}</p>
                 {invite.reception && <p className={s.menuNote}>The standard menu includes chicken and beef. Please let us know if you require an alternative.</p>}
                 {invite.guests.map((guest) => {
                   const answer = answers.find((item) => item.guestId === guest.id)!;
-                  return <div key={guest.id} className={s.guestBlock}><fieldset className={s.guest} aria-describedby={errors[guest.id] ? `error-${guest.id}` : undefined}>
+                  return <div key={guest.id} className={s.guestBlock} data-answered={Boolean(answer.attendance)}><fieldset className={s.guest} aria-describedby={errors[guest.id] ? `error-${guest.id}` : undefined}>
                     <legend>{guest.name}{guest.child && <small>CHILD</small>}</legend>
-                    <div className={`${s.attendance} ${errors[guest.id] && !answer.attendance ? s.attendanceError : ""}`}>{([{ value: "yes", label: "Joyfully attending" }, { value: "no", label: "Respectfully declining" }] as const).map((option) => <label key={option.value} className={answer.attendance === option.value ? s.chosen : ""}><input id={`attendance-${guest.id}-${option.value}`} type="radio" name={`attendance-${guest.id}`} value={option.value} checked={answer.attendance === option.value} onChange={() => updateGuest(guest.id, { attendance: option.value, ...(option.value === "no" ? { dietary: "" } : {}) })} aria-describedby={errors[guest.id] ? `error-${guest.id}` : undefined} />{option.label}</label>)}</div>
+                    <div className={`${s.attendance} ${errors[guest.id] && !answer.attendance ? s.attendanceError : ""}`}>{([{ value: "yes", label: "Joyfully attending" }, { value: "no", label: "Respectfully declining" }] as const).map((option) => <label key={option.value} className={answer.attendance === option.value ? s.chosen : ""}><input id={`attendance-${guest.id}-${option.value}`} type="radio" name={`attendance-${guest.id}`} value={option.value} checked={answer.attendance === option.value} onChange={() => updateGuest(guest.id, { attendance: option.value, ...(option.value === "no" ? { dietary: "" } : {}) })} aria-describedby={errors[guest.id] ? `error-${guest.id}` : undefined} /><span>{option.label}</span></label>)}</div>
                     {answer.attendance === "yes" && invite.reception && <div className={s.guestFields}>
                       <label className={s.field} htmlFor={`dietary-${guest.id}`}>Dietary requirements or allergies for {guest.name.split(" ")[0]} <span className={s.optional}>(optional)</span><textarea id={`dietary-${guest.id}`} name={`dietary-${guest.id}`} autoComplete="off" rows={2} value={answer.dietary} onChange={(event) => updateGuest(guest.id, { dietary: event.target.value })} maxLength={300} placeholder="e.g. vegetarian, pescatarian, gluten-free, or food allergies" /></label>
                     </div>}
@@ -398,32 +407,52 @@ export function RsvpDemo() {
           <div className={s.detailInner}>
             <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="locations-title" tabIndex={-1}>Locations</h2></div>
             <div className={s.locationsGrid}>
-              <section className={s.location} data-invite-reveal="copy"><h3>{wedding.ceremony.name}</h3><p className={s.locationTime}>Ceremony at {wedding.ceremony.time}</p><p>{wedding.ceremony.address}</p></section>
-              {invite.reception && <section className={s.location} data-invite-reveal="copy"><h3>{wedding.reception.name}</h3><p className={s.locationTime}>Reception at {wedding.reception.time}</p><p>{wedding.reception.address}</p></section>}
+              <section className={s.location} data-invite-reveal="copy"><VenueMark kind="church" /><h3>{wedding.ceremony.name}</h3><p className={s.locationTime}>Ceremony at {wedding.ceremony.time}</p><p>{wedding.ceremony.address}</p><a className={s.textLink} href={directionsTo(wedding.ceremony)} target="_blank" rel="noopener noreferrer" aria-label={`Get directions to ${wedding.ceremony.name}`}>Get directions</a></section>
+              {invite.reception && <section className={s.location} data-invite-reveal="copy"><VenueMark kind="celebration" /><h3>{wedding.reception.name}</h3><p className={s.locationTime}>Reception at {wedding.reception.time}</p><p>{wedding.reception.address}</p><a className={s.textLink} href={directionsTo(wedding.reception)} target="_blank" rel="noopener noreferrer" aria-label={`Get directions to ${wedding.reception.name}`}>Get directions</a></section>}
             </div>
+            <div className={s.journey}>
+              <div className={s.journeyIntro}>
+                <h3>{invite.reception ? "From our vows to the celebration" : "A place to say “I do”"}</h3>
+                <p>{invite.reception ? "Our ceremony is in Mississauga, with the evening celebration in Concord. Plan your journey below." : "Join us at Saints Peter and Paul Parish in Mississauga."}</p>
+              </div>
+              <iframe className={s.routeMap} src={`/maps/luca-victoria-route.html${invite.reception ? "" : "?ceremony=1"}`} title={invite.reception ? "Map showing the ceremony, reception and an illustrative driving route" : "Map showing Saints Peter and Paul Parish"} loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />
+              <div className={s.journeyFooter}>
+                <p>{invite.reception ? "A route preview for planning. Check live directions before travelling." : "Check live directions before travelling."}</p>
+                <a className={s.outlineLink} href={invite.reception ? betweenVenues : directionsTo(wedding.ceremony)} target="_blank" rel="noopener noreferrer">{invite.reception ? "Ceremony-to-reception directions" : "Directions to the ceremony"}</a>
+              </div>
+            </div>
+            <p className={s.parkingNote}>Parking and arrival details will be shared here once confirmed.</p>
           </div>
         </section>
         <section id="itinerary" className={s.detailBand} aria-labelledby="itinerary-title">
           <div className={s.detailInner}>
             <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="itinerary-title" tabIndex={-1}>Itinerary</h2></div>
-            <ol className={s.timeline} data-invite-reveal="copy"><li><time>{wedding.ceremony.time}</time><span>Wedding ceremony</span></li>{invite.reception && <><li><time>{wedding.reception.time}</time><span>Reception &amp; antipasto bar</span></li><li><time>To follow</time><span>Dinner</span></li></>}</ol>
+            <p className={s.itineraryDate}>Saturday, August 28, 2027</p>
+            <ol className={s.timeline}>{weddingEvents.filter((event) => invite.reception || event.id === "ceremony").map((event) => <li key={event.id}>
+              <time dateTime={event.start}>{event.time}</time><div className={s.eventCopy}><h3>{event.title}</h3><p className={s.eventVenue}>{event.venue.name}</p><p>{event.description}</p><CalendarOptions event={event} /></div>
+            </li>)}{invite.reception && <li><span className={s.toFollow}>To follow</span><div className={s.eventCopy}><h3>Dinner</h3><p>A meal together, and more memories to make.</p></div></li>}</ol>
             <p className={s.itineraryNote}>Further itinerary details to come.</p>
           </div>
         </section>
         <section id="dress-code" className={s.detailBand} aria-labelledby="dress-code-title">
           <div className={s.detailInner}>
             <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="dress-code-title" tabIndex={-1}>Dress code</h2></div>
-            <div className={s.detailCopy} data-invite-reveal="copy"><h3>Details to come</h3><p>We’ll share the dress code here once it’s confirmed.</p></div>
+            <div className={s.detailCopy} data-invite-reveal="copy"><p>We’ll share the dress code here once it’s confirmed.</p></div>
           </div>
         </section>
         <section id="faq" className={s.detailBand} aria-labelledby="faq-title">
           <div className={s.detailInner}>
             <div className={s.sectionHeading} data-detail-heading data-invite-reveal="heading"><h2 id="faq-title" tabIndex={-1}>FAQs</h2></div>
             <div className={s.faq} data-invite-reveal="copy">
-              <details><summary>Who is included on my invitation?</summary><p>Everyone listed in your RSVP form is invited. In a live invitation, plus-ones and children would be included here if invited.</p></details>
+              <details><summary>Who is included on my invitation?</summary><p>Please reply for each person named in your invitation. Plus-ones and children are included when they appear in your guest list. Guest names in this demo are fictional.</p></details>
+              <details><summary>When should I reply?</summary><p>We’ll share the reply deadline here once it’s confirmed. You can already explore and save a sample response in this demo.</p></details>
               <details><summary>Can I change my response?</summary><p>Yes. Return with the same code and choose “Edit my response”. This demo remembers replies in the same browser. A live site would remember them across devices.</p></details>
+              <details><summary>Where should I park?</summary><p>Parking and arrival instructions will be added here once confirmed. Please check this page again closer to the wedding.</p></details>
+              {invite.reception && <details><summary>How do I get between the venues?</summary><p>The ceremony is in Mississauga and the reception is in Concord. Use the route preview in Locations to get your bearings, then check live directions for traffic and your departure time. Transport arrangements have not been confirmed.</p><a className={s.textLink} href={betweenVenues} target="_blank" rel="noopener noreferrer">Open ceremony-to-reception directions</a></details>}
+              {invite.reception && <details><summary>How do I share dietary requirements?</summary><p>The standard menu includes chicken and beef. After selecting “Joyfully attending”, use the dietary requirements field under each guest’s name for vegetarian, pescatarian, allergy or other requirements. No separate meal selection is needed.</p></details>}
               <details><summary>Which details are confirmed?</summary><p>The wedding date and ceremony details are confirmed.{invite.reception && " The reception begins at 5:30 PM at The Venetian Banquet Hall, with an antipasto bar and dinner to follow."} Further itinerary details and dress code are still to come. Guest names are examples for this demo.</p></details>
             </div>
+            <div className={s.contactNote}><h3>A little help?</h3><p>For anything else, please reach out to Victoria or Luca directly.</p></div>
           </div>
         </section>
         <section className={s.demoTools} aria-label="Demo controls">
@@ -436,6 +465,18 @@ export function RsvpDemo() {
     </main>
     {invite && <footer className={s.footer}><span>WITH LOVE, VICTORIA & LUCA</span><span>A sample invitation, made for a real celebration.</span><span>DEMONSTRATION ONLY</span></footer>}
   </div>;
+}
+
+function CalendarOptions({ event }: { event: WeddingEvent }) {
+  const links = calendarLinks(event);
+  return <details className={s.calendarOptions} onKeyDown={(key) => { if (key.key === "Escape") { key.currentTarget.open = false; key.currentTarget.querySelector("summary")?.focus(); } }}>
+    <summary aria-label={`Add ${event.title} to your calendar`}>Add to calendar<svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" strokeWidth="1.3" /></svg></summary>
+    <div className={s.calendarChoices}><a href={links.google} target="_blank" rel="noopener noreferrer">Google Calendar</a><a href={links.outlook} target="_blank" rel="noopener noreferrer">Outlook</a><a href={links.file} download={`victoria-luca-${event.id}.ics`}>Apple / calendar file</a></div>
+  </details>;
+}
+
+function VenueMark({ kind }: { kind: "church" | "celebration" }) {
+  return <svg className={s.venueMark} viewBox="0 0 40 40" fill="none" aria-hidden="true" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">{kind === "church" ? <><path d="M20 3v8m-3-5h6M9 34V21l11-10 11 10v13M5 34h30M16 34v-9h8v9" /><path d="M18 19h4" /></> : <><path d="m10 7 7 2-3 10c-2 7-10 4-8-2L10 7Zm20 0-7 2 3 10c2 7 10 4 8-2L30 7ZM10 23l-3 9m19-9 7 9M3 31l8 3m18 0 8-3M18 15h4M20 10V7" /></>}</svg>;
 }
 
 function Arrow() {
