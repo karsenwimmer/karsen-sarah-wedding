@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { betweenVenues, calendarFile, calendarLinks, directionsTo, weddingEvents } from "./event-tools";
 
 describe("Victoria and Luca guest planning tools", () => {
@@ -13,7 +15,8 @@ describe("Victoria and Luca guest planning tools", () => {
       const links = calendarLinks(event);
       expect(new URL(links.google).searchParams.get("ctz")).toBe("America/Toronto");
       expect(new URL(links.outlook).searchParams.get("startdt")).toBe(event.start);
-      expect(decodeURIComponent(links.file.split(",").slice(1).join(","))).toBe(file);
+      expect(links.file).toBe(`/calendars/victoria-luca-${event.id}.ics`);
+      expect(readFileSync(resolve(process.cwd(), "public" + links.file), "utf8")).toBe(file);
     }
   });
 

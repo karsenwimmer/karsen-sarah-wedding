@@ -1,0 +1,16 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Victoria and Luca//Wedding//EN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:victoria-luca-reception-20270828@thewimmers.ca
+DTSTAMP:20261124T000000Z
+DTSTART:20270828T213000Z
+SUMMARY:Victoria & Luca — Reception & antipasto bar
+LOCATION:The Venetian Banquet Hall\, 219 Romina Drive\, Concord\, Ontario
+  L4K 4V3
+DESCRIPTION:The celebration continues at The Venetian\, with an antipasto
+  bar and dinner to follow.\nStart time confirmed\; full schedule to foll
+ ow.
+END:VEVENT
+END:VCALENDAR

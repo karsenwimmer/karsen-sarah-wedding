@@ -58,6 +58,6 @@ export function calendarLinks(event: WeddingEvent) {
   return {
     google: `https://calendar.google.com/calendar/render?${new URLSearchParams({ action: "TEMPLATE", text: title, dates: `${compact(event.start)}/${compact(event.start)}`, ctz: "America/Toronto", location, details: description })}`,
     outlook: `https://outlook.live.com/calendar/0/action/compose?${new URLSearchParams({ rru: "addevent", subject: title, startdt: event.start, location, body: description })}`,
-    file: `data:text/calendar;charset=utf-8,${encodeURIComponent(calendarFile(event))}`
+    file: `/calendars/victoria-luca-${event.id}.ics`
   };
 }

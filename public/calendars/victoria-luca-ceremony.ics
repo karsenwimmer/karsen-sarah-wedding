@@ -1,0 +1,15 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Victoria and Luca//Wedding//EN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:victoria-luca-ceremony-20270828@thewimmers.ca
+DTSTAMP:20261124T000000Z
+DTSTART:20270828T160000Z
+SUMMARY:Victoria & Luca — Wedding ceremony
+LOCATION:Saints Peter and Paul Parish\, 4070 Central Parkway East\, Missi
+ ssauga\, Ontario L4Z 1T6
+DESCRIPTION:Join us as we exchange our vows at Saints Peter and Paul Pari
+ sh.\nStart time confirmed\; full schedule to follow.
+END:VEVENT
+END:VCALENDAR
